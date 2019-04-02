@@ -73,6 +73,17 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the midpoint between the line's start and end.
+        /// </summary>
+        /// <returns>
+        /// A Vector3 point.
+        /// </returns>
+        public static Vector3 Midpoint(this Line line)
+        {
+            return new Vector3((line.Start.X + line.End.X) * 0.5, (line.Start.Y + line.End.Y) * 0.5);
+        }
+
+        /// <summary>
         /// Returns a new line displaced from the supplied line along a 2D vector calculated between the supplied Vector3 points.
         /// </summary>
         /// <param name="line">The Line instance to be copied.</param>
@@ -85,6 +96,23 @@ namespace GeometryEx
         {
             var v = new Vector3(to.X - from.X, to.Y - from.Y);
             return new Line(line.Start + v, line.End + v);
+        }
+
+        /// <summary>
+        /// Returns a point the supplied distance along the line.
+        /// </summary>
+        /// <param name="distance">Distance along the line to the desired point.</param>
+        /// <returns>
+        /// A Vector3 point on the line.
+        /// If the distance exceed the length of the line, returns the end point of the line.
+        /// </returns>
+        public static Vector3 PositionAt(this Line line, double distance)
+        {
+            if (distance >= line.Length())
+            {
+                return line.End;
+            }
+            return line.PointAt(distance / line.Length());
         }
 
         /// <summary>
@@ -104,6 +132,89 @@ namespace GeometryEx
             var eX = (Math.Cos(theta) * (line.End.X - pivot.X)) - (Math.Sin(theta) * (line.End.Y - pivot.Y)) + pivot.X;
             var eY = (Math.Sin(theta) * (line.End.X - pivot.X)) + (Math.Cos(theta) * (line.End.Y - pivot.Y)) + pivot.Y;
             return new Line(new Vector3(sX, sY), new Vector3(eX, eY));
+        }
+
+        /// <summary>
+        /// Returns a list of lines by dividing the supplied line by the supplied length from the line's start point.
+        /// </summary>
+        /// <param name="length">Longest allowable segment.</param>
+        /// <returns>
+        /// A list of lines of the specified length and a shorter line representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
+        /// </returns>
+        public static List<Line> Segment(this Line line, double max, double min)
+        {
+            var lines = new List<Line>();
+            var segments = line.Length() / max;
+            if (segments <= 1.0 || min > max)
+            {
+                lines.Add(line);
+                return lines;
+            }
+            var start = line.Start;
+            for (int i = 0; i < Math.Floor(segments); i++)
+            {
+                var end = line.PointAt(max / line.Length() * (i + 1));
+                if (start.IsAlmostEqualTo(end))
+                {
+                    break;
+                }
+                var newLine = new Line(start, end);
+                lines.Add(newLine);
+                start = newLine.End;
+            }
+            if (lines.Count > 0)
+            {
+                start = lines[lines.Count - 1].End;
+                if (!start.IsAlmostEqualTo(line.End))
+                {
+                    var remainder = new Line(start, line.End);
+                    if (remainder.Length() < min)
+                    {
+                        remainder = new Line(lines[lines.Count - 1].Start, remainder.End);
+                        lines.RemoveAt(lines.Count - 1);
+                    }
+                    lines.Add(remainder);
+                }
+            }
+            return lines;
+        }
+
+        /// <summary>
+        /// Returns a list of lines by dividing the supplied line by the supplied length from the specified start point.
+        /// </summary>
+        /// <param name="length">Longest allowable segment.</param>
+        /// <returns>
+        /// A list of lines of the specified length and shorter line or lines representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
+        /// </returns>
+        public static List<Line> SegmentFrom(this Line line, double max, double min, DivideFrom from = DivideFrom.Start)
+        {
+            var lines = new List<Line>();
+            if (max >= line.Length())
+            {
+                lines.Add(line);
+                return lines;
+            }
+            switch (from)
+            {
+                case DivideFrom.Center:
+                    lines.AddRange(new Line(line.Midpoint(), line.Start).Segment(max, min));
+                    lines.AddRange(new Line(line.Midpoint(), line.End).Segment(max, min));
+                    break;
+                case DivideFrom.Centered:
+                    var start = line.PositionAt((line.Length() * 0.5) - (max * 0.5));
+                    var end = line.PositionAt((line.Length() * 0.5) + (max * 0.5));
+                    lines.Add(new Line(start, end));
+                    lines.AddRange(new Line(start, line.Start).Segment(max, min));
+                    lines.AddRange(new Line(end, line.End).Segment(max, min));
+                    break;
+                case DivideFrom.End:
+                    lines.AddRange(new Line(line.End, line.Start).Segment(max, min));
+                    break;
+                default:
+                    lines.AddRange(line.Segment(max, min));
+                    break;
+            }
+            return lines;
         }
     }
 }

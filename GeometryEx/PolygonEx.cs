@@ -25,6 +25,33 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Hypothesizes a centerline of an oblong rectangular Polygon by finding the midpoint of the two shortest sides and creating a line between them. If the two shortest sides share a point, skips a side and returns the line form the midpoint of the first and third sides in the list.
+        /// </summary>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        public static Line AxisQuad(this Polygon polygon)
+        {
+            var segments = new List<Line>(polygon.Segments().OrderBy(i => i.Length()));
+            if (segments.Count() != 4)
+            {
+                return null;
+            }
+            if (segments[0].Start == segments[1].End || segments[0].End == segments[1].Start)
+            {
+                if (segments[0].Start != segments[2].End && segments[0].End != segments[2].Start)
+                {
+                    return new Line(segments[0].Midpoint(), segments[2].Midpoint());
+                }
+                else
+                {
+                    return new Line(segments[0].Midpoint(), segments[3].Midpoint());
+                }
+            }
+            return new Line(segments[0].Midpoint(), segments[1].Midpoint());
+        }
+
+        /// <summary>
         /// Returns a TopoBox representation of the Polygon's bounding box.
         /// </summary>
         public static TopoBox Box(this Polygon polygon)

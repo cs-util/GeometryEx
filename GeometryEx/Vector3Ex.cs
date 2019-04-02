@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elements.Geometry;
-using ClipperLib;
 
-namespace RoomKit
+namespace GeometryEx
 {
     /// <summary>
     /// Extends Elements.Geometry.Vector3 with utility methods.
