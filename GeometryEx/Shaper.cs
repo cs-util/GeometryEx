@@ -559,6 +559,23 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Tests if two doubles are effectively equal within a tolerance.
+        /// </summary>
+        /// <param name="thisValue">The lower bound of the random range.</param>
+        /// <param name="thatValue">The upper bound of the random range.</param>
+        /// <returns>
+        /// True if the supplied values are equivalent within the default or supplied tolerance.
+        /// </returns>
+        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 0.000001)
+        {
+            if (Math.Abs(thisValue - thatValue) > tolerance)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Returns a random double within the supplied range.
         /// </summary>
         /// <param name="minValue">The lower bound of the random range.</param>

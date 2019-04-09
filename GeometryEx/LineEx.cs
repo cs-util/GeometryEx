@@ -41,26 +41,28 @@ namespace GeometryEx
         {
             var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
             var intrSlope = (intr.End.Y - intr.Start.Y) / (intr.End.X - intr.Start.X);
-            if (lineSlope == intrSlope)
+            if (lineSlope.NearEqual(intrSlope))
             {
                 return null;
             }
-            if (lineSlope == double.PositiveInfinity && intrSlope == 0.0)
+            if ((lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity) 
+                && intrSlope.NearEqual(0.0))
             {
                 return new Vector3(line.Start.X, intr.Start.Y);
             }
-            if (lineSlope == 0.0 && intrSlope == double.PositiveInfinity)
+            if ((intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity) 
+                && lineSlope.NearEqual(0.0))
             {
                 return new Vector3(intr.Start.X, line.Start.Y);
             }
             double lineB;
             double intrB;
-            if (lineSlope == double.PositiveInfinity)
+            if (lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity)
             {
                 intrB = intr.End.Y - (intrSlope * intr.End.X);
                 return new Vector3(line.End.X, intrSlope * line.End.X + intrB);
             }
-            if (intrSlope == double.PositiveInfinity)
+            if (intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity)
             {
                 lineB = line.End.Y - (lineSlope * line.End.X);
                 return new Vector3(intr.End.X, lineSlope * intr.End.X + lineB);
@@ -70,6 +72,96 @@ namespace GeometryEx
             var x = (intrB - lineB) / (lineSlope - intrSlope);
             var y = lineSlope * x + lineB;
             return new Vector3(x, y);
+        }
+
+        /// <summary>
+        /// Returns whether this line shares a point and a slope with the supplied line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <returns>
+        /// True if the lines share a point and have the same slope.
+        /// </returns>
+        public static bool IsContiguousWith(this Line line, Line thatLine)
+        {
+            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
+            if (lineSlope == double.NegativeInfinity)
+            {
+                lineSlope = double.PositiveInfinity;
+            }
+            if (thatSlope == double.NegativeInfinity)
+            {
+                thatSlope = double.PositiveInfinity;
+            }
+            if (!lineSlope.NearEqual(thatSlope))
+            {
+                return false;
+            }
+            if (line.End.IsAlmostEqualTo(thatLine.End) || line.Start.IsAlmostEqualTo(thatLine.Start) ||
+                line.Start.IsAlmostEqualTo(thatLine.End) || line.End.IsAlmostEqualTo(thatLine.Start))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns whether a line is parallel to the x-axis.
+        /// </summary>
+        /// <returns>
+        /// True if the line's slope is zero.
+        /// </returns>
+        public static bool IsHorizontal(this Line line)
+        {
+            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            if (slope.NearEqual(0.0))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns whether this line is parallel to the supplied line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <returns>
+        /// True if the lines have equal slopes.
+        /// </returns>
+        public static bool IsParallelTo(this Line line, Line thatLine)
+        {
+            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
+            if (lineSlope == double.NegativeInfinity)
+            {
+                lineSlope = double.PositiveInfinity;
+            }
+            if (thatSlope == double.NegativeInfinity)
+            {
+                thatSlope = double.PositiveInfinity;
+            }
+            if (lineSlope.NearEqual(thatSlope))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns whether a line is parallel to the y-axis.
+        /// </summary>
+        /// <returns>
+        /// True if the line's slope resolves to an infinite value.
+        /// </returns>
+        public static bool IsVertical (this Line line)
+        {
+            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            if (slope == double.PositiveInfinity || slope == double.NegativeInfinity)
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -215,6 +307,22 @@ namespace GeometryEx
                     break;
             }
             return lines;
+        }
+
+        /// <summary>
+        /// Returns the slope of the line, normalizing a vertical line to a slope of positive infinity.
+        /// </summary>
+        /// <returns>
+        /// A double representing the slope of the line.
+        /// </returns>
+        public static double Slope (this Line line)
+        {
+            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            if (slope == double.NegativeInfinity)
+            {
+                slope = double.PositiveInfinity;
+            }
+            return slope;
         }
     }
 }
