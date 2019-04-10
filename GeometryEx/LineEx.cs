@@ -1,11 +1,46 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using ClipperLib;
 using Elements.Geometry;
 
 namespace GeometryEx
 {
     public static class LineEx
     {
+        /// <summary>
+        /// Constructs the geometric difference between this Line and the supplied Polygons.
+        /// </summary>
+        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <returns>
+        /// Returns a list of Lines representing the subtraction of the Lines intersecting the supplied list of Polygons.
+        /// </returns>
+        public static List<Line> Difference(this Line line, IList<Polygon> difPolys)
+        {
+            var thisPath = ToClipperPath(line);
+            var polyPaths = new List<List<IntPoint>>();
+            foreach (Polygon poly in difPolys)
+            {
+                polyPaths.Add(poly.ToClipperPath());
+            }
+            Clipper clipper = new Clipper();
+            clipper.AddPath(thisPath, PolyType.ptSubject, false);
+            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
+            var solution = new PolyTree();
+            clipper.Execute(ClipType.ctDifference, solution);
+            var soLines = Clipper.OpenPathsFromPolyTree(solution);
+            if (soLines.Count == 0)
+            {
+                return null;
+            }
+            var lines = new List<Line>();
+            foreach (List<IntPoint> path in soLines)
+            {
+                lines.Add(ToLine(path.Distinct().ToList()));
+            }
+            return lines;
+        }
+
         /// <summary>
         /// Creates a collection of Vector3 points representing the division of the linear geometry into the supplied number of segments.
         /// </summary>
@@ -323,6 +358,34 @@ namespace GeometryEx
                 slope = double.PositiveInfinity;
             }
             return slope;
+        }
+
+        private const double scale = 1024.0;
+
+        /// <summary>
+        /// Construct a clipper path from a Polygon.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        internal static List<IntPoint> ToClipperPath(this Line line)
+        {
+            var path = new List<IntPoint>
+            {
+                new IntPoint(line.Start.X * scale, line.Start.Y * scale),
+                new IntPoint(line.End.X * scale, line.End.Y * scale)
+            };
+            return path.ToList();
+        }
+
+        /// <summary>
+        /// Construct a Line from a clipper path 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        internal static Line ToLine(this List<IntPoint> line)
+        {
+            return new Line(new Vector3(line.First().X / scale, line.First().Y / scale),
+                            new Vector3(line.Last().X / scale, line.Last().Y / scale));
         }
     }
 }

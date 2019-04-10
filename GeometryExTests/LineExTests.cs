@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using Xunit;
 using Elements.Geometry;
 using GeometryEx;
@@ -8,6 +8,37 @@ namespace GeometryExTests
 {
     public class LineExTests
     {
+        [Fact]
+        public void Difference()
+        {
+            var line = new Line(new Vector3(-5.0, 5.0), new Vector3(15.0, 5.0));
+            var polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(10.0, 0.0),
+                        new Vector3(10.0, 10.0),
+                        new Vector3(0.0, 10.0)
+                    }
+                )
+            };
+            var lines = line.Difference(polygons);
+            var points = new List<Vector3>();
+            foreach (Line segment in lines)
+            {
+                points.Add(segment.Start);
+                points.Add(segment.End);
+            }
+            Assert.Equal(2, lines.Count);
+            Assert.Contains(line.Start, points);
+            Assert.Contains(new Vector3(0.0, 5.0), points);
+            Assert.Contains(new Vector3(10.0, 5.0), points);
+            Assert.Contains(line.End, points);
+        }
+
         [Fact]
         public void Divide()
         {
