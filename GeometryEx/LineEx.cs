@@ -66,6 +66,38 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Extends this Line from its start point by the supplied distance.
+        /// </summary>
+        /// <param name="length">length by which to extend this line.</param>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        public static Line ExtendStart(this Line line, double length)
+        {
+            length += line.Length();
+            double extend = Math.Atan2(line.Start.Y - line.End.Y, line.Start.X - line.End.X);
+            var startX = line.End.X + length * Math.Cos(extend);
+            var startY = line.End.Y + length * Math.Sin(extend);
+            return new Line(line.End, new Vector3(startX, startY));
+        }
+
+        /// <summary>
+        /// Extends this Line from its end point by the supplied distance.
+        /// </summary>
+        /// <param name="length">length by which to extend this line.</param>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        public static Line ExtendEnd(this Line line, double length)
+        {
+            length += line.Length();
+            double extend = Math.Atan2(line.End.Y - line.Start.Y, line.End.X - line.Start.X);
+            var endX = line.Start.X + length * Math.Cos(extend);
+            var endY = line.Start.Y + length * Math.Sin(extend);
+            return new Line(line.Start, new Vector3(endX, endY));
+        }
+
+        /// <summary>
         /// Finds the implied intersection of this line with a supplied line.
         /// </summary>
         /// <param name="intr">Line to find intersection with this Line.</param>
@@ -80,12 +112,12 @@ namespace GeometryEx
             {
                 return null;
             }
-            if ((lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity) 
+            if ((lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity)
                 && intrSlope.NearEqual(0.0))
             {
                 return new Vector3(line.Start.X, intr.Start.Y);
             }
-            if ((intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity) 
+            if ((intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity)
                 && lineSlope.NearEqual(0.0))
             {
                 return new Vector3(intr.Start.X, line.Start.Y);
@@ -184,6 +216,29 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns whether this line is perpendicular to the supplied line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <returns>
+        /// True if the product of the slopes is -1.
+        /// </returns>
+        public static bool IsPerpendicularTo(this Line line, Line thatLine)
+        {
+            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
+            if (((lineSlope == double.PositiveInfinity || lineSlope == double.NegativeInfinity) && thatSlope == 0.0) ||
+                ((thatSlope == double.PositiveInfinity || thatSlope == double.NegativeInfinity) && lineSlope == 0.0))
+            {
+                return true;
+            }
+            if (lineSlope * thatSlope == -1)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns whether a line is parallel to the y-axis.
         /// </summary>
         /// <returns>
@@ -197,6 +252,42 @@ namespace GeometryEx
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Calculates a new line from this Line and a supplied line with a single coincident endpoint and identical slope.
+        /// </summary>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        public static Line JoinTo (this Line line, Line join)
+        {
+            if (!line.Slope().NearEqual(join.Slope()) ||
+               (!line.Start.IsAlmostEqualTo(join.Start) &&
+                !line.Start.IsAlmostEqualTo(join.End) &&
+                !line.End.IsAlmostEqualTo(join.Start) &&
+                !line.End.IsAlmostEqualTo(join.End)))
+            {
+                return null;
+            }
+            var length = line.Length() + join.Length();
+            if (line.Start.DistanceTo(join.Start).NearEqual(length))
+            {
+                return new Line(line.Start, join.Start);
+            }
+            if (line.Start.DistanceTo(join.End).NearEqual(length))
+            {
+                return new Line(line.Start, join.End);
+            }
+            if (line.End.DistanceTo(join.Start).NearEqual(length))
+            {
+                return new Line(line.End, join.Start);
+            }
+            if (line.End.DistanceTo(join.End).NearEqual(length))
+            {
+                return new Line(line.End, join.End);
+            }
+            return null;
         }
 
         /// <summary>
@@ -268,11 +359,11 @@ namespace GeometryEx
         /// <returns>
         /// A list of lines of the specified length and a shorter line representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
         /// </returns>
-        public static List<Line> Segment(this Line line, double max, double min)
+        public static List<Line> Segment(this Line line, double length, double minimum)
         {
             var lines = new List<Line>();
-            var segments = line.Length() / max;
-            if (segments <= 1.0 || min > max)
+            var segments = line.Length() / length;
+            if (segments <= 1.0 || minimum > length)
             {
                 lines.Add(line);
                 return lines;
@@ -280,7 +371,7 @@ namespace GeometryEx
             var start = line.Start;
             for (int i = 0; i < Math.Floor(segments); i++)
             {
-                var end = line.PointAt(max / line.Length() * (i + 1));
+                var end = line.PointAt(length / line.Length() * (i + 1));
                 if (start.IsAlmostEqualTo(end))
                 {
                     break;
@@ -289,19 +380,23 @@ namespace GeometryEx
                 lines.Add(newLine);
                 start = newLine.End;
             }
-            if (lines.Count > 0)
+            start = lines.Last().End;
+            if (!start.IsAlmostEqualTo(line.End))
             {
-                start = lines[lines.Count - 1].End;
-                if (!start.IsAlmostEqualTo(line.End))
+                var remainder = new Line(start, line.End);
+                if (remainder.Length() < minimum)
                 {
-                    var remainder = new Line(start, line.End);
-                    if (remainder.Length() < min)
+                    var joiner = lines.Last();
+                    lines.Reverse();
+                    lines = lines.Skip(1).ToList();
+                    lines.Reverse();
+                    var tstJoin = joiner.JoinTo(remainder);
+                    if (tstJoin != null)
                     {
-                        remainder = new Line(lines[lines.Count - 1].Start, remainder.End);
-                        lines.RemoveAt(lines.Count - 1);
+                        remainder = new Line(tstJoin.Start, tstJoin.End);
                     }
-                    lines.Add(remainder);
                 }
+                lines.Add(remainder);
             }
             return lines;
         }
@@ -313,10 +408,10 @@ namespace GeometryEx
         /// <returns>
         /// A list of lines of the specified length and shorter line or lines representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
         /// </returns>
-        public static List<Line> SegmentFrom(this Line line, double max, double min, DivideFrom from = DivideFrom.Start)
+        public static List<Line> SegmentFrom(this Line line, double length, double minimum, DivideFrom from = DivideFrom.Start)
         {
             var lines = new List<Line>();
-            if (max >= line.Length())
+            if (length >= line.Length())
             {
                 lines.Add(line);
                 return lines;
@@ -324,21 +419,21 @@ namespace GeometryEx
             switch (from)
             {
                 case DivideFrom.Center:
-                    lines.AddRange(new Line(line.Midpoint(), line.Start).Segment(max, min));
-                    lines.AddRange(new Line(line.Midpoint(), line.End).Segment(max, min));
+                    lines.AddRange(new Line(line.Midpoint(), line.Start).Segment(length, minimum));
+                    lines.AddRange(new Line(line.Midpoint(), line.End).Segment(length, minimum));
                     break;
                 case DivideFrom.Centered:
-                    var start = line.PositionAt((line.Length() * 0.5) - (max * 0.5));
-                    var end = line.PositionAt((line.Length() * 0.5) + (max * 0.5));
+                    var start = line.PositionAt((line.Length() * 0.5) - (length * 0.5));
+                    var end = line.PositionAt((line.Length() * 0.5) + (length * 0.5));
                     lines.Add(new Line(start, end));
-                    lines.AddRange(new Line(start, line.Start).Segment(max, min));
-                    lines.AddRange(new Line(end, line.End).Segment(max, min));
+                    lines.AddRange(new Line(start, line.Start).Segment(length, minimum));
+                    lines.AddRange(new Line(end, line.End).Segment(length, minimum));
                     break;
                 case DivideFrom.End:
-                    lines.AddRange(new Line(line.End, line.Start).Segment(max, min));
+                    lines.AddRange(new Line(line.End, line.Start).Segment(length, minimum));
                     break;
                 default:
-                    lines.AddRange(line.Segment(max, min));
+                    lines.AddRange(line.Segment(length, minimum));
                     break;
             }
             return lines;

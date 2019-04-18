@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Xunit;
 using Elements.Geometry;
@@ -44,6 +45,16 @@ namespace GeometryExTests
         {
             var line = new Line(Vector3.Origin, new Vector3(0.0, 150.0));
             Assert.Equal(25.0, line.Divide(24).Count);
+        }
+
+        [Fact]
+        public void Extend()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(5.0, 5.0));
+            line = line.ExtendEnd(3.0);
+            Assert.Equal(Math.Sqrt(50.0) + 3.0, line.Length());
+            line = line.ExtendEnd(5.0);
+            Assert.Equal(Math.Sqrt(50.0) + 8.0, line.Length(), 8);
         }
 
         [Fact]
@@ -105,6 +116,18 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsPerpendicularTo()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 1.0));
+            var intr = new Line(new Vector3(5.0, 5.0), new Vector3(5.0, 1.0));
+            Assert.True(line.IsPerpendicularTo(intr));
+
+            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            intr = new Line(new Vector3(5.0, 5.0), new Vector3(8.0, 9.0));
+            Assert.False(line.IsPerpendicularTo(intr));
+        }
+
+        [Fact]
         public void IsVertical()
         {
             var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
@@ -112,6 +135,44 @@ namespace GeometryExTests
 
             line = new Line(new Vector3(1.0, 1.0), new Vector3(1.0, 5.0));
             Assert.True(line.IsVertical());
+        }
+
+        [Fact]
+        public void JoinTo()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            var join = new Line(new Vector3(1.0, 1.0), new Vector3(-5.0, -5.0));
+            line = line.JoinTo(join);
+            Assert.Equal(6.0, line.Start.X);
+            Assert.Equal(6.0, line.Start.Y);
+            Assert.Equal(-5.0, line.End.X);
+            Assert.Equal(-5.0, line.End.Y);
+
+            line = new Line(new Vector3(6.0, 6.0), new Vector3(1.0, 1.0));
+            join = new Line(new Vector3(1.0, 1.0), new Vector3(-5.0, -5.0));
+            line = line.JoinTo(join);
+            Assert.Equal(6.0, line.Start.X);
+            Assert.Equal(6.0, line.Start.Y);
+            Assert.Equal(-5.0, line.End.X);
+            Assert.Equal(-5.0, line.End.Y);
+
+            line = new Line(new Vector3(6.0, 6.0), new Vector3(1.0, 1.0));
+            join = new Line(new Vector3(-5.0, -5.0), new Vector3(1.0, 1.0));
+            line = line.JoinTo(join);
+            Assert.Equal(6.0, line.Start.X);
+            Assert.Equal(6.0, line.Start.Y);
+            Assert.Equal(-5.0, line.End.X);
+            Assert.Equal(-5.0, line.End.Y);
+
+            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            join = new Line(new Vector3(0.0, 0.0), new Vector3(-5.0, -5.0));
+            line = line.JoinTo(join);
+            Assert.Null(line);
+
+            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 7.0));
+            join = new Line(new Vector3(1.0, 1.0), new Vector3(-5.0, -5.0));
+            line = line.JoinTo(join);
+            Assert.Null(line);
         }
 
         [Fact]
@@ -130,6 +191,14 @@ namespace GeometryExTests
             var rotated = line.Rotate(Vector3.Origin, 90.0);
             Assert.Equal(0.0, rotated.End.X, 10);
             Assert.Equal(5.0, rotated.End.Y, 10);
+        }
+
+        [Fact]
+        public void Segment()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(20.0, 0.0));
+            var segments = line.Segment(9.0, 4.0);
+            Assert.Equal(2, segments.Count);
         }
     }
 }
