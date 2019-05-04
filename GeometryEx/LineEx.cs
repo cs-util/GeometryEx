@@ -108,28 +108,27 @@ namespace GeometryEx
         {
             var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
             var intrSlope = (intr.End.Y - intr.Start.Y) / (intr.End.X - intr.Start.X);
-            if (lineSlope.NearEqual(intrSlope))
+            if (lineSlope.NearEqual(intrSlope) || 
+               (Math.Abs(lineSlope) == double.PositiveInfinity && Math.Abs(intrSlope) == double.PositiveInfinity))
             {
                 return null;
             }
-            if ((lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity)
-                && intrSlope.NearEqual(0.0))
+            if (Math.Abs(lineSlope) == double.PositiveInfinity && intrSlope.NearEqual(0.0))
             {
                 return new Vector3(line.Start.X, intr.Start.Y);
             }
-            if ((intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity)
-                && lineSlope.NearEqual(0.0))
+            if (Math.Abs(intrSlope) == double.PositiveInfinity && lineSlope.NearEqual(0.0))
             {
                 return new Vector3(intr.Start.X, line.Start.Y);
             }
             double lineB;
             double intrB;
-            if (lineSlope == double.NegativeInfinity || lineSlope == double.PositiveInfinity)
+            if (Math.Abs(lineSlope) == double.PositiveInfinity)
             {
                 intrB = intr.End.Y - (intrSlope * intr.End.X);
                 return new Vector3(line.End.X, intrSlope * line.End.X + intrB);
             }
-            if (intrSlope == double.NegativeInfinity || intrSlope == double.PositiveInfinity)
+            if (Math.Abs(intrSlope) == double.PositiveInfinity)
             {
                 lineB = line.End.Y - (lineSlope * line.End.X);
                 return new Vector3(intr.End.X, lineSlope * intr.End.X + lineB);
