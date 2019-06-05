@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.1.4</Version>
+    <Version>1.1.7</Version>
     <Authors>Anthony A. Hauck</Authors>
     <Company>Hypar Inc.</Company>
     <Description>Extensions to to Hypar.Elements.Geometry and Polygon creation utilities</Description>
@@ -10,14 +10,24 @@
     <PackageProjectUrl>https://github.com/hypar-io/GeometryEx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hypar-io/GeometryEx</RepositoryUrl>
     <PackageTags>Hypar Elements Geometry Extensions Polygon</PackageTags>
-    <PackageReleaseNotes>Fixed a bug in LineEx.Intersection and made code cleaner.</PackageReleaseNotes>
-    <AssemblyVersion>1.1.4.0</AssemblyVersion>
-    <FileVersion>1.1.4.0</FileVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReleaseNotes>Upgraded to Hypar Element 2.4.4</PackageReleaseNotes>
+    <AssemblyVersion>1.1.6.0</AssemblyVersion>
+    <FileVersion>1.1.6.0</FileVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hypar.Elements" Version="0.2.2" />
+    <Compile Remove="nuget\**" />
+    <EmbeddedResource Remove="nuget\**" />
+    <None Remove="nuget\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="GeometryEx.nuspec" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hypar.Elements" Version="0.2.4.4" />
     <PackageReference Include="ParagonClipper" Version="6.4.2" />
   </ItemGroup>
 

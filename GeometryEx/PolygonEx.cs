@@ -14,14 +14,7 @@ namespace GeometryEx
         public static double AspectRatio(this Polygon polygon)
         {
             var box = polygon.Box();
-            if (box.SizeX >= box.SizeY)
-            {
-                return box.SizeX / box.SizeY;
-            }
-            else
-            {
-                return box.SizeY / box.SizeX;
-            }
+            return box.SizeX >= box.SizeY ? box.SizeX / box.SizeY : box.SizeY / box.SizeX;
         }
 
         /// <summary>
@@ -224,7 +217,7 @@ namespace GeometryEx
             {
                 return false;
             }
-            return Math.Abs(solution.First().ToPolygon().Area - cover.ToClipperPath().ToPolygon().Area) <= 0.0001;
+            return Math.Abs(solution.First().ToPolygon().Area() - cover.ToClipperPath().ToPolygon().Area()) <= 0.0001;
         }
 
         /// <summary>

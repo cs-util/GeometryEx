@@ -84,15 +84,15 @@ namespace GeometryEx
                                            int trials = 20)
         {
             var i = 0;
-            var position = polygon.Centroid;
+            var position = polygon.Centroid();
             Polygon tryPoly = null;
             do
             {
-                var factor = Math.Sqrt(area / polygon.Area);
+                var factor = Math.Sqrt(area / polygon.Area());
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
                 tryPoly = t.OfPolygon(polygon);
-                var centroid = tryPoly.Centroid;
+                var centroid = tryPoly.Centroid();
                 tryPoly = tryPoly.MoveFromTo(centroid, position);
                 if (within != null && tryPoly.Intersects(within))
                 {
@@ -104,7 +104,7 @@ namespace GeometryEx
                 }
                 i++;
             }
-            while ((tryPoly.Area < area - (area * tolerance) || tryPoly.Area > area + (area * tolerance)) && i < trials);
+            while ((tryPoly.Area() < area - (area * tolerance) || tryPoly.Area() > area + (area * tolerance)) && i < trials);
             return tryPoly;
         }
 
@@ -149,6 +149,38 @@ namespace GeometryEx
             }
             return polyAmong;
         }
+
+        /// <summary>
+        /// Constructs the geometric union of the supplied list of Polygons.
+        /// </summary>
+        /// <param name="polygons">The list of Polygons to be combined.</param>
+        /// <returns>
+        /// List of Polygons.
+        /// </returns>
+        public static List<Polygon> Merge(List<Polygon> polygons)
+        {
+            var polyPaths = new List<List<IntPoint>>();
+            foreach (Polygon polygon in polygons)
+            {
+                polyPaths.Add(polygon.ToClipperPath());
+            }
+            Clipper clipper = new Clipper();
+            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
+            clipper.AddPaths(polyPaths, PolyType.ptSubject, true);
+            var solution = new List<List<IntPoint>>();
+            clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftNonZero);
+            if (solution.Count == 0)
+            {
+                return polygons;
+            }
+            var uPolygons = new List<Polygon>();
+            foreach (var solved in solution)
+            {
+                uPolygons.Add(solved.Distinct().ToList().ToPolygon());
+            }
+            return uPolygons;
+        }
+
 
         /// <summary>
         /// Tests whether the supplied Vector3 point falls within or on any Polygon in the supplied collection when compared on a shared plane.

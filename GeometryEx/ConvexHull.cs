@@ -121,8 +121,6 @@ namespace GeometryEx
                 else
                     return 0;
             }
-
         }
-
     }
 }

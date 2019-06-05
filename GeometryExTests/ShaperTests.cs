@@ -23,28 +23,28 @@ namespace GeometryExTests
                         new Vector3(0.0, 4.0)
                     });
             var polygon = Shaper.AdjacentArea(adjTo, 20.0, Orient.N);
-            Assert.Equal(20.0, polygon.Area);
+            Assert.Equal(20.0, polygon.Area());
             Assert.Contains(new Vector3(0.0, 4.0), polygon.Vertices);
             Assert.Contains(new Vector3(4.0, 4.0), polygon.Vertices);
             Assert.Contains(new Vector3(0.0, 9.0), polygon.Vertices);
             Assert.Contains(new Vector3(4.0, 9.0), polygon.Vertices);
 
             polygon = Shaper.AdjacentArea(adjTo, 20.0, Orient.S);
-            Assert.Equal(20.0, polygon.Area);
+            Assert.Equal(20.0, polygon.Area());
             Assert.Contains(new Vector3(0.0, 0.0), polygon.Vertices);
             Assert.Contains(new Vector3(4.0, 0.0), polygon.Vertices);
             Assert.Contains(new Vector3(0.0, -5.0), polygon.Vertices);
             Assert.Contains(new Vector3(4.0, -5.0), polygon.Vertices);
 
             polygon = Shaper.AdjacentArea(adjTo, 20.0, Orient.W);
-            Assert.Equal(20.0, polygon.Area);
+            Assert.Equal(20.0, polygon.Area());
             Assert.Contains(new Vector3(0.0, 0.0), polygon.Vertices);
             Assert.Contains(new Vector3(-5.0, 0.0), polygon.Vertices);
             Assert.Contains(new Vector3(-5.0, 4.0), polygon.Vertices);
             Assert.Contains(new Vector3(0.0, 4.0), polygon.Vertices);
 
             polygon = Shaper.AdjacentArea(adjTo, 20.0, Orient.E);
-            Assert.Equal(20.0, polygon.Area);
+            Assert.Equal(20.0, polygon.Area());
             Assert.Contains(new Vector3(4.0, 0.0), polygon.Vertices);
             Assert.Contains(new Vector3(4.0, 4.0), polygon.Vertices);
             Assert.Contains(new Vector3(9.0, 0.0), polygon.Vertices);
@@ -168,6 +168,46 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Merge()
+        {
+            var polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new []
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(5.0, 0.0),
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 20.0),
+                        new Vector3(5.0, 20.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(10.0, 0.0),
+                        new Vector3(20.0, 0.0),
+                        new Vector3(20.0, 3.0),
+                        new Vector3(10.0, 3.0)
+                    }
+                )
+            };
+            var merged = Shaper.Merge(polygons);
+            Assert.Equal(2, merged.Count);
+        }
+
+        [Fact]
         public void PointWithin()
         {
             var polygons = new List<Polygon>
@@ -228,7 +268,7 @@ namespace GeometryExTests
         {
             var polygon = Shaper.PolygonByArea(9.0, 1.0, new Vector3(10.0, 10.0));
 
-            Assert.Equal(9.0, polygon.Area);
+            Assert.Equal(9.0, polygon.Area());
             Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 10.0);
             Assert.Contains(polygon.Vertices, p => p.X == 13.0 && p.Y == 13.0);
             Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 13.0);
@@ -241,8 +281,8 @@ namespace GeometryExTests
             var polygon = Shaper.PolygonRegular(new Vector3(10.0, 11.0), 10, 6);
 
             Assert.Equal(6.0, polygon.Vertices.Count());
-            Assert.Equal(10.0, polygon.Centroid.X, 10);
-            Assert.Equal(11.0, polygon.Centroid.Y, 10);
+            Assert.Equal(10.0, polygon.Centroid().X, 10);
+            Assert.Equal(11.0, polygon.Centroid().Y, 10);
         }
 
         [Fact]
