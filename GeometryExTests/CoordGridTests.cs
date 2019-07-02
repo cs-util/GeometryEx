@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Xunit;
 using Elements.Geometry;
-using RoomKit;
+using GeometryEx;
 
 namespace GeometryExTests
 {
@@ -150,8 +150,6 @@ namespace GeometryExTests
             grid.Allocate(allocate);
             var point = grid.AllocatedRandom();
             Assert.Contains(point, grid.Allocated);
-            Assert.Equal(17.0, point.X);
-            Assert.Equal(12.0, point.Y);
         }
 
         [Fact]
@@ -238,8 +236,6 @@ namespace GeometryExTests
             grid.Allocate(allocate);
             var point = grid.AvailableRandom();
             Assert.Contains(point, grid.Available);
-            Assert.Equal(42.0, point.X);
-            Assert.Equal(8.0, point.Y);
         }
     }
 }

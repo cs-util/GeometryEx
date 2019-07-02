@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using ClipperLib;
 using Elements.Geometry;
-using GeometryEx;
 
-namespace RoomKit
+namespace GeometryEx
 {
     /// <summary>
     /// Maintains a list of available and allocated points in a grid of the specified interval within the orthogonal bounding box of a Polygon.
@@ -54,9 +51,9 @@ namespace RoomKit
         /// <returns>
         /// A new CoordGrid.
         /// </returns>
-        public CoordGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1, int randomSeed = 1)
+        public CoordGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1)
         {
-            random = new Random(randomSeed);
+            random = new Random();
             Allocated = new List<Vector3>();
             Available = new List<Vector3>();
             Perimeter = new Polygon(polygon.Vertices);
@@ -68,7 +65,7 @@ namespace RoomKit
                 while (x <= box.SE.X)
                 {
                     var point = new Vector3(x, y);
-                    if (polygon.Contains(point) || polygon.Touches(point))
+                    if (polygon.Covers(point))
                     {
                         Available.Add(point);
                     }

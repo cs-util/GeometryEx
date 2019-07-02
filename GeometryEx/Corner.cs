@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RoomKit
+﻿namespace GeometryEx
 {
     /// <summary>
     /// A list of box corners as compass designations.
