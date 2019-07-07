@@ -151,6 +151,29 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Calculate the centroid of the polygon.
+        /// </summary>
+        public static Vector3 CenterOfMass (this Polygon polygon)
+        {
+            var x = 0.0;
+            var y = 0.0;
+            var factor = 0.0;
+            var _vertices = polygon.Vertices;
+            for (var i = 0; i < _vertices.Length; i++)
+            {
+                factor =
+                     (_vertices[i].X * _vertices[(i + 1) % _vertices.Length].Y) -
+                     (_vertices[(i + 1) % _vertices.Length].X * _vertices[i].Y);
+                x += (_vertices[i].X + _vertices[(i + 1) % _vertices.Length].X) * factor;
+                y += (_vertices[i].Y + _vertices[(i + 1) % _vertices.Length].Y) * factor;
+            }
+            var divisor = polygon.Area() * 6;
+            x /= divisor;
+            y /= divisor;
+            return new Vector3(x, y);
+        }
+
+        /// <summary>
         /// Tests if the supplied Vector3 point is within this Polygon without coincidence with an edge when compared on a shared plane.
         /// </summary>
         /// <param name="point">The Vector3 point to compare to this Polygon.</param>

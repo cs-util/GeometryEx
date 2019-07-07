@@ -43,15 +43,16 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates an orthogonal 2D grid of Vector3 points from the supplied Polygon and axis intervals.
+        /// Creates a rotated 2D grid of Vector3 points from the supplied Polygon, axis intervals, and angle.
         /// </summary>
-        /// <param name="perimeter">The Polygon boundary of the point grid.</param>
-        /// <param name="xInterval">The spacing of the grid along the x-axis.</param>
-        /// <param name="yInterval">The spacing of the grid along the y-axis.</param>
+        /// <param name="perimeter">Polygon boundary of the point grid.</param>
+        /// <param name="xInterval">Spacing of the grid along the x-axis.</param>
+        /// <param name="yInterval">Spacing of the grid along the y-axis.</param>
+        /// <param name="angle">Rotation of the grid around the Polygon centroid.</param>
         /// <returns>
         /// A new CoordGrid.
         /// </returns>
-        public CoordGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1)
+        public CoordGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1, double angle = 0.0)
         {
             random = new Random();
             Allocated = new List<Vector3>();
@@ -60,19 +61,25 @@ namespace GeometryEx
             var box = new TopoBox(polygon);
             var x = box.SW.X;
             var y = box.SW.Y;
+            var points = new List<Vector3>();
+            var centroid = polygon.CenterOfMass();
             while (y <= box.NW.Y)
             {
                 while (x <= box.SE.X)
                 {
-                    var point = new Vector3(x, y);
-                    if (polygon.Covers(point))
-                    {
-                        Available.Add(point);
-                    }
+                    points.Add(new Vector3(x, y));
                     x += xInterval;
                 }
                 x = box.SW.X;
                 y += yInterval;
+            }
+            foreach (var pnt in points)
+            {
+                var point = pnt.Rotate(centroid, angle);
+                if (polygon.Covers(point))
+                {
+                    Available.Add(point);
+                }
             }
         }
 

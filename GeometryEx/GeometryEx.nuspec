@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/hypar-io/GeometryEx</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Separated from RoomKit for more flexibility.</releaseNotes>
+    <releaseNotes>$PackageReleaseNotes$</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>Hypar Elements Geometry Extensions</tags>
   </metadata>
