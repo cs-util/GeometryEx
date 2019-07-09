@@ -58,11 +58,13 @@ namespace GeometryEx
             Allocated = new List<Vector3>();
             Available = new List<Vector3>();
             Perimeter = new Polygon(polygon.Vertices);
-            var box = new TopoBox(polygon);
-            var x = box.SW.X;
-            var y = box.SW.Y;
-            var points = new List<Vector3>();
             var centroid = polygon.CenterOfMass();
+            var box = new TopoBox(polygon);
+            var points = new List<Vector3>();
+
+            // Northeast quadrant
+            var x = centroid.X + (xInterval * 0.5);
+            var y = centroid.Y + (yInterval * 0.5);
             while (y <= box.NW.Y)
             {
                 while (x <= box.SE.X)
@@ -70,9 +72,52 @@ namespace GeometryEx
                     points.Add(new Vector3(x, y));
                     x += xInterval;
                 }
-                x = box.SW.X;
+                x = centroid.X + (xInterval * 0.5);
                 y += yInterval;
             }
+
+            // Northwest quadrant
+            x = centroid.X - (xInterval * 0.5);
+            y = centroid.Y + (yInterval * 0.5);
+            while (y <= box.NW.Y)
+            {
+                while (x >= box.SW.X)
+                {
+                    points.Add(new Vector3(x, y));
+                    x -= xInterval;
+                }
+                x = centroid.X - (xInterval * 0.5);
+                y += yInterval;
+            }
+
+            // Southeast quadrant
+            x = centroid.X + (xInterval * 0.5);
+            y = centroid.Y - (yInterval * 0.5);
+            while (y >= box.SW.Y)
+            {
+                while (x <= box.SE.X)
+                {
+                    points.Add(new Vector3(x, y));
+                    x += xInterval;
+                }
+                x = centroid.X + (xInterval * 0.5);
+                y -= yInterval;
+            }
+
+            // Southwest quadrant
+            x = centroid.X - (xInterval * 0.5);
+            y = centroid.Y - (yInterval * 0.5);
+            while (y >= box.SW.Y)
+            {
+                while (x >= box.SW.X)
+                {
+                    points.Add(new Vector3(x, y));
+                    x -= xInterval;
+                }
+                x = centroid.X - (xInterval * 0.5);
+                y -= yInterval;
+            }
+
             foreach (var pnt in points)
             {
                 var point = pnt.Rotate(centroid, angle);
