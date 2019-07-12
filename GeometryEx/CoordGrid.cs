@@ -58,7 +58,7 @@ namespace GeometryEx
             Allocated = new List<Vector3>();
             Available = new List<Vector3>();
             Perimeter = new Polygon(polygon.Vertices);
-            var centroid = polygon.CenterOfMass();
+            var centroid = polygon.Centroid();
             var box = new TopoBox(polygon);
             var points = new List<Vector3>();
 
