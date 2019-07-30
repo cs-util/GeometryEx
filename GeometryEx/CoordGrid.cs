@@ -194,6 +194,10 @@ namespace GeometryEx
         /// </returns>
         public Vector3 AllocatedNearTo(Vector3 point)
         {
+            if (Allocated.Count == 0)
+            {
+                return null;
+            }
             var x = Allocated.First().X;
             var y = Allocated.First().Y;
             foreach (Vector3 aPoint in Allocated)
@@ -218,6 +222,10 @@ namespace GeometryEx
         /// </returns>
         public Vector3 AllocatedRandom()
         {
+            if (Allocated.Count == 0)
+            {
+                return null;
+            }
             return Allocated[random.Next(0, Allocated.Count - 1)];
         }
 
@@ -230,6 +238,10 @@ namespace GeometryEx
 
         public Vector3 AvailableMax()
         {
+            if (Available.Count == 0)
+            {
+                return null;
+            }
             var maxX = Available.First().X;
             var maxY = Available.First().Y;
             foreach (Vector3 point in Available)
@@ -252,6 +264,10 @@ namespace GeometryEx
 
         public Vector3 AvailableMin()
         {
+            if (Available.Count == 0)
+            {
+                return null;
+            }
             var minX = Available.First().X;
             var minY = Available.First().Y;
             foreach (Vector3 point in Available)
@@ -274,6 +290,10 @@ namespace GeometryEx
         /// </returns>
         public Vector3 AvailableNearTo(Vector3 point)
         {
+            if (Available.Count == 0)
+            {
+                return null;
+            }
             var x = Available.First().X;
             var y = Available.First().Y;
             foreach (Vector3 aPoint in Available)
@@ -299,6 +319,10 @@ namespace GeometryEx
         /// </returns>
         public Vector3 AvailableRandom()
         {
+            if (Available.Count == 0)
+            {
+                return null;
+            }
             return Available[random.Next(0, Available.Count - 1)];
         }
     }

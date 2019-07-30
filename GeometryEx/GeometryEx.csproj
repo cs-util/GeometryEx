@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>1.6.2</Version>
+    <Version>1.6.3</Version>
     <Author>Anthony A. Hauck</Author>
     <Company>Hypar Inc.</Company>
     <Description>Extensions to to Hypar.Elements.Geometry and Polygon creation utilities</Description>
@@ -10,10 +10,10 @@
     <PackageProjectUrl>https://github.com/hypar-io/GeometryEx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hypar-io/GeometryEx</RepositoryUrl>
     <PackageTags>Hypar Elements Geometry Extensions Polygon</PackageTags>
-    <PackageReleaseNotes>- Upgraded to Hypar Elements 3.2
-- Removed Polygon.CenterOfMass in favor of fixed Polygon.Centroid in Hypar Elements 3.2.</PackageReleaseNotes>
-    <AssemblyVersion>1.6.2.0</AssemblyVersion>
-    <FileVersion>1.6.2.0</FileVersion>
+    <PackageReleaseNotes>- Upgraded to Hypar Elements 3.4
+- Fixed bugs associated with extracting random points from various CoordGrid lists.</PackageReleaseNotes>
+    <AssemblyVersion>1.6.3.0</AssemblyVersion>
+    <FileVersion>1.6.3.0</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hypar.Elements" Version="0.3.2" />
+    <PackageReference Include="Hypar.Elements" Version="0.3.4" />
     <PackageReference Include="ParagonClipper" Version="6.4.2" />
   </ItemGroup>
 
