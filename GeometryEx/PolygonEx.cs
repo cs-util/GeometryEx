@@ -249,7 +249,8 @@ namespace GeometryEx
             var polygons = new List<Polygon>();
             foreach (List<IntPoint> path in solution)
             {
-                polygons.Add(ToPolygon(path.Distinct().ToList()));
+                var vertices = path.Distinct().ToList();
+                polygons.Add(ToPolygon(vertices));
             }
             return polygons;
         }
