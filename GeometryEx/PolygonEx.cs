@@ -319,6 +319,25 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Calculates whether this polygon is configured clockwise.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns>True if the polygon is oriented clockwise.</returns>
+        public static bool IsClockWise(this Polygon polygon)
+        {
+            var verts = polygon.Vertices;
+            var xA = verts[0].X;         
+            var xB = verts[1].X;           
+            var xC = verts[2].X;
+
+            var yA = verts[0].Y;
+            var yB = verts[1].Y;
+            var yC = verts[2].Y;
+
+            return (xB - xA) * (yC - yA) - (xC - xA) * (yB - yA) < 0 ? true : false;
+        }
+
+        /// <summary>
         /// Returns a new Polygon displaced along a 2D vector calculated between the supplied Vector3 points.
         /// </summary>
         /// <param name="polygon">Polygon instance to be copied.</param>

@@ -341,6 +341,26 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsClockWise()
+        {
+            var p1 = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(10.0, 0.0),
+                    new Vector3(20.0, 0.0),
+                    new Vector3(20.0, 20.0),
+                    new Vector3(10.0, 20.0)
+                }
+            );
+            var verts = new List<Vector3>(p1.Vertices);
+            verts.Reverse();
+            var p2 = new Polygon(verts.ToArray());
+            Assert.False(p1.IsClockWise());
+            Assert.True(p2.IsClockWise());
+        }
+
+        [Fact]
         public void MoveFromTo()
         {
             var polygon =
