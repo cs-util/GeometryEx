@@ -8,9 +8,8 @@ namespace GeometryEx
     /// <summary>
     /// Maintains a list of available and allocated points in a grid of the specified interval within the orthogonal bounding box of a Polygon.
     /// </summary>
-    public class CoordGrid
+    public class CoordinateGrid
     {
-
         /// <summary>
         /// Providing a random seed value ensures reproducible results.
         /// </summary>
@@ -52,7 +51,7 @@ namespace GeometryEx
         /// <returns>
         /// A new CoordGrid.
         /// </returns>
-        public CoordGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1, double angle = 0.0)
+        public CoordinateGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1, double angle = 0.0)
         {
             random = new Random();
             Allocated = new List<Vector3>();
@@ -117,7 +116,6 @@ namespace GeometryEx
                 x = centroid.X - (xInterval * 0.5);
                 y -= yInterval;
             }
-
             foreach (var pnt in points)
             {
                 var point = pnt.Rotate(centroid, angle);

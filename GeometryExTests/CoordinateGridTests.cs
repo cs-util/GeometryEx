@@ -7,10 +7,10 @@ using GeometryEx;
 
 namespace GeometryExTests
 {
-    public class CoordGridTests
+    public class CoordinateGridTests
     {
         [Fact]
-        public void CoordGrid()
+        public void CoordinateGrid()
         {
             var perimeter = new Polygon
             (
@@ -22,7 +22,7 @@ namespace GeometryExTests
                     new Vector3(0, 30)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var model = new Model();
             var colType = 
                 new StructuralFramingType("", new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Concrete);
@@ -30,7 +30,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Column(point, 1.0, colType));
             }
-            model.ToGlTF("../../../../CoordGrid.glb");
+            model.ToGlTF("../../../../CoordinateGrid.glb");
             Assert.Equal(600, grid.Available.Count);
         }
 
@@ -47,7 +47,7 @@ namespace GeometryExTests
                     new Vector3(0, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             Assert.Equal(2160, grid.Available.Count);
             var allocate1 = new Polygon
             (
@@ -71,7 +71,7 @@ namespace GeometryExTests
                     new Vector3(30, 30)
                 }
             );
-            grid = new CoordGrid(perimeter);
+            grid = new CoordinateGrid(perimeter);
             var allocate = new List<Polygon> { allocate1, allocate2 };
             grid.Allocate(allocate);
             Assert.Equal(1860, grid.Available.Count);
@@ -123,7 +123,7 @@ namespace GeometryExTests
                     }
                 )
             };
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             foreach(Polygon polygon in allocated)
             {
                 grid.Allocate(polygon);
@@ -146,7 +146,7 @@ namespace GeometryExTests
                     new Vector3(0, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var allocate = new Polygon
             (
                 new[]
@@ -175,7 +175,7 @@ namespace GeometryExTests
                     new Vector3(5, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var max = grid.AvailableMax();
             Assert.Equal(60, max.X);
             Assert.Equal(36, max.Y);
@@ -194,7 +194,7 @@ namespace GeometryExTests
                     new Vector3(5, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var min = grid.AvailableMin();
             Assert.Equal(5, min.X);
             Assert.Equal(5, min.Y);
@@ -213,7 +213,7 @@ namespace GeometryExTests
                     new Vector3(0, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var nearPoint = grid.AvailableNearTo(new Vector3(50.6, 40.1));
             Assert.Equal(29.5, nearPoint.X);
             Assert.Equal(17.5, nearPoint.Y);
@@ -232,7 +232,7 @@ namespace GeometryExTests
                     new Vector3(0, 36)
                 }
             );
-            var grid = new CoordGrid(perimeter);
+            var grid = new CoordinateGrid(perimeter);
             var allocate = new Polygon
             (
                 new[]
