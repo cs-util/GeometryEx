@@ -1,0 +1,154 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "4681f509ec39c5606201a43202158916078cde69"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "GeometryEx/1.8.3": {
+        "dependencies": {
+          "Hypar.Elements": "0.3.7",
+          "ParagonClipper": "6.4.2"
+        },
+        "runtime": {
+          "GeometryEx.dll": {}
+        }
+      },
+      "Antlr4.Runtime.Standard/4.7.1": {
+        "runtime": {
+          "lib/netstandard/Antlr4.Runtime.Core.dll": {
+            "assemblyVersion": "4.7.0.0",
+            "fileVersion": "4.7.0.0"
+          }
+        }
+      },
+      "glTF2Loader/1.1.3-alpha": {
+        "dependencies": {
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard1.3/glTFLoader.dll": {
+            "assemblyVersion": "1.1.3.0",
+            "fileVersion": "1.1.3.0"
+          }
+        }
+      },
+      "Hypar.Elements/0.3.7": {
+        "dependencies": {
+          "Hypar.IFC2X3": "0.1.4",
+          "Microsoft.CSharp": "4.5.0",
+          "Newtonsoft.Json": "11.0.2",
+          "Unofficial.LibTessDotNet": "2.0.0",
+          "glTF2Loader": "1.1.3-alpha"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Hypar.Elements.dll": {
+            "assemblyVersion": "0.3.7.0",
+            "fileVersion": "0.3.7.0"
+          }
+        }
+      },
+      "Hypar.IFC2X3/0.1.4": {
+        "dependencies": {
+          "Antlr4.Runtime.Standard": "4.7.1",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Hypar.IFC2X3.dll": {
+            "assemblyVersion": "0.1.4.0",
+            "fileVersion": "0.1.4.0"
+          }
+        }
+      },
+      "Microsoft.CSharp/4.5.0": {},
+      "Newtonsoft.Json/11.0.2": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "11.0.0.0",
+            "fileVersion": "11.0.2.21924"
+          }
+        }
+      },
+      "ParagonClipper/6.4.2": {
+        "runtime": {
+          "lib/netstandard2.0/Clipper.dll": {
+            "assemblyVersion": "6.4.2.0",
+            "fileVersion": "6.4.2.0"
+          }
+        }
+      },
+      "Unofficial.LibTessDotNet/2.0.0": {
+        "runtime": {
+          "lib/netstandard2.0/LibTessDotNet.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GeometryEx/1.8.3": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Antlr4.Runtime.Standard/4.7.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xCf8wvtksc/UFbifyPSNlthnVCRqQSA4qOGgES5tb1sW/dGBb9rRU8019vfyWK5oiadqQxVabcSlfAZ0lM9C4A==",
+      "path": "antlr4.runtime.standard/4.7.1",
+      "hashPath": "antlr4.runtime.standard.4.7.1.nupkg.sha512"
+    },
+    "glTF2Loader/1.1.3-alpha": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ofv66of3ZkcdRRFblOPyduJxiDeUubzbUaFoGnlMboX1rAsz1yXH53ReVmYsCUVm5Vl6/ssVtgX6o95eVdy7+Q==",
+      "path": "gltf2loader/1.1.3-alpha",
+      "hashPath": "gltf2loader.1.1.3-alpha.nupkg.sha512"
+    },
+    "Hypar.Elements/0.3.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cIi1fIkuw6BSeHAWX9k/Y1HdCmxnwV6O/qM9DQQdHT1eUfu77IWNuSbfpGJCnkHtCfOyWkKXsXpenM2IAFhQdw==",
+      "path": "hypar.elements/0.3.7",
+      "hashPath": "hypar.elements.0.3.7.nupkg.sha512"
+    },
+    "Hypar.IFC2X3/0.1.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fwW/kNNF8+1Gq+0ZMBoCSMKi2HNh9RWkz7ibDQwhVPCo0P1ABETPMWJX6RqkJE0jby4xcP9zGwbnyFxEFrVDpA==",
+      "path": "hypar.ifc2x3/0.1.4",
+      "hashPath": "hypar.ifc2x3.0.1.4.nupkg.sha512"
+    },
+    "Microsoft.CSharp/4.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-EGoBmf3Na2ppbhPePDE9PlX81r1HuOZH5twBrq7couJZiPTjUnD3648balerQJO6EJ8Sj+43+XuRwQ7r+3tE3w==",
+      "path": "microsoft.csharp/4.5.0",
+      "hashPath": "microsoft.csharp.4.5.0.nupkg.sha512"
+    },
+    "Newtonsoft.Json/11.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-znZGbws7E4BA9jxNZ7FuiIRI3C9hrgatVQSTKhIYZYNOud4M5VfGlTYi6RdYO5sQrebFuF/g9UEV3hOxDMXF6Q==",
+      "path": "newtonsoft.json/11.0.2",
+      "hashPath": "newtonsoft.json.11.0.2.nupkg.sha512"
+    },
+    "ParagonClipper/6.4.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VnRIdNIpMwPUU6vMoPXh4kDptxN8/gwepX5nk8OLaFSqPeGfrzyDH22Z+sPtn8LJ9xR0lJHHhYSRl1DjtOqowQ==",
+      "path": "paragonclipper/6.4.2",
+      "hashPath": "paragonclipper.6.4.2.nupkg.sha512"
+    },
+    "Unofficial.LibTessDotNet/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-yFoNctkoIZ7INlzkFvlmHIc7aklBupOyj0lDAqVPxyx6IoV/JwrS37as954B3uKNt3QHXWYZ6mfeXU6c1SvVVQ==",
+      "path": "unofficial.libtessdotnet/2.0.0",
+      "hashPath": "unofficial.libtessdotnet.2.0.0.nupkg.sha512"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>1.8.1</Version>
+    <Version>1.8.3</Version>
     <Author>Anthony A. Hauck</Author>
     <Company>Hypar Inc.</Company>
     <Description>Extensions to to Hypar.Elements.Geometry and Polygon creation utilities.</Description>
@@ -10,9 +10,9 @@
     <PackageProjectUrl>https://github.com/hypar-io/GeometryEx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hypar-io/GeometryEx</RepositoryUrl>
     <PackageTags>Hypar Elements Geometry Extensions Polygon</PackageTags>
-    <PackageReleaseNotes>- Renamed 'CoordGrid' to 'CoordinateGrid' for clarity</PackageReleaseNotes>
-    <AssemblyVersion>1.8.1.0</AssemblyVersion>
-    <FileVersion>1.8.1.0</FileVersion>
+    <PackageReleaseNotes>- Add Topobox.Compass to retrieve all perimeter points.</PackageReleaseNotes>
+    <AssemblyVersion>1.8.3.0</AssemblyVersion>
+    <FileVersion>1.8.3.0</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hypar.Elements" Version="0.3.5" />
+    <PackageReference Include="Hypar.Elements" Version="0.3.7" />
     <PackageReference Include="ParagonClipper" Version="6.4.2" />
   </ItemGroup>
 

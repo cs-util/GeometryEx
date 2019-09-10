@@ -95,6 +95,21 @@ namespace GeometryEx
         public Vector3 NNE { get; }
 
         /// <summary>
+        /// Returns a list of all Topobox points except for the center(C).
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> Compass
+        {
+            get
+            {
+                return new List<Vector3>
+                {
+                    SW, SSW, S, SSE, SE, ESE, E, ENE, NE, NNE, N, NNW, NW, WNW, W, WSW
+                };
+            }
+        }
+
+        /// <summary>
         /// X and Y dimensions of the TopoBox perimeter.
         /// </summary>
         public double SizeX { get; }
@@ -139,6 +154,8 @@ namespace GeometryEx
             NE = new Vector3(maxX, maxY);
             NNE = new Vector3(minX + (SizeX * 0.75), maxY);
         }
+
+
 
         /// <summary>
         /// Returns the requested bounding box location by orientation.

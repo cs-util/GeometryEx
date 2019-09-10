@@ -54,6 +54,8 @@ namespace GeometryExTests
             Assert.Equal(2.0, box.W.Y);
             Assert.Equal(0.0, box.WSW.X);
             Assert.Equal(1.0, box.WSW.Y);
+
+            Assert.Equal(16.0, box.Compass.Count);
         }
     }
 }
