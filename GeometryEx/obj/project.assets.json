@@ -24,7 +24,7 @@
           "lib/netstandard1.3/glTFLoader.dll": {}
         }
       },
-      "Hypar.Elements/0.3.7": {
+      "Hypar.Elements/0.3.10": {
         "type": "package",
         "dependencies": {
           "Hypar.IFC2X3": "0.1.4",
@@ -324,14 +324,14 @@
         "lib/netstandard1.3/glTFLoader.dll"
       ]
     },
-    "Hypar.Elements/0.3.7": {
-      "sha512": "cIi1fIkuw6BSeHAWX9k/Y1HdCmxnwV6O/qM9DQQdHT1eUfu77IWNuSbfpGJCnkHtCfOyWkKXsXpenM2IAFhQdw==",
+    "Hypar.Elements/0.3.10": {
+      "sha512": "q7K5WRJo0SQ36sw2b3aTjwAwgPSDugVNttLo6WyukcaSK1p+cXjmFiG96s41GuzbFG95Q38YT8HxNUqZw31EjQ==",
       "type": "package",
-      "path": "hypar.elements/0.3.7",
+      "path": "hypar.elements/0.3.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "hypar.elements.0.3.7.nupkg.sha512",
+        "hypar.elements.0.3.10.nupkg.sha512",
         "hypar.elements.nuspec",
         "lib/netstandard2.0/Hypar.Elements.dll",
         "lib/netstandard2.0/Hypar.Elements.xml"
@@ -946,7 +946,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
-      "Hypar.Elements >= 0.3.7",
+      "Hypar.Elements >= 0.3.10",
       "Microsoft.NETCore.App >= 2.1.0",
       "ParagonClipper >= 6.4.2"
     ]
@@ -956,7 +956,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.8.3",
+    "version": "1.8.4",
     "restore": {
       "projectUniqueName": "C:\\Users\\Anthony\\GitHub\\GeometryEx\\GeometryEx\\GeometryEx.csproj",
       "projectName": "GeometryEx",
@@ -994,7 +994,7 @@
         "dependencies": {
           "Hypar.Elements": {
             "target": "Package",
-            "version": "[0.3.7, )"
+            "version": "[0.3.10, )"
           },
           "Microsoft.NETCore.App": {
             "suppressParent": "All",
