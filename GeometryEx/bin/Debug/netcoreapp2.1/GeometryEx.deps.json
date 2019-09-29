@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
-      "GeometryEx/1.8.4": {
+      "GeometryEx/1.9.0": {
         "dependencies": {
           "Hypar.Elements": "0.3.10",
           "ParagonClipper": "6.4.2"
@@ -89,7 +89,7 @@
     }
   },
   "libraries": {
-    "GeometryEx/1.8.4": {
+    "GeometryEx/1.9.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

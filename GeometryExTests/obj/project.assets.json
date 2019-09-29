@@ -1667,7 +1667,7 @@
           "build/netcoreapp1.0/xunit.runner.visualstudio.props": {}
         }
       },
-      "GeometryEx/1.8.4": {
+      "GeometryEx/1.9.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.1",
         "dependencies": {
@@ -5811,7 +5811,7 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "GeometryEx/1.8.4": {
+    "GeometryEx/1.9.0": {
       "type": "project",
       "path": "../GeometryEx/GeometryEx.csproj",
       "msbuildProject": "../GeometryEx/GeometryEx.csproj"
@@ -5819,7 +5819,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
-      "GeometryEx >= 1.8.4",
+      "GeometryEx >= 1.9.0",
       "Microsoft.NET.Test.Sdk >= 15.9.0",
       "Microsoft.NETCore.App >= 2.1.0",
       "xunit >= 2.4.0",

@@ -79,7 +79,7 @@ namespace GeometryEx
         {
             var count = 0;
             var box = new TopoBox(perimeter);
-            var boundary = Shaper.PolygonBox(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
+            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
             foreach (Vector3 vertex in BoxCorners(polygon))
             {
                 if (boundary.Touches(vertex))
@@ -135,7 +135,7 @@ namespace GeometryEx
         {
             var count = 0;
             var box = new TopoBox(perimeter);
-            var boundary = Shaper.PolygonBox(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
+            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
             foreach (Vector3 vertex in BoxCorners(polygon))
             {
                 if (boundary.Touches(vertex) || perimeter.Touches(vertex))

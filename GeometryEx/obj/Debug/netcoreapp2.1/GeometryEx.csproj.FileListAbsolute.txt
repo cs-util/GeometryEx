@@ -6,3 +6,4 @@ C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx
 C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.AssemblyInfo.cs
 C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.dll
 C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.pdb
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.csprojAssemblyReference.cache

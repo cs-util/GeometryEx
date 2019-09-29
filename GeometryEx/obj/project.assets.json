@@ -956,7 +956,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.8.4",
+    "version": "1.9.0",
     "restore": {
       "projectUniqueName": "C:\\Users\\Anthony\\GitHub\\GeometryEx\\GeometryEx\\GeometryEx.csproj",
       "projectName": "GeometryEx",
