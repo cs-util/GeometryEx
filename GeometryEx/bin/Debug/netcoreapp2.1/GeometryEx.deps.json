@@ -1,14 +1,14 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "a25871c5a5bf5d65b9c0536fc4bdfa09570fc28e"
+    "signature": "7edb9a278bdaf12612b1baf7f17505b74fe773d5"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
-      "GeometryEx/1.9.0": {
+      "GeometryEx/1.9.2": {
         "dependencies": {
-          "Hypar.Elements": "0.3.10",
+          "Hypar.Elements": "0.3.11",
           "ParagonClipper": "6.4.2"
         },
         "runtime": {
@@ -34,7 +34,7 @@
           }
         }
       },
-      "Hypar.Elements/0.3.10": {
+      "Hypar.Elements/0.3.11": {
         "dependencies": {
           "Hypar.IFC2X3": "0.1.4",
           "Microsoft.CSharp": "4.5.0",
@@ -44,8 +44,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Hypar.Elements.dll": {
-            "assemblyVersion": "0.3.10.0",
-            "fileVersion": "0.3.10.0"
+            "assemblyVersion": "0.3.11.0",
+            "fileVersion": "0.3.11.0"
           }
         }
       },
@@ -89,7 +89,7 @@
     }
   },
   "libraries": {
-    "GeometryEx/1.9.0": {
+    "GeometryEx/1.9.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -108,12 +108,12 @@
       "path": "gltf2loader/1.1.3-alpha",
       "hashPath": "gltf2loader.1.1.3-alpha.nupkg.sha512"
     },
-    "Hypar.Elements/0.3.10": {
+    "Hypar.Elements/0.3.11": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-q7K5WRJo0SQ36sw2b3aTjwAwgPSDugVNttLo6WyukcaSK1p+cXjmFiG96s41GuzbFG95Q38YT8HxNUqZw31EjQ==",
-      "path": "hypar.elements/0.3.10",
-      "hashPath": "hypar.elements.0.3.10.nupkg.sha512"
+      "sha512": "sha512-kO4HCfvKG5Y2eYe0nwdfZ+YVr3wwhNJQBDscykwnmJTuWUC76xQWWkOQIx5B8NMjmFXuQXFFO2Ixot6PIl/3kw==",
+      "path": "hypar.elements/0.3.11",
+      "hashPath": "hypar.elements.0.3.11.nupkg.sha512"
     },
     "Hypar.IFC2X3/0.1.4": {
       "type": "package",

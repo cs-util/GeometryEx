@@ -24,7 +24,7 @@
           "lib/netstandard1.3/glTFLoader.dll": {}
         }
       },
-      "Hypar.Elements/0.3.10": {
+      "Hypar.Elements/0.3.11": {
         "type": "package",
         "dependencies": {
           "Hypar.IFC2X3": "0.1.4",
@@ -1667,11 +1667,11 @@
           "build/netcoreapp1.0/xunit.runner.visualstudio.props": {}
         }
       },
-      "GeometryEx/1.9.0": {
+      "GeometryEx/1.9.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.1",
         "dependencies": {
-          "Hypar.Elements": "0.3.10",
+          "Hypar.Elements": "0.3.11",
           "ParagonClipper": "6.4.2"
         },
         "compile": {
@@ -1710,14 +1710,14 @@
         "lib/netstandard1.3/glTFLoader.dll"
       ]
     },
-    "Hypar.Elements/0.3.10": {
-      "sha512": "q7K5WRJo0SQ36sw2b3aTjwAwgPSDugVNttLo6WyukcaSK1p+cXjmFiG96s41GuzbFG95Q38YT8HxNUqZw31EjQ==",
+    "Hypar.Elements/0.3.11": {
+      "sha512": "kO4HCfvKG5Y2eYe0nwdfZ+YVr3wwhNJQBDscykwnmJTuWUC76xQWWkOQIx5B8NMjmFXuQXFFO2Ixot6PIl/3kw==",
       "type": "package",
-      "path": "hypar.elements/0.3.10",
+      "path": "hypar.elements/0.3.11",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "hypar.elements.0.3.10.nupkg.sha512",
+        "hypar.elements.0.3.11.nupkg.sha512",
         "hypar.elements.nuspec",
         "lib/netstandard2.0/Hypar.Elements.dll",
         "lib/netstandard2.0/Hypar.Elements.xml"
@@ -5811,7 +5811,7 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "GeometryEx/1.9.0": {
+    "GeometryEx/1.9.2": {
       "type": "project",
       "path": "../GeometryEx/GeometryEx.csproj",
       "msbuildProject": "../GeometryEx/GeometryEx.csproj"
@@ -5819,7 +5819,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
-      "GeometryEx >= 1.9.0",
+      "GeometryEx >= 1.9.2",
       "Microsoft.NET.Test.Sdk >= 15.9.0",
       "Microsoft.NETCore.App >= 2.1.0",
       "xunit >= 2.4.0",

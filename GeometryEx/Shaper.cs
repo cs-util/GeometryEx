@@ -219,24 +219,21 @@ namespace GeometryEx
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
-            var polygon =
+            return
                 new Polygon
                 (
                     new[]
                     {
                         Vector3.Origin,
-                        new Vector3(size.X, 0),
+                        new Vector3(size.X, Vector3.Origin.Y),
                         new Vector3(size.X, width),
                         new Vector3(width, width),
                         new Vector3(width, size.Y - width),
                         new Vector3(size.X, size.Y - width),
                         new Vector3(size.X, size.Y),
-                        new Vector3(0, size.Y),
+                        new Vector3(Vector3.Origin.X, size.Y),
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -256,13 +253,13 @@ namespace GeometryEx
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
-            var polygon = 
+            return 
                 new Polygon
                 (
                     new []
                     {
                         Vector3.Origin,
-                        new Vector3(size.X, 0),
+                        new Vector3(size.X, Vector3.Origin.Y),
                         new Vector3(size.X, width),
                         new Vector3(width, width),
                         new Vector3(width, xAxis - halfWidth),//
@@ -272,12 +269,9 @@ namespace GeometryEx
                         new Vector3(width, size.Y - width),//
                         new Vector3(size.X, size.Y - width),
                         new Vector3(size.X, size.Y),
-                        new Vector3(0, size.Y),
+                        new Vector3(Vector3.Origin.X, size.Y),
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -297,13 +291,13 @@ namespace GeometryEx
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
-            var polygon =
+            return
                 new Polygon
                 (
                     new []
                     {
                         Vector3.Origin,
-                        new Vector3(width, origin.Y),
+                        new Vector3(width, Vector3.Origin.Y),
                         new Vector3(width, xAxis - halfWidth),
                         new Vector3(size.X, xAxis - halfWidth),
                         new Vector3(size.X, xAxis + halfWidth),
@@ -311,12 +305,9 @@ namespace GeometryEx
                         new Vector3(width, size.Y - width),
                         new Vector3(size.X, size.Y - width),
                         new Vector3(size.X, size.Y),
-                        new Vector3(0, size.Y),
+                        new Vector3(Vector3.Origin.X, size.Y),
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -338,28 +329,25 @@ namespace GeometryEx
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
             var rightWest = size.X - width;
-            var polygon = 
+            return 
                 new Polygon
                 (
                     new []
                     {
                         Vector3.Origin,
-                        new Vector3(width, 0),
+                        new Vector3(width, Vector3.Origin.Y),
                         new Vector3(width, xAxis - halfWidth),
                         new Vector3(rightWest, xAxis - halfWidth),
-                        new Vector3(rightWest, 0),
-                        new Vector3(size.X, 0),
+                        new Vector3(rightWest, Vector3.Origin.Y),
+                        new Vector3(size.X, Vector3.Origin.Y),
                         new Vector3(size.X, size.Y),
                         new Vector3(rightWest, size.Y),
                         new Vector3(rightWest, xAxis + halfWidth),
                         new Vector3(width, xAxis + halfWidth),
                         new Vector3(width, size.Y),
-                        new Vector3(0, size.Y),
+                        new Vector3(Vector3.Origin.X, size.Y),
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -377,22 +365,19 @@ namespace GeometryEx
             {
                 throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
-            var polygon =
+            return
                 new Polygon
                 (
-                    new []
+                    new[]
                     {
-                        origin,
-                        new Vector3(size.X, 0),
+                        Vector3.Origin,
+                        new Vector3(size.X, Vector3.Origin.Y),
                         new Vector3(size.X, width),
                         new Vector3(width, width),
                         new Vector3(width, size.Y),
-                        new Vector3(0, size.Y)
+                        new Vector3(Vector3.Origin.X, size.Y)
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -412,7 +397,7 @@ namespace GeometryEx
             }
             var halfWidth = width * 0.5;
             var yAxis = origin.X + (size.X * 0.5);
-            var polygon =
+            return
                 new Polygon
                 (
                     new []
@@ -422,14 +407,11 @@ namespace GeometryEx
                         new Vector3(yAxis + halfWidth, size.Y - width),
                         new Vector3(size.X, size.Y - width),
                         new Vector3(size.X, size.Y),
-                        new Vector3(0, size.Y),
-                        new Vector3(0, size.Y - width),
+                        new Vector3(Vector3.Origin.X, size.Y),
+                        new Vector3(Vector3.Origin.X, size.Y - width),
                         new Vector3(yAxis - halfWidth, size.Y - width)
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -447,24 +429,21 @@ namespace GeometryEx
             {
                 throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
-            var polygon =
+            return
                 new Polygon
                 (
                     new []
                     {
-                        origin,
-                        new Vector3(size.X, origin.Y),
-                        new Vector3(size.X, origin.Y + size.Y),
-                        new Vector3(size.X - width, origin.Y + size.Y),
-                        new Vector3(size.X - width, origin.Y + width),
-                        new Vector3(width, origin.Y + width),
-                        new Vector3(width, origin.Y + size.Y),
-                        new Vector3(origin.X, origin.Y + size.Y)
+                        Vector3.Origin,
+                        new Vector3(size.X, Vector3.Origin.Y),
+                        new Vector3(size.X, Vector3.Origin.Y + size.Y),
+                        new Vector3(size.X - width, Vector3.Origin.Y + size.Y),
+                        new Vector3(size.X - width, Vector3.Origin.Y + width),
+                        new Vector3(width, Vector3.Origin.Y + width),
+                        new Vector3(width, Vector3.Origin.Y + size.Y),
+                        new Vector3(Vector3.Origin.X, Vector3.Origin.Y + size.Y)
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -485,13 +464,13 @@ namespace GeometryEx
             var halfWidth = width * 0.5;
             var xAxis = origin.Y + (size.Y * 0.5);
             var yAxis = origin.X + (size.X * 0.5);
-            var polygon = 
+            return 
                 new Polygon
                 (               
                     new []
                     {
-                        new Vector3(yAxis - halfWidth, 0),
-                        new Vector3(yAxis + halfWidth, 0),
+                        new Vector3(yAxis - halfWidth, Vector3.Origin.Y),
+                        new Vector3(yAxis + halfWidth, Vector3.Origin.Y),
                         new Vector3(yAxis + halfWidth, xAxis - halfWidth),
                         new Vector3(size.X, xAxis - halfWidth),
                         new Vector3(size.X, xAxis + halfWidth),
@@ -499,14 +478,11 @@ namespace GeometryEx
                         new Vector3(yAxis + halfWidth, size.Y),
                         new Vector3(yAxis - halfWidth, size.Y),
                         new Vector3(yAxis - halfWidth, xAxis + halfWidth),
-                        new Vector3(0, xAxis + halfWidth),
-                        new Vector3(0, xAxis - halfWidth),
+                        new Vector3(Vector3.Origin.X, xAxis + halfWidth),
+                        new Vector3(Vector3.Origin.X, xAxis - halfWidth),
                         new Vector3(yAxis - halfWidth, xAxis - halfWidth)
                     }
-                );
-            Transform movTrans = new Transform();
-            movTrans.Move(origin);
-            return movTrans.OfPolygon(polygon);
+                ).MoveFromTo(Vector3.Origin, origin);
         }
 
         /// <summary>
@@ -557,10 +533,10 @@ namespace GeometryEx
                 (
                     new[]
                     {
-                        new Vector3(0.0, 0.0),
-                        new Vector3(sizeX, 0.0),
+                        Vector3.Origin,
+                        new Vector3(sizeX, Vector3.Origin.Y),
                         new Vector3(sizeX, sizeY),
-                        new Vector3(0.0, sizeY)
+                        new Vector3(Vector3.Origin.X, sizeY)
                     }
                 );
             if (moveTo != null)
