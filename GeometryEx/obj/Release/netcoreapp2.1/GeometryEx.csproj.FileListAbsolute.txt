@@ -1,8 +1,0 @@
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Release\netcoreapp2.1\GeometryEx.deps.json
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Release\netcoreapp2.1\GeometryEx.dll
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Release\netcoreapp2.1\GeometryEx.pdb
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Release\netcoreapp2.1\GeometryEx.csproj.CoreCompileInputs.cache
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Release\netcoreapp2.1\GeometryEx.AssemblyInfoInputs.cache
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Release\netcoreapp2.1\GeometryEx.AssemblyInfo.cs
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Release\netcoreapp2.1\GeometryEx.dll
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Release\netcoreapp2.1\GeometryEx.pdb

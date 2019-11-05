@@ -1,9 +1,0 @@
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Debug\netstandard2.0\GeometryEx.deps.json
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Debug\netstandard2.0\GeometryEx.dll
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\bin\Debug\netstandard2.0\GeometryEx.pdb
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.csprojAssemblyReference.cache
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.csproj.CoreCompileInputs.cache
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.AssemblyInfoInputs.cache
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.AssemblyInfo.cs
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.dll
-C:\Users\aahau\GitHub\GeometryEx\GeometryEx\obj\Debug\netstandard2.0\GeometryEx.pdb

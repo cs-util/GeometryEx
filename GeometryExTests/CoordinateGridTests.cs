@@ -24,11 +24,9 @@ namespace GeometryExTests
             );
             var grid = new CoordinateGrid(perimeter);
             var model = new Model();
-            var colType = 
-                new StructuralFramingType("", new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Concrete);
             foreach (var point in grid.Available)
             {
-                model.AddElement(new Column(point, 1.0, colType));
+                model.AddElement(new Column(point, 4.0, new Profile(Polygon.Rectangle(0.1, 0.1))));
             }
             model.ToGlTF("../../../../CoordinateGrid.glb");
             Assert.Equal(600, grid.Available.Count);

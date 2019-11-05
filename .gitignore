@@ -1,4 +1,6 @@
-/bin
-/obj
-/.vs/*.*
+/[Bb]in
+/[Oo]bj
+/~nuget
+/.vs
+/.vscode
 *.glb
