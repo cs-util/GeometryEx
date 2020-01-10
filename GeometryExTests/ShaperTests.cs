@@ -96,10 +96,10 @@ namespace GeometryExTests
             polygon = Shaper.ExpandtoArea(polygon, 20, within, among);
             var spaces = new List<Space>
             {
-                new Space(polygon, 3.0, 0.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, 0.0, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, 0.0, new Material("yellow", Palette.Yellow)),
-                new Space(among[1], 3.0, 0.0, new Material("green", Palette.Green))
+                new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
+                new Space(within, 0.1, new Material("aqua", Palette.Aqua)),
+                new Space(among[0], 3.0, new Material("yellow", Palette.Yellow)),
+                new Space(among[1], 3.0, new Material("green", Palette.Green))
             };
             var model = new Model();
             foreach (Space space in spaces)
@@ -154,10 +154,10 @@ namespace GeometryExTests
             polygon = Shaper.FitTo(polygon, within, among).First();
             var spaces = new List<Space>
             {
-                new Space(polygon, 3.0, 0.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, 0.0, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, 0.0, new Material("yellow", Palette.Yellow)),
-                new Space(among[1], 3.0, 0.0, new Material("green", Palette.Green))
+                new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
+                new Space(within, 0.1, new Material("aqua", Palette.Aqua)),
+                new Space(among[0], 3.0, new Material("yellow", Palette.Yellow)),
+                new Space(among[1], 3.0, new Material("green", Palette.Green))
             };
             var model = new Model();
             foreach (Space space in spaces)

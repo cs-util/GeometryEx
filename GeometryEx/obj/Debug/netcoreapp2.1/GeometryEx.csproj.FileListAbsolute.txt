@@ -1,0 +1,9 @@
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\bin\Debug\netcoreapp2.1\GeometryEx.deps.json
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\bin\Debug\netcoreapp2.1\GeometryEx.dll
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\bin\Debug\netcoreapp2.1\GeometryEx.pdb
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.csproj.CoreCompileInputs.cache
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.AssemblyInfoInputs.cache
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.AssemblyInfo.cs
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.dll
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.pdb
+C:\Users\Anthony\GitHub\GeometryEx\GeometryEx\obj\Debug\netcoreapp2.1\GeometryEx.csprojAssemblyReference.cache

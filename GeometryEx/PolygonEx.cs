@@ -278,6 +278,42 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polyon's Centroid.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static List<Vector3> FindInternalPoints(this Polygon polygon, double resolution = 1.0)
+        {
+            var centroid = polygon.Centroid();
+            var distPoints = polygon.Vertices.ToList().OrderByDescending(v => v.DistanceTo(centroid));
+            var segments = polygon.Segments();
+            var intPoints = new List<Vector3>();
+            foreach (var point in distPoints)
+            {
+                var ray = new Line(centroid, point);
+                var lines = ray.DivideByLength(resolution);
+                foreach (var line in lines)
+                {
+                    foreach (var segment in segments)
+                    {
+                        if (ray.Intersects2D(segment))
+                        {
+                            if (polygon.Contains(line.Start))
+                            {
+                                intPoints.Add(line.Start);
+                            }
+                            if (polygon.Contains(line.End))
+                            {
+                                intPoints.Add(line.End);
+                            }
+                        }
+                    }
+                }
+            }
+            return intPoints;
+        }
+
+        /// <summary>
         /// Tests whether a Polygon is covered by a Polygon perimeter and doesn't intersect with a list of Polygons.
         /// </summary>
         /// <param name="polygon">The Polygon to test.</param>
@@ -325,16 +361,15 @@ namespace GeometryEx
         /// <returns>True if the polygon is oriented clockwise.</returns>
         public static bool IsClockWise(this Polygon polygon)
         {
-            var verts = polygon.Vertices;
-            var xA = verts[0].X;         
-            var xB = verts[1].X;           
-            var xC = verts[2].X;
-
-            var yA = verts[0].Y;
-            var yB = verts[1].Y;
-            var yC = verts[2].Y;
-
-            return (xB - xA) * (yC - yA) - (xC - xA) * (yB - yA) < 0 ? true : false;
+            // https://en.wikipedia.org/wiki/Shoelace_formula
+            var sum = 0.0;
+            for (int i = 0; i < polygon.Vertices.Count; i++)
+            {
+                var point = polygon.Vertices[i];
+                var nextPoint = polygon.Vertices[(i + 1) % polygon.Vertices.Count];
+                sum += (nextPoint.X - point.X) * (nextPoint.Y + point.Y);
+            }
+            return sum > 0;
         }
 
         /// <summary>
