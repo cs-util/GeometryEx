@@ -21,7 +21,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 4.0)
                 }
             );
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             Assert.Equal(0.0, box.SW.X);
             Assert.Equal(0.0, box.SW.Y);
             Assert.Equal(1.0, box.SSW.X);

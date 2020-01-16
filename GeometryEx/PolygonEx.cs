@@ -30,9 +30,9 @@ namespace GeometryEx
             {
                 return null;
             }
-            if (segments[0].Start == segments[1].End || segments[0].End == segments[1].Start)
+            if (segments[0].Start.Equals(segments[1].End) || segments[0].End.Equals(segments[1].Start))
             {
-                if (segments[0].Start != segments[2].End && segments[0].End != segments[2].Start)
+                if (segments[0].Start.Equals(segments[2].End) && segments[0].End.Equals(segments[2].Start))
                 {
                     return new Line(segments[0].Midpoint(), segments[2].Midpoint());
                 }
@@ -47,9 +47,9 @@ namespace GeometryEx
         /// <summary>
         /// Returns a TopoBox representation of the Polygon's bounding box.
         /// </summary>
-        public static TopoBox Box(this Polygon polygon)
+        public static CompassBox Box(this Polygon polygon)
         {
-            return new TopoBox(polygon);
+            return new CompassBox(polygon);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace GeometryEx
         /// </summary>
         public static List<Vector3> BoxCorners(this Polygon polygon)
         {
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             return new List<Vector3>
             {
                 box.SW,
@@ -65,89 +65,6 @@ namespace GeometryEx
                 box.NE,
                 box.NW
             };
-        }
-
-        /// <summary>
-        /// Tests if the supplied Polygon resides in a corner of a Polygon perimeter.
-        /// </summary>
-        /// <param name="polygon">The Polygon to test.</param>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if exactly three of the polygon bounding box points fall on the Polygon perimeter bounding box.
-        /// </returns>
-        public static bool AtCorner(this Polygon polygon, Polygon perimeter)
-        {
-            var count = 0;
-            var box = new TopoBox(perimeter);
-            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (boundary.Touches(vertex))
-                {
-                    count++;
-                }
-            }
-            if (count != 3)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the supplied Polygon resides against an edge of a Polygon perimeter.
-        /// </summary>
-        /// <param name="polygon">The Polygon to test.</param>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if exactly two of the Polygon bounding box points fall on or outside the perimeter and exactly two bounding box points fall inside the perimeter.
-        /// </returns>
-        public static bool AtEdge(this Polygon polygon, Polygon perimeter)
-        {
-            var countOn = 0;
-            var countIn = 0;
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (perimeter.Contains(vertex))
-                {
-                    countIn++;
-                }
-                else if (perimeter.Touches(vertex) || perimeter.Disjoint(vertex))
-                {
-                    countOn++;
-                }
-            }
-            if (countOn != countIn)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the bounding box of the supplied Polygon fills a side of the perimeter.
-        /// </summary>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if all Polygon bounding box points fall on the perimeter or on its bounding box.
-        /// </returns>
-        public static bool AtSide(this Polygon polygon, Polygon perimeter)
-        {
-            var count = 0;
-            var box = new TopoBox(perimeter);
-            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (boundary.Touches(vertex) || perimeter.Touches(vertex))
-                {
-                    count++;
-                }
-            }
-            if (count != 4)
-            {
-                return false;
-            }
-            return true;
         }
 
         /// <summary>
@@ -159,7 +76,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Contains(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }
@@ -182,7 +99,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Covers(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }
@@ -264,7 +181,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Disjoint(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return true;
             }
@@ -278,11 +195,11 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polyon's Centroid.
+        /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polygon's Centroid.
         /// </summary>
         /// <param name="polygon"></param>
         /// <returns></returns>
-        public static List<Vector3> FindInternalPoints(this Polygon polygon, double resolution = 1.0)
+        public static List<Vector3> FindInternalPoints(this Polygon polygon, double interval = 1.0)
         {
             var centroid = polygon.Centroid();
             var distPoints = polygon.Vertices.ToList().OrderByDescending(v => v.DistanceTo(centroid));
@@ -291,7 +208,7 @@ namespace GeometryEx
             foreach (var point in distPoints)
             {
                 var ray = new Line(centroid, point);
-                var lines = ray.DivideByLength(resolution);
+                var lines = ray.DivideByLength(interval);
                 foreach (var line in lines)
                 {
                     foreach (var segment in segments)
@@ -418,7 +335,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Touches(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }

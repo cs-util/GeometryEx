@@ -111,7 +111,7 @@ namespace GeometryEx
             if (lineSlope.NearEqual(intrSlope) || 
                (Math.Abs(lineSlope) == double.PositiveInfinity && Math.Abs(intrSlope) == double.PositiveInfinity))
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             if (Math.Abs(lineSlope) == double.PositiveInfinity && intrSlope.NearEqual(0.0))
             {

@@ -397,7 +397,7 @@ namespace GeometryExTests
         [Fact]
         public void Rectangle()
         {
-            var vertices = Shaper.Rectangle(10.0, 10.0).Vertices;
+            var vertices = Shaper.Rectangle(10.0, 10.0, Vector3.Origin).Vertices;
 
             Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
             Assert.Contains(vertices, p => p.X == 10.0 && p.Y == 0.0);

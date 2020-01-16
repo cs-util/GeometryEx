@@ -1,4 +1,6 @@
-﻿namespace GeometryEx
+﻿using Elements.Geometry;
+
+namespace GeometryEx
 {
     /// <summary>
     /// A list of box corners as compass designations.
@@ -7,5 +9,6 @@
     /// SW = minimum X and Y corner.
     /// NW = minimum X and maximum Y corner.
     /// </summary>
-    public enum Corner { NE, SE, SW, NW };    
+    public enum Corners { NE, SE, SW, NW };
 }
+

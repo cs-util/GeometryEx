@@ -7,7 +7,7 @@ namespace GeometryEx
     /// <summary>
     /// Maintains a set of points on the orthogonal bounding box of a supplied Polygon corresponding to four divisions of each side.
     /// </summary>
-    public class TopoBox
+    public class CompassBox
     {
         /// <summary>
         /// Vector3 location identifier corresponding to the center of the box perimeter.
@@ -121,7 +121,7 @@ namespace GeometryEx
         /// <returns>
         /// A new TopoBox.
         /// </returns>
-        public TopoBox(Polygon polygon)
+        public CompassBox(Polygon polygon)
         {
             var vertices = new List<Vector3>(polygon.Vertices);
             vertices.Sort((a, b) => a.X.CompareTo(b.X));
@@ -186,7 +186,7 @@ namespace GeometryEx
                 case Orient.NE: return NE;
                 case Orient.NNE: return NNE;
             }
-            return null;
+            return new Vector3(double.NaN, double.NaN);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace GeometryEx
                 case Orient.NE: return SW;
                 case Orient.NNE: return SSW;
             }
-            return null;
+            return new Vector3(double.NaN, double.NaN);
         }
     }
 }

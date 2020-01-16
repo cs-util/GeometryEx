@@ -22,7 +22,7 @@ namespace GeometryEx
         /// </returns>
         public static Polygon AdjacentArea(Polygon polygon, double area, Orient orient)
         {
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             double sizeX = 0.0;
             double sizeY = 0.0;
             if (orient == Orient.N || orient == Orient.S)
@@ -35,7 +35,7 @@ namespace GeometryEx
                 sizeX = area / box.SizeY;
                 sizeY = box.SizeY;
             }
-            Vector3 origin = null;
+            Vector3 origin = Vector3.Origin;
             switch (orient)
             {
                 case Orient.N:
@@ -522,7 +522,7 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon Rectangle(double sizeX, double sizeY, Vector3 moveTo = null)
+        public static Polygon Rectangle(double sizeX, double sizeY, Vector3 moveTo)
         {
             if (sizeX <= 0 || sizeY <= 0)
             {
@@ -539,11 +539,7 @@ namespace GeometryEx
                         new Vector3(Vector3.Origin.X, sizeY)
                     }
                 );
-            if (moveTo != null)
-            {
-                return polygon.MoveFromTo(Vector3.Origin, moveTo);
-            }
-            return polygon;
+            return polygon.MoveFromTo(Vector3.Origin, moveTo);
         }
 
         /// <summary>
@@ -555,15 +551,11 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon RectangleByArea(double area, double ratio, Vector3 moveTo = null, double angle = 0.0)
+        public static Polygon RectangleByArea(double area, double ratio, Vector3 moveTo, double angle = 0.0)
         {
             var x = Math.Sqrt(area * ratio);
             var y = area / x;
-            if (moveTo != null)
-            {
-                return Rectangle(x, y).MoveFromTo(Vector3.Origin, moveTo).Rotate(moveTo, angle);
-            }
-            return Rectangle(x, y);
+            return Rectangle(x, y, moveTo).Rotate(moveTo, angle);
         }
 
         /// <summary>
@@ -574,14 +566,10 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon RectangleBySide(double ySide, double area, Vector3 moveTo = null, double angle = 0.0)
+        public static Polygon RectangleBySide(double ySide, double area, Vector3 moveTo, double angle = 0.0)
         {
             var x = area / ySide;
-            if (moveTo != null)
-            {
-                return Rectangle(x, ySide).MoveFromTo(Vector3.Origin, moveTo).Rotate(moveTo, angle);
-            }
-            return Rectangle(x, ySide);
+            return Rectangle(x, ySide, moveTo).Rotate(moveTo, angle);
         }
 
         /// <summary>
