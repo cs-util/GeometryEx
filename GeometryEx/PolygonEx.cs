@@ -13,7 +13,7 @@ namespace GeometryEx
         /// </summary>
         public static double AspectRatio(this Polygon polygon)
         {
-            var box = polygon.Box();
+            var box = polygon.Compass();
             return box.SizeX >= box.SizeY ? box.SizeX / box.SizeY : box.SizeY / box.SizeX;
         }
 
@@ -45,9 +45,9 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a TopoBox representation of the Polygon's bounding box.
+        /// Returns a CompassBox representation of the Polygon's bounding box.
         /// </summary>
-        public static CompassBox Box(this Polygon polygon)
+        public static CompassBox Compass(this Polygon polygon)
         {
             return new CompassBox(polygon);
         }

@@ -85,7 +85,7 @@ namespace GeometryEx
         {
             var i = 0;
             var position = polygon.Centroid();
-            Polygon tryPoly = null;
+            Polygon tryPoly;
             do
             {
                 var factor = Math.Sqrt(area / polygon.Area());
@@ -515,34 +515,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates an orthogonal box Polygon with the southwest corner at the origin.
-        /// </summary>
-        /// <param name="sizeX">The x dimension of the Polygon.</param>
-        /// <param name="sizeY">The y dimension of the Polygon.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon Rectangle(double sizeX, double sizeY, Vector3 moveTo)
-        {
-            if (sizeX <= 0 || sizeY <= 0)
-            {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
-            }
-            var polygon =
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(sizeX, Vector3.Origin.Y),
-                        new Vector3(sizeX, sizeY),
-                        new Vector3(Vector3.Origin.X, sizeY)
-                    }
-                );
-            return polygon.MoveFromTo(Vector3.Origin, moveTo);
-        }
-
-        /// <summary>
         /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
@@ -551,25 +523,9 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon RectangleByArea(double area, double ratio, Vector3 moveTo, double angle = 0.0)
+        public static Polygon RectangleByArea(double area, double ratio = 1.0)
         {
-            var x = Math.Sqrt(area * ratio);
-            var y = area / x;
-            return Rectangle(x, y, moveTo).Rotate(moveTo, angle);
-        }
-
-        /// <summary>
-        /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
-        /// </summary>
-        /// <param name="ySide">Length of the y-dimension.</param>
-        /// <param name="area">Required area of the Polygon.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon RectangleBySide(double ySide, double area, Vector3 moveTo, double angle = 0.0)
-        {
-            var x = area / ySide;
-            return Rectangle(x, ySide, moveTo).Rotate(moveTo, angle);
+            return Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area * ratio), area / Math.Sqrt(area * ratio)));
         }
 
         /// <summary>

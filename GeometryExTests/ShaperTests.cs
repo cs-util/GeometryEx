@@ -395,38 +395,15 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void Rectangle()
-        {
-            var vertices = Shaper.Rectangle(10.0, 10.0, Vector3.Origin).Vertices;
-
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 10.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 10.0);
-        }
-
-        [Fact]
         public void RectangleByArea()
         {
-            var polygon = Shaper.RectangleByArea(9.0, 1.0, new Vector3(10.0, 10.0));
+            var polygon = Shaper.RectangleByArea(9.0, 1.0);
 
             Assert.Equal(9.0, polygon.Area());
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 13.0 && p.Y == 13.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 13.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 13.0 && p.Y == 13.0);
-        }
-
-        [Fact]
-        public void RectangleBySide()
-        {
-            var polygon = Shaper.RectangleBySide(10.0, 100.0, new Vector3(10.0, 10.0));
-
-            Assert.Equal(100.0, polygon.Area());
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 20.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 20.0 && p.Y == 20.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 20.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 0.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 3.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 3.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 0.0);
         }
     }
 }
