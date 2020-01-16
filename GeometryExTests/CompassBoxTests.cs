@@ -6,10 +6,10 @@ using GeometryEx;
 
 namespace GeometryExTests
 {
-    public class TopoBoxTests
+    public class CompassBoxTests
     {
         [Fact]
-        public void TopoBoxCreate()
+        public void CompassBoxCreate()
         {
             var polygon = new Polygon
             (
