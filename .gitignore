@@ -1,6 +1,6 @@
-/bin
-/obj
-/.nuget
-/.vs
-/.vscode
+bin/
+obj/
+nuget/
+.vs/
+.vscode/
 *.glb
