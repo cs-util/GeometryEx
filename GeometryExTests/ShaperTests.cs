@@ -93,7 +93,7 @@ namespace GeometryExTests
                         new Vector3(1.0, 6.0),
                     })
             };
-            polygon = Shaper.ExpandtoArea(polygon, 20, within, among);
+            polygon = Shaper.ExpandtoArea(polygon, 20.0, within, among);
             var spaces = new List<Space>
             {
                 new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
@@ -250,16 +250,6 @@ namespace GeometryExTests
             Assert.False(Shaper.PointWithin(point1, polygons));
             Assert.True(Shaper.PointWithin(point2, polygons));
             Assert.True(Shaper.PointWithin(point3, polygons));
-        }
-
-        [Fact]
-        public void PolygonRegular()
-        {
-            var polygon = Shaper.PolygonRegular(new Vector3(10.0, 11.0), 10, 6);
-
-            Assert.Equal(6.0, polygon.Vertices.Count());
-            Assert.Equal(10.0, polygon.Centroid().X, 10);
-            Assert.Equal(11.0, polygon.Centroid().Y, 10);
         }
 
         [Fact]

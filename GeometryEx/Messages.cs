@@ -12,7 +12,7 @@ namespace GeometryEx
         /// <summary>
         /// 
         /// </summary>
-        public const string POLYGON_SHAPE_EXCEPTION = "Values will result in an unexpected shape. Examine polygon relationships and requested dimensions.";
+        public const string POLYGON_SHAPE_EXCEPTION = "Values will result in an unexpected shape. Examine polygon relationships and dimensions.";
 
     }
 }

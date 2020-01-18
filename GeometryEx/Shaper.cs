@@ -76,18 +76,24 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon ExpandtoArea(Polygon polygon,
-                                           double area,
-                                           Polygon within = null,
-                                           List<Polygon> among = null,
-                                           double tolerance = 0.1,
-                                           int trials = 20)
+        public static Polygon ExpandtoArea(Polygon polygon, double area,
+                                           Polygon within = null, List<Polygon> among = null,
+                                           double tolerance = 0.1)
         {
-            var i = 0;
+            if (polygon.IsClockWise())
+            {
+                polygon = polygon.Reversed();
+            }
+            if (Math.Abs(polygon.Area() - area) <= tolerance)
+            {
+                return polygon;
+            }
             var position = polygon.Centroid();
-            Polygon tryPoly;
+            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
+            double tryArea;
             do
             {
+                tryArea = tryPoly.Area();
                 var factor = Math.Sqrt(area / polygon.Area());
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
@@ -102,9 +108,9 @@ namespace GeometryEx
                 {
                     tryPoly = tryPoly.Difference(among).First();
                 }
-                i++;
             }
-            while ((tryPoly.Area() < area - (area * tolerance) || tryPoly.Area() > area + (area * tolerance)) && i < trials);
+            while ((!NearEqual(tryPoly.Area(), area, tolerance)) && 
+                    !NearEqual(tryPoly.Area(), tryArea, 0.01));
             return tryPoly;
         }
 
@@ -486,35 +492,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates a regular Polygon inscribed within the supplied radius from the supplied center.
-        /// </summary>
-        /// <param name="center">The Vector3 center point of the Polygon.</param>
-        /// <param name="radius">The radius of the inscribed Polygon.</param>
-        /// <param name="sides">The number of sides of the inscribed Polygon.</param>
-        /// <returns>
-        /// A new regular Polygon.
-        /// </returns>
-
-        public static Polygon PolygonRegular(Vector3 center, double radius, int sides = 3)
-        {
-            if (radius <= 0.0 || sides < 3)
-            {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
-            }
-            var vertices = new List<Vector3>();
-            var angle = Math.PI * 0.5;
-            var nxtAngle = Math.PI * 2 / sides;
-            for (int i = 0; i < sides; i++)
-            {
-                var x = center.X + (radius * Math.Cos(angle));
-                var y = center.Y + (radius * Math.Sin(angle));
-                vertices.Add(new Vector3(x, y));
-                angle += nxtAngle;
-            }
-            return new Polygon(vertices.ToArray());
-        }
-
-        /// <summary>
         /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
@@ -525,6 +502,10 @@ namespace GeometryEx
         /// </returns>
         public static Polygon RectangleByArea(double area, double ratio = 1.0)
         {
+            if (area <= 0.0 || ratio <= 0.0)
+            {
+                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+            }
             return Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area * ratio), area / Math.Sqrt(area * ratio)));
         }
 
@@ -536,7 +517,7 @@ namespace GeometryEx
         /// <returns>
         /// True if the supplied values are equivalent within the default or supplied tolerance.
         /// </returns>
-        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 0.000001)
+        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
         {
             if (Math.Abs(thisValue - thatValue) > tolerance)
             {
