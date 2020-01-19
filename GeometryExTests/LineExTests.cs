@@ -44,7 +44,7 @@ namespace GeometryExTests
         public void Divide()
         {
             var line = new Line(Vector3.Origin, new Vector3(0.0, 150.0));
-            Assert.Equal(25.0, line.Divide(24).Count);
+            Assert.Equal(25, line.Divide(24).Count);
         }
 
         [Fact]

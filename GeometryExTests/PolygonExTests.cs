@@ -25,7 +25,6 @@ namespace GeometryExTests
             Assert.Equal(2.0, polygon.AspectRatio());
         }
 
-
         [Fact]
         public void Contains()
         {

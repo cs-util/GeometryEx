@@ -18,33 +18,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Hypothesizes a centerline of an oblong rectangular Polygon by finding the midpoint of the two shortest sides and creating a line between them. If the two shortest sides share a point, skips a side and returns the line form the midpoint of the first and third sides in the list.
-        /// </summary>
-        /// <returns>
-        /// A new Line.
-        /// </returns>
-        public static Line AxisQuad(this Polygon polygon)
-        {
-            var segments = new List<Line>(polygon.Segments().OrderBy(i => i.Length()));
-            if (segments.Count() != 4)
-            {
-                return null;
-            }
-            if (segments[0].Start.Equals(segments[1].End) || segments[0].End.Equals(segments[1].Start))
-            {
-                if (segments[0].Start.Equals(segments[2].End) && segments[0].End.Equals(segments[2].Start))
-                {
-                    return new Line(segments[0].Midpoint(), segments[2].Midpoint());
-                }
-                else
-                {
-                    return new Line(segments[0].Midpoint(), segments[3].Midpoint());
-                }
-            }
-            return new Line(segments[0].Midpoint(), segments[1].Midpoint());
-        }
-
-        /// <summary>
         /// Returns a CompassBox representation of the Polygon's bounding box.
         /// </summary>
         public static CompassBox Compass(this Polygon polygon)
@@ -195,6 +168,54 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Attempts to expand a Polygon horizontally until coming within the tolerance percentage of the target area.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="area">Target area of the Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <param name="among">Llist of Polygons to avoid intersecting.</param>
+        /// <param name="tolerance">Area total tolerance.</param>
+        /// <returns>
+        /// A new Polygon.
+        /// </returns>
+        public static Polygon ExpandtoArea(this Polygon polygon, double area, double tolerance = 0.1,
+                                           Polygon within = null, List<Polygon> among = null)
+        {
+            if (polygon.IsClockWise())
+            {
+                polygon = polygon.Reversed();
+            }
+            if (Math.Abs(polygon.Area() - area) <= tolerance)
+            {
+                return polygon;
+            }
+            var position = polygon.Centroid();
+            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
+            double tryArea;
+            do
+            {
+                tryArea = tryPoly.Area();
+                var factor = Math.Sqrt(area / polygon.Area());
+                var t = new Transform();
+                t.Scale(new Vector3(factor, factor));
+                tryPoly = t.OfPolygon(polygon);
+                var centroid = tryPoly.Centroid();
+                tryPoly = tryPoly.MoveFromTo(centroid, position);
+                if (within != null && tryPoly.Intersects(within))
+                {
+                    tryPoly = within.Intersection(tryPoly).First();
+                }
+                if (among != null && tryPoly.Intersects(among))
+                {
+                    tryPoly = tryPoly.Difference(among).First();
+                }
+            }
+            while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
+                    !Shaper.NearEqual(tryPoly.Area(), tryArea, 0.01));
+            return tryPoly;
+        }
+
+        /// <summary>
         /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polygon's Centroid.
         /// </summary>
         /// <param name="polygon"></param>
@@ -246,6 +267,48 @@ namespace GeometryEx
                 return false;
             }
             return !polygon.Intersects(among);
+        }
+
+        /// <summary>
+        /// Creates the largest Polygon fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
+        /// <returns>
+        /// A list of Polygons.
+        /// </returns>
+        public static Polygon FitTo(this Polygon polygon, Polygon within = null, List<Polygon> among = null)
+        {
+            var polyWithin = new List<Polygon>();
+            if (within != null && polygon.Intersects(within))
+            {
+                polyWithin.AddRange(within.Intersection(polygon));
+            }
+            else
+            {
+                polyWithin.Add(polygon);
+            }
+            if (among == null)
+            {
+                polyWithin = polyWithin.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+                return polyWithin.First();
+            }
+            var polyAmong = new List<Polygon>();
+            foreach (Polygon poly in polyWithin)
+            {
+                var polygons = poly.Difference(among);
+                if (polygons != null)
+                {
+                    polyAmong.AddRange(polygons);
+                }
+                else
+                {
+                    polyAmong.Add(poly);
+                }
+            }
+            polyAmong = polyAmong.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            return polyAmong.First();
         }
 
         /// <summary>
@@ -303,6 +366,21 @@ namespace GeometryEx
             var t = new Transform();
             t.Move(new Vector3(to.X - from.X, to.Y - from.Y));
             return t.OfPolygon(polygon);
+        }
+
+        /// <summary>
+        /// Returns a new Polygon placed in a spatial relationship with a supplied polygon by using supplied Orient points derived from Polygon.Compass bounding box points on each Polygon.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="adjTo">Reference Polygon in relation to which to place This Polygon.</param>
+        /// <param name="from">Orient value indicating the point on This Polygon to use a MoveFromTo 'from' value.</param>
+        /// <param name="to">Orient value indicating the point on the reference Polygon as a MoveFromTo 'to' value.</param>
+        /// <returns>A new Polygon.</returns>
+        public static Polygon PlaceNear(this Polygon polygon, Polygon adjTo, Orient from, Orient to)
+        {
+            var thisCompass = polygon.Compass();
+            var adjCompass = adjTo.Compass();
+            return polygon.MoveFromTo(thisCompass.PointBy(from), adjCompass.PointBy(to));
         }
 
         /// <summary>

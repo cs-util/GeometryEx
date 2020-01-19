@@ -65,53 +65,23 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Attempts to expand a Polygon horizontally until coming within the tolerance percentage of the target area.
+        /// Hypothesizes a centerline of a rectangular Polygon by finding the midpoint of the shortest side and creating a line between its midpoint and midpoint of the second segment away from that side.
         /// </summary>
-        /// <param name="polygon">Polygon to expand to the specified area.</param>
-        /// <param name="area">Target area of the Polygon.</param>
-        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
-        /// <param name="among">Llist of Polygons to avoid intersecting.</param>
-        /// <param name="tolerance">Area total tolerance.</param>
-        /// <param name="trials">Number of times to attempt to scale the Polygon to the desired area.</param>
         /// <returns>
-        /// A new Polygon.
+        /// A new Line.
         /// </returns>
-        public static Polygon ExpandtoArea(Polygon polygon, double area,
-                                           Polygon within = null, List<Polygon> among = null,
-                                           double tolerance = 0.1)
+        public static Line AxisQuad(Polygon polygon)
         {
-            if (polygon.IsClockWise())
+            var segments = polygon.Segments();
+            if (segments.Count() != 4)
             {
-                polygon = polygon.Reversed();
+                throw new ArgumentException("Polygon must have 4 sides");
             }
-            if (Math.Abs(polygon.Area() - area) <= tolerance)
-            {
-                return polygon;
-            }
-            var position = polygon.Centroid();
-            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
-            double tryArea;
-            do
-            {
-                tryArea = tryPoly.Area();
-                var factor = Math.Sqrt(area / polygon.Area());
-                var t = new Transform();
-                t.Scale(new Vector3(factor, factor));
-                tryPoly = t.OfPolygon(polygon);
-                var centroid = tryPoly.Centroid();
-                tryPoly = tryPoly.MoveFromTo(centroid, position);
-                if (within != null && tryPoly.Intersects(within))
-                {
-                    tryPoly = within.Intersection(tryPoly).First();
-                }
-                if (among != null && tryPoly.Intersects(among))
-                {
-                    tryPoly = tryPoly.Difference(among).First();
-                }
-            }
-            while ((!NearEqual(tryPoly.Area(), area, tolerance)) && 
-                    !NearEqual(tryPoly.Area(), tryArea, 0.01));
-            return tryPoly;
+            var shortest = segments.OrderBy(s => s.Length()).ToArray()[0];
+            var points = polygon.Vertices.ToList();
+            points.Remove(shortest.Start);
+            points.Remove(shortest.End);
+            return new Line(shortest.Midpoint(), new Line(points.First(), points.Last()).Midpoint());
         }
 
         /// <summary>
@@ -123,9 +93,7 @@ namespace GeometryEx
         /// <returns>
         /// A list of Polygons.
         /// </returns>
-        public static List<Polygon> FitTo(Polygon polygon,
-                                          Polygon within = null,
-                                          List<Polygon> among = null)
+        public static List<Polygon> FitTo(Polygon polygon, Polygon within = null, List<Polygon> among = null)
         {
             var polyWithin = new List<Polygon>();
             if (within != null && polygon.Intersects(within))
