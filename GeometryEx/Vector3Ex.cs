@@ -10,7 +10,6 @@ namespace GeometryEx
     /// </summary>
     public static class Vector3Ex
     {
-
         /// <summary>
         /// Returns the Vector3 point in a List farthest from this point.
         /// </summary>
@@ -22,7 +21,7 @@ namespace GeometryEx
         {
             if (points.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN);
             }
             return points.OrderByDescending(pnt => point.DistanceTo(pnt)).First();
         }
@@ -38,7 +37,7 @@ namespace GeometryEx
         {
             if (points.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN);
             }
             return points.OrderBy(pnt => point.DistanceTo(pnt)).First();
         }

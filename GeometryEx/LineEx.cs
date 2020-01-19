@@ -46,23 +46,18 @@ namespace GeometryEx
         /// </summary>
         /// <param name="segments">The quantity of desired segments.</param>
         /// <returns>
-        /// A List of Vector3 points.
+        /// A List of Vector3 points including the start and end points of the series.
         /// </returns>
         public static List<Vector3> Divide(this Line line, int segments)
         {
-            var pointList = new List<Vector3>()
+            var lines = line.DivideByCount(segments);
+            var points = new List<Vector3>();
+            foreach (var segment in lines)
             {
-                line.Start
-            };
-            var percent = 1.0 / segments;
-            var factor = 1;
-            var at = percent * factor;
-            for (int i = 0; i < segments; i++)
-            {
-                pointList.Add(line.PointAt(at));
-                at = percent * ++factor;
+                points.Add(segment.Start);
             }
-            return pointList;
+            points.Add(lines.Last().End);
+            return points;
         }
 
         /// <summary>
@@ -111,7 +106,7 @@ namespace GeometryEx
             if (lineSlope.NearEqual(intrSlope) || 
                (Math.Abs(lineSlope) == double.PositiveInfinity && Math.Abs(intrSlope) == double.PositiveInfinity))
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             if (Math.Abs(lineSlope) == double.PositiveInfinity && intrSlope.NearEqual(0.0))
             {

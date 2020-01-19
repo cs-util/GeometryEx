@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>1.10.0</Version>
+    <Version>2.5</Version>
     <Author>Anthony A. Hauck</Author>
     <Company>Hypar Inc.</Company>
     <Description>Extensions to to Hypar.Elements.Geometry and Polygon creation utilities.</Description>
@@ -10,9 +10,9 @@
     <PackageProjectUrl>https://github.com/hypar-io/GeometryEx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hypar-io/GeometryEx</RepositoryUrl>
     <PackageTags>Hypar Elements Geometry Extensions Polygon</PackageTags>
-    <PackageReleaseNotes>- Experimental upgrade to Hypar.Elements 0.4.0 Alpha 4</PackageReleaseNotes>
-    <AssemblyVersion>1.10.0.0</AssemblyVersion>
-    <FileVersion>1.10.0.0</FileVersion>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <AssemblyVersion>2.5.0.0</AssemblyVersion>
+    <FileVersion>2.5.0.0</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hypar.Elements" Version="0.4.0-alpha.4" />
+    <PackageReference Include="Hypar.Elements" Version="0.4.3.4" />
     <PackageReference Include="ParagonClipper" Version="6.4.2" />
   </ItemGroup>
 

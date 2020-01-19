@@ -26,117 +26,6 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void AtCorner()
-        {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(0.0, 10.0)
-                }
-            );
-            var p2 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(5.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(5.0, 10.0)
-                }
-            );
-            var perimeter = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 20.0),
-                    new Vector3(0.0, 20.0)
-                }
-            );
-            Assert.True(p1.AtCorner(perimeter));
-            Assert.False(p2.AtCorner(perimeter));
-        }
-
-        [Fact]
-        public void AtEdge()
-        {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(0.0, 10.0)
-                }
-            );
-            var p2 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(5.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(5.0, 10.0)
-                }
-            );
-            var perimeter = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 20.0),
-                    new Vector3(0.0, 20.0)
-                }
-            );
-            Assert.False(p1.AtEdge(perimeter));
-            Assert.True(p2.AtEdge(perimeter));
-        }
-
-        [Fact]
-        public void AtSide()
-        {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 20.0),
-                    new Vector3(0.0, 20.0)
-                }
-            );
-            var p2 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(5.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(5.0, 10.0)
-                }
-            );
-            var perimeter = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 20.0),
-                    new Vector3(0.0, 20.0)
-                }
-            );
-            Assert.True(p1.AtSide(perimeter));
-            Assert.False(p2.AtSide(perimeter));
-        }
-
-        [Fact]
         public void Contains()
         {
             var polygon = new Polygon
@@ -259,6 +148,27 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void FindInternalPoints()
+        {
+            var within = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(0.0, 0.0),
+                    new Vector3(100.0, 0.0),
+                    new Vector3(100.0, 25.0),
+                    new Vector3(25.0, 25.0),
+                    new Vector3(25.0, 100.0),
+                    new Vector3(0.0, 100.0),
+                }
+            );
+            var points = within.FindInternalPoints();
+            Assert.Equal(172, points.Count);
+            points = within.FindInternalPoints(0.5);
+            Assert.Equal(344, points.Count);
+        }
+
+        [Fact]
         public void Fits()
         {
             var within = new Polygon
@@ -347,17 +257,20 @@ namespace GeometryExTests
             (
                 new[]
                 {
-                    new Vector3(10.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 20.0),
-                    new Vector3(10.0, 20.0)
-                }
+                    new Vector3(0.0, 5.0),
+                    new Vector3(5.0, 5.0),
+                    new Vector3(0.0, 10.0),
+                    new Vector3(10.0, 10.0),
+                    new Vector3(10.0, 5.0),
+                    new Vector3(5.0, 0.0),
+                    new Vector3(0.0, 0.0)
+                 }
             );
+            Assert.True(p1.IsClockWise());
             var verts = new List<Vector3>(p1.Vertices);
             verts.Reverse();
             var p2 = new Polygon(verts.ToArray());
-            Assert.False(p1.IsClockWise());
-            Assert.True(p2.IsClockWise());
+            Assert.False(p2.IsClockWise());
         }
 
         [Fact]

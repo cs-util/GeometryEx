@@ -22,7 +22,7 @@ namespace GeometryEx
         /// </returns>
         public static Polygon AdjacentArea(Polygon polygon, double area, Orient orient)
         {
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             double sizeX = 0.0;
             double sizeY = 0.0;
             if (orient == Orient.N || orient == Orient.S)
@@ -35,7 +35,7 @@ namespace GeometryEx
                 sizeX = area / box.SizeY;
                 sizeY = box.SizeY;
             }
-            Vector3 origin = null;
+            Vector3 origin = Vector3.Origin;
             switch (orient)
             {
                 case Orient.N:
@@ -65,47 +65,23 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Attempts to expand a Polygon horizontally until coming within the tolerance percentage of the target area.
+        /// Hypothesizes a centerline of a rectangular Polygon by finding the midpoint of the shortest side and creating a line between its midpoint and midpoint of the second segment away from that side.
         /// </summary>
-        /// <param name="polygon">Polygon to expand to the specified area.</param>
-        /// <param name="area">Target area of the Polygon.</param>
-        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
-        /// <param name="among">Llist of Polygons to avoid intersecting.</param>
-        /// <param name="tolerance">Area total tolerance.</param>
-        /// <param name="trials">Number of times to attempt to scale the Polygon to the desired area.</param>
         /// <returns>
-        /// A new Polygon.
+        /// A new Line.
         /// </returns>
-        public static Polygon ExpandtoArea(Polygon polygon,
-                                           double area,
-                                           Polygon within = null,
-                                           List<Polygon> among = null,
-                                           double tolerance = 0.1,
-                                           int trials = 20)
+        public static Line AxisQuad(Polygon polygon)
         {
-            var i = 0;
-            var position = polygon.Centroid();
-            Polygon tryPoly = null;
-            do
+            var segments = polygon.Segments();
+            if (segments.Count() != 4)
             {
-                var factor = Math.Sqrt(area / polygon.Area());
-                var t = new Transform();
-                t.Scale(new Vector3(factor, factor));
-                tryPoly = t.OfPolygon(polygon);
-                var centroid = tryPoly.Centroid();
-                tryPoly = tryPoly.MoveFromTo(centroid, position);
-                if (within != null && tryPoly.Intersects(within))
-                {
-                    tryPoly = within.Intersection(tryPoly).First();
-                }
-                if (among != null && tryPoly.Intersects(among))
-                {
-                    tryPoly = tryPoly.Difference(among).First();
-                }
-                i++;
+                throw new ArgumentException("Polygon must have 4 sides");
             }
-            while ((tryPoly.Area() < area - (area * tolerance) || tryPoly.Area() > area + (area * tolerance)) && i < trials);
-            return tryPoly;
+            var shortest = segments.OrderBy(s => s.Length()).ToArray()[0];
+            var points = polygon.Vertices.ToList();
+            points.Remove(shortest.Start);
+            points.Remove(shortest.End);
+            return new Line(shortest.Midpoint(), new Line(points.First(), points.Last()).Midpoint());
         }
 
         /// <summary>
@@ -117,9 +93,7 @@ namespace GeometryEx
         /// <returns>
         /// A list of Polygons.
         /// </returns>
-        public static List<Polygon> FitTo(Polygon polygon,
-                                          Polygon within = null,
-                                          List<Polygon> among = null)
+        public static List<Polygon> FitTo(Polygon polygon, Polygon within = null, List<Polygon> among = null)
         {
             var polyWithin = new List<Polygon>();
             if (within != null && polygon.Intersects(within))
@@ -486,67 +460,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates a regular Polygon inscribed within the supplied radius from the supplied center.
-        /// </summary>
-        /// <param name="center">The Vector3 center point of the Polygon.</param>
-        /// <param name="radius">The radius of the inscribed Polygon.</param>
-        /// <param name="sides">The number of sides of the inscribed Polygon.</param>
-        /// <returns>
-        /// A new regular Polygon.
-        /// </returns>
-
-        public static Polygon PolygonRegular(Vector3 center, double radius, int sides = 3)
-        {
-            if (radius <= 0.0 || sides < 3)
-            {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
-            }
-            var vertices = new List<Vector3>();
-            var angle = Math.PI * 0.5;
-            var nxtAngle = Math.PI * 2 / sides;
-            for (int i = 0; i < sides; i++)
-            {
-                var x = center.X + (radius * Math.Cos(angle));
-                var y = center.Y + (radius * Math.Sin(angle));
-                vertices.Add(new Vector3(x, y));
-                angle += nxtAngle;
-            }
-            return new Polygon(vertices.ToArray());
-        }
-
-        /// <summary>
-        /// Creates an orthogonal box Polygon with the southwest corner at the origin.
-        /// </summary>
-        /// <param name="sizeX">The x dimension of the Polygon.</param>
-        /// <param name="sizeY">The y dimension of the Polygon.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon Rectangle(double sizeX, double sizeY, Vector3 moveTo = null)
-        {
-            if (sizeX <= 0 || sizeY <= 0)
-            {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
-            }
-            var polygon =
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(sizeX, Vector3.Origin.Y),
-                        new Vector3(sizeX, sizeY),
-                        new Vector3(Vector3.Origin.X, sizeY)
-                    }
-                );
-            if (moveTo != null)
-            {
-                return polygon.MoveFromTo(Vector3.Origin, moveTo);
-            }
-            return polygon;
-        }
-
-        /// <summary>
         /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
@@ -555,33 +468,13 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon RectangleByArea(double area, double ratio, Vector3 moveTo = null, double angle = 0.0)
+        public static Polygon RectangleByArea(double area, double ratio = 1.0)
         {
-            var x = Math.Sqrt(area * ratio);
-            var y = area / x;
-            if (moveTo != null)
+            if (area <= 0.0 || ratio <= 0.0)
             {
-                return Rectangle(x, y).MoveFromTo(Vector3.Origin, moveTo).Rotate(moveTo, angle);
+                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
-            return Rectangle(x, y);
-        }
-
-        /// <summary>
-        /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
-        /// </summary>
-        /// <param name="ySide">Length of the y-dimension.</param>
-        /// <param name="area">Required area of the Polygon.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon RectangleBySide(double ySide, double area, Vector3 moveTo = null, double angle = 0.0)
-        {
-            var x = area / ySide;
-            if (moveTo != null)
-            {
-                return Rectangle(x, ySide).MoveFromTo(Vector3.Origin, moveTo).Rotate(moveTo, angle);
-            }
-            return Rectangle(x, ySide);
+            return Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area * ratio), area / Math.Sqrt(area * ratio)));
         }
 
         /// <summary>
@@ -592,7 +485,7 @@ namespace GeometryEx
         /// <returns>
         /// True if the supplied values are equivalent within the default or supplied tolerance.
         /// </returns>
-        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 0.000001)
+        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
         {
             if (Math.Abs(thisValue - thatValue) > tolerance)
             {

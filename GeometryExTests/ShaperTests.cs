@@ -52,6 +52,29 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void AxisQuad()
+        {
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(3.0, 1.0),
+                    new Vector3(6.0, 1.0),
+                    new Vector3(1.0, 6.0),
+                    new Vector3(1.0, 3.0)
+                }
+            );
+            var axis = Shaper.AxisQuad(polygon);
+            var start = new Vector3(2.0, 2.0);
+            var end = new Vector3(3.5, 3.5);
+
+            Assert.Equal(axis.Start.X, start.X);
+            Assert.Equal(axis.Start.Y, start.Y);
+            Assert.Equal(axis.End.X, end.X);
+            Assert.Equal(axis.End.Y, end.Y);
+        }
+
+        [Fact]
         public void ExpandToArea()
         {
             var polygon = new Polygon
@@ -93,13 +116,13 @@ namespace GeometryExTests
                         new Vector3(1.0, 6.0),
                     })
             };
-            polygon = Shaper.ExpandtoArea(polygon, 20, within, among);
+            polygon = polygon.ExpandtoArea(20.0, 0.1, within, among);
             var spaces = new List<Space>
             {
-                new Space(polygon, 3.0, 0.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, 0.0, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, 0.0, new Material("yellow", Palette.Yellow)),
-                new Space(among[1], 3.0, 0.0, new Material("green", Palette.Green))
+                new Space(polygon, 3.0, new Material("blue", new Color(0.0f, 0.0f, 1.0f, 0.6f))),
+                new Space(within, 0.1, new Material("aqua", new Color(0.3f, 0.7f, 0.7f, 0.6f))),
+                new Space(among[0], 3.0, new Material("yellow", new Color(1.0f, 0.9f, 0.1f, 0.6f))),
+                new Space(among[1], 3.0, new Material("green", new Color(0.0f, 1.0f, 0.0f, 0.6f)))
             };
             var model = new Model();
             foreach (Space space in spaces)
@@ -154,10 +177,10 @@ namespace GeometryExTests
             polygon = Shaper.FitTo(polygon, within, among).First();
             var spaces = new List<Space>
             {
-                new Space(polygon, 3.0, 0.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, 0.0, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, 0.0, new Material("yellow", Palette.Yellow)),
-                new Space(among[1], 3.0, 0.0, new Material("green", Palette.Green))
+                new Space(polygon, 3.0, new Material("blue", new Color(0.0f, 0.0f, 1.0f, 0.6f))),
+                new Space(within, 0.1, new Material("aqua", new Color(0.3f, 0.7f, 0.7f, 0.6f))),
+                new Space(among[0], 3.0, new Material("yellow", new Color(1.0f, 0.9f, 0.1f, 0.6f))),
+                new Space(among[1], 3.0, new Material("green", new Color(0.0f, 1.0f, 0.0f, 0.6f)))
             };
             var model = new Model();
             foreach (Space space in spaces)
@@ -250,16 +273,6 @@ namespace GeometryExTests
             Assert.False(Shaper.PointWithin(point1, polygons));
             Assert.True(Shaper.PointWithin(point2, polygons));
             Assert.True(Shaper.PointWithin(point3, polygons));
-        }
-
-        [Fact]
-        public void PolygonRegular()
-        {
-            var polygon = Shaper.PolygonRegular(new Vector3(10.0, 11.0), 10, 6);
-
-            Assert.Equal(6.0, polygon.Vertices.Count());
-            Assert.Equal(10.0, polygon.Centroid().X, 10);
-            Assert.Equal(11.0, polygon.Centroid().Y, 10);
         }
 
         [Fact]
@@ -395,38 +408,15 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void Rectangle()
-        {
-            var vertices = Shaper.Rectangle(10.0, 10.0).Vertices;
-
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 10.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 10.0);
-        }
-
-        [Fact]
         public void RectangleByArea()
         {
-            var polygon = Shaper.RectangleByArea(9.0, 1.0, new Vector3(10.0, 10.0));
+            var polygon = Shaper.RectangleByArea(9.0, 1.0);
 
             Assert.Equal(9.0, polygon.Area());
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 13.0 && p.Y == 13.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 13.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 13.0 && p.Y == 13.0);
-        }
-
-        [Fact]
-        public void RectangleBySide()
-        {
-            var polygon = Shaper.RectangleBySide(10.0, 100.0, new Vector3(10.0, 10.0));
-
-            Assert.Equal(100.0, polygon.Area());
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 20.0 && p.Y == 10.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 20.0 && p.Y == 20.0);
-            Assert.Contains(polygon.Vertices, p => p.X == 10.0 && p.Y == 20.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 0.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 3.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 3.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 0.0);
         }
     }
 }

@@ -13,43 +13,16 @@ namespace GeometryEx
         /// </summary>
         public static double AspectRatio(this Polygon polygon)
         {
-            var box = polygon.Box();
+            var box = polygon.Compass();
             return box.SizeX >= box.SizeY ? box.SizeX / box.SizeY : box.SizeY / box.SizeX;
         }
 
         /// <summary>
-        /// Hypothesizes a centerline of an oblong rectangular Polygon by finding the midpoint of the two shortest sides and creating a line between them. If the two shortest sides share a point, skips a side and returns the line form the midpoint of the first and third sides in the list.
+        /// Returns a CompassBox representation of the Polygon's bounding box.
         /// </summary>
-        /// <returns>
-        /// A new Line.
-        /// </returns>
-        public static Line AxisQuad(this Polygon polygon)
+        public static CompassBox Compass(this Polygon polygon)
         {
-            var segments = new List<Line>(polygon.Segments().OrderBy(i => i.Length()));
-            if (segments.Count() != 4)
-            {
-                return null;
-            }
-            if (segments[0].Start == segments[1].End || segments[0].End == segments[1].Start)
-            {
-                if (segments[0].Start != segments[2].End && segments[0].End != segments[2].Start)
-                {
-                    return new Line(segments[0].Midpoint(), segments[2].Midpoint());
-                }
-                else
-                {
-                    return new Line(segments[0].Midpoint(), segments[3].Midpoint());
-                }
-            }
-            return new Line(segments[0].Midpoint(), segments[1].Midpoint());
-        }
-
-        /// <summary>
-        /// Returns a TopoBox representation of the Polygon's bounding box.
-        /// </summary>
-        public static TopoBox Box(this Polygon polygon)
-        {
-            return new TopoBox(polygon);
+            return new CompassBox(polygon);
         }
 
         /// <summary>
@@ -57,7 +30,7 @@ namespace GeometryEx
         /// </summary>
         public static List<Vector3> BoxCorners(this Polygon polygon)
         {
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             return new List<Vector3>
             {
                 box.SW,
@@ -65,89 +38,6 @@ namespace GeometryEx
                 box.NE,
                 box.NW
             };
-        }
-
-        /// <summary>
-        /// Tests if the supplied Polygon resides in a corner of a Polygon perimeter.
-        /// </summary>
-        /// <param name="polygon">The Polygon to test.</param>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if exactly three of the polygon bounding box points fall on the Polygon perimeter bounding box.
-        /// </returns>
-        public static bool AtCorner(this Polygon polygon, Polygon perimeter)
-        {
-            var count = 0;
-            var box = new TopoBox(perimeter);
-            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (boundary.Touches(vertex))
-                {
-                    count++;
-                }
-            }
-            if (count != 3)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the supplied Polygon resides against an edge of a Polygon perimeter.
-        /// </summary>
-        /// <param name="polygon">The Polygon to test.</param>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if exactly two of the Polygon bounding box points fall on or outside the perimeter and exactly two bounding box points fall inside the perimeter.
-        /// </returns>
-        public static bool AtEdge(this Polygon polygon, Polygon perimeter)
-        {
-            var countOn = 0;
-            var countIn = 0;
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (perimeter.Contains(vertex))
-                {
-                    countIn++;
-                }
-                else if (perimeter.Touches(vertex) || perimeter.Disjoint(vertex))
-                {
-                    countOn++;
-                }
-            }
-            if (countOn != countIn)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the bounding box of the supplied Polygon fills a side of the perimeter.
-        /// </summary>
-        /// <param name="perimeter">The Polygon to test against.</param>
-        /// <returns>
-        /// Returns true if all Polygon bounding box points fall on the perimeter or on its bounding box.
-        /// </returns>
-        public static bool AtSide(this Polygon polygon, Polygon perimeter)
-        {
-            var count = 0;
-            var box = new TopoBox(perimeter);
-            var boundary = Shaper.Rectangle(box.SizeX, box.SizeY).MoveFromTo(Vector3.Origin, box.SW);
-            foreach (Vector3 vertex in BoxCorners(polygon))
-            {
-                if (boundary.Touches(vertex) || perimeter.Touches(vertex))
-                {
-                    count++;
-                }
-            }
-            if (count != 4)
-            {
-                return false;
-            }
-            return true;
         }
 
         /// <summary>
@@ -159,7 +49,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Contains(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }
@@ -182,7 +72,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Covers(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }
@@ -264,7 +154,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Disjoint(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return true;
             }
@@ -275,6 +165,90 @@ namespace GeometryEx
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Attempts to expand a Polygon horizontally until coming within the tolerance percentage of the target area.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="area">Target area of the Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <param name="among">Llist of Polygons to avoid intersecting.</param>
+        /// <param name="tolerance">Area total tolerance.</param>
+        /// <returns>
+        /// A new Polygon.
+        /// </returns>
+        public static Polygon ExpandtoArea(this Polygon polygon, double area, double tolerance = 0.1,
+                                           Polygon within = null, List<Polygon> among = null)
+        {
+            if (polygon.IsClockWise())
+            {
+                polygon = polygon.Reversed();
+            }
+            if (Math.Abs(polygon.Area() - area) <= tolerance)
+            {
+                return polygon;
+            }
+            var position = polygon.Centroid();
+            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
+            double tryArea;
+            do
+            {
+                tryArea = tryPoly.Area();
+                var factor = Math.Sqrt(area / polygon.Area());
+                var t = new Transform();
+                t.Scale(new Vector3(factor, factor));
+                tryPoly = t.OfPolygon(polygon);
+                var centroid = tryPoly.Centroid();
+                tryPoly = tryPoly.MoveFromTo(centroid, position);
+                if (within != null && tryPoly.Intersects(within))
+                {
+                    tryPoly = within.Intersection(tryPoly).First();
+                }
+                if (among != null && tryPoly.Intersects(among))
+                {
+                    tryPoly = tryPoly.Difference(among).First();
+                }
+            }
+            while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
+                    !Shaper.NearEqual(tryPoly.Area(), tryArea, 0.01));
+            return tryPoly;
+        }
+
+        /// <summary>
+        /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polygon's Centroid.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static List<Vector3> FindInternalPoints(this Polygon polygon, double interval = 1.0)
+        {
+            var centroid = polygon.Centroid();
+            var distPoints = polygon.Vertices.ToList().OrderByDescending(v => v.DistanceTo(centroid));
+            var segments = polygon.Segments();
+            var intPoints = new List<Vector3>();
+            foreach (var point in distPoints)
+            {
+                var ray = new Line(centroid, point);
+                var lines = ray.DivideByLength(interval);
+                foreach (var line in lines)
+                {
+                    foreach (var segment in segments)
+                    {
+                        if (ray.Intersects2D(segment))
+                        {
+                            if (polygon.Contains(line.Start))
+                            {
+                                intPoints.Add(line.Start);
+                            }
+                            if (polygon.Contains(line.End))
+                            {
+                                intPoints.Add(line.End);
+                            }
+                        }
+                    }
+                }
+            }
+            return intPoints;
         }
 
         /// <summary>
@@ -293,6 +267,48 @@ namespace GeometryEx
                 return false;
             }
             return !polygon.Intersects(among);
+        }
+
+        /// <summary>
+        /// Creates the largest Polygon fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
+        /// <returns>
+        /// A list of Polygons.
+        /// </returns>
+        public static Polygon FitTo(this Polygon polygon, Polygon within = null, List<Polygon> among = null)
+        {
+            var polyWithin = new List<Polygon>();
+            if (within != null && polygon.Intersects(within))
+            {
+                polyWithin.AddRange(within.Intersection(polygon));
+            }
+            else
+            {
+                polyWithin.Add(polygon);
+            }
+            if (among == null)
+            {
+                polyWithin = polyWithin.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+                return polyWithin.First();
+            }
+            var polyAmong = new List<Polygon>();
+            foreach (Polygon poly in polyWithin)
+            {
+                var polygons = poly.Difference(among);
+                if (polygons != null)
+                {
+                    polyAmong.AddRange(polygons);
+                }
+                else
+                {
+                    polyAmong.Add(poly);
+                }
+            }
+            polyAmong = polyAmong.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            return polyAmong.First();
         }
 
         /// <summary>
@@ -325,16 +341,15 @@ namespace GeometryEx
         /// <returns>True if the polygon is oriented clockwise.</returns>
         public static bool IsClockWise(this Polygon polygon)
         {
-            var verts = polygon.Vertices;
-            var xA = verts[0].X;         
-            var xB = verts[1].X;           
-            var xC = verts[2].X;
-
-            var yA = verts[0].Y;
-            var yB = verts[1].Y;
-            var yC = verts[2].Y;
-
-            return (xB - xA) * (yC - yA) - (xC - xA) * (yB - yA) < 0 ? true : false;
+            // https://en.wikipedia.org/wiki/Shoelace_formula
+            var sum = 0.0;
+            for (int i = 0; i < polygon.Vertices.Count; i++)
+            {
+                var point = polygon.Vertices[i];
+                var nextPoint = polygon.Vertices[(i + 1) % polygon.Vertices.Count];
+                sum += (nextPoint.X - point.X) * (nextPoint.Y + point.Y);
+            }
+            return sum > 0;
         }
 
         /// <summary>
@@ -351,6 +366,21 @@ namespace GeometryEx
             var t = new Transform();
             t.Move(new Vector3(to.X - from.X, to.Y - from.Y));
             return t.OfPolygon(polygon);
+        }
+
+        /// <summary>
+        /// Returns a new Polygon placed in a spatial relationship with a supplied polygon by using supplied Orient points derived from Polygon.Compass bounding box points on each Polygon.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="adjTo">Reference Polygon in relation to which to place This Polygon.</param>
+        /// <param name="from">Orient value indicating the point on This Polygon to use a MoveFromTo 'from' value.</param>
+        /// <param name="to">Orient value indicating the point on the reference Polygon as a MoveFromTo 'to' value.</param>
+        /// <returns>A new Polygon.</returns>
+        public static Polygon PlaceNear(this Polygon polygon, Polygon adjTo, Orient from, Orient to)
+        {
+            var thisCompass = polygon.Compass();
+            var adjCompass = adjTo.Compass();
+            return polygon.MoveFromTo(thisCompass.PointBy(from), adjCompass.PointBy(to));
         }
 
         /// <summary>
@@ -383,7 +413,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Touches(this Polygon polygon, Vector3 point)
         {
-            if (point == null)
+            if (point.IsNaN())
             {
                 return false;
             }

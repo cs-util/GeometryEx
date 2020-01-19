@@ -58,7 +58,7 @@ namespace GeometryEx
             Available = new List<Vector3>();
             Perimeter = new Polygon(polygon.Vertices);
             var centroid = polygon.Centroid();
-            var box = new TopoBox(polygon);
+            var box = new CompassBox(polygon);
             var points = new List<Vector3>();
 
             // Northeast quadrant
@@ -194,7 +194,7 @@ namespace GeometryEx
         {
             if (Allocated.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             var x = Allocated.First().X;
             var y = Allocated.First().Y;
@@ -222,7 +222,7 @@ namespace GeometryEx
         {
             if (Allocated.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             return Allocated[random.Next(0, Allocated.Count - 1)];
         }
@@ -238,7 +238,7 @@ namespace GeometryEx
         {
             if (Available.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             var maxX = Available.First().X;
             var maxY = Available.First().Y;
@@ -264,7 +264,7 @@ namespace GeometryEx
         {
             if (Available.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             var minX = Available.First().X;
             var minY = Available.First().Y;
@@ -290,7 +290,7 @@ namespace GeometryEx
         {
             if (Available.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             var x = Available.First().X;
             var y = Available.First().Y;
@@ -319,7 +319,7 @@ namespace GeometryEx
         {
             if (Available.Count == 0)
             {
-                return null;
+                return new Vector3(double.NaN, double.NaN, double.NaN);
             }
             return Available[random.Next(0, Available.Count - 1)];
         }
