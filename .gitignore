@@ -1,6 +1,6 @@
-/[Bb]in
-/[Oo]bj
-/.nuget
-/.vs
-/.vscode
+[Bb]in/
+[Oo]bj/
+~nuget/
+vs/
+.vscode/
 *.glb
