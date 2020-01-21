@@ -168,39 +168,51 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Attempts to expand a Polygon horizontally until coming within the tolerance percentage of the target area.
+        /// Attempts to scale up a Polygon until coming within the tolerance percentage of the target area.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
+        /// <param name="polygon">Polygon to scale.</param>
         /// <param name="area">Target area of the Polygon.</param>
+        /// <param name="tolerance">Area total tolerance.</param>
+        /// <param name="origin">Alignment location for final Polygon.</param>
         /// <param name="within">Polygon acting as a constraining outer boundary.</param>
         /// <param name="among">Llist of Polygons to avoid intersecting.</param>
-        /// <param name="tolerance">Area total tolerance.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon ExpandtoArea(this Polygon polygon, double area, double tolerance = 0.1,
+        public static Polygon ExpandtoArea(this Polygon polygon, double area,
+                                           double tolerance = 0.1, Orient origin = Orient.C,
                                            Polygon within = null, List<Polygon> among = null)
         {
             if (polygon.IsClockWise())
             {
                 polygon = polygon.Reversed();
             }
-            if (Math.Abs(polygon.Area() - area) <= tolerance)
+            if (Math.Abs(polygon.Area() - area) <= tolerance * area)
             {
                 return polygon;
             }
-            var position = polygon.Centroid();
+            var pBox = polygon.Compass();
+            var position = pBox.PointBy(origin);
             Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
             double tryArea;
             do
             {
                 tryArea = tryPoly.Area();
-                var factor = Math.Sqrt(area / polygon.Area());
+                double factor;
+                if (tryArea >= area)
+                {
+                    factor = Math.Sqrt(tryArea / area);
+                }
+                else
+                {
+                    factor = Math.Sqrt(area / tryArea);
+                }
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
                 tryPoly = t.OfPolygon(polygon);
-                var centroid = tryPoly.Centroid();
-                tryPoly = tryPoly.MoveFromTo(centroid, position);
+                var tBox = tryPoly.Compass();
+                var from = tBox.PointBy(origin);
+                tryPoly = tryPoly.MoveFromTo(from, position);
                 if (within != null && tryPoly.Intersects(within))
                 {
                     tryPoly = within.Intersection(tryPoly).First();
@@ -210,8 +222,8 @@ namespace GeometryEx
                     tryPoly = tryPoly.Difference(among).First();
                 }
             }
-            while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
-                    !Shaper.NearEqual(tryPoly.Area(), tryArea, 0.01));
+            while ((!Shaper.NearEqual(tryPoly.Area(), area, area * tolerance)) &&
+                    !Shaper.NearEqual(tryPoly.Area(), tryArea, tryArea * tolerance));
             return tryPoly;
         }
 
