@@ -478,6 +478,23 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
+        /// </summary>
+        /// <param name="ratio">Ratio of width to depth.</param>
+        /// <param name="moveTo">Location of the southwest corner of the new Polygon.</param>
+        /// <returns>
+        /// A new Polygon.
+        /// </returns>
+        public static Polygon RectangleByRatio(double ratio = 1.0)
+        {
+            if (ratio <= 0.0)
+            {
+                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+            }
+            return Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, ratio));
+        }
+
+        /// <summary>
         /// Tests if two doubles are effectively equal within a tolerance.
         /// </summary>
         /// <param name="thisValue">The lower bound of the random range.</param>

@@ -418,5 +418,17 @@ namespace GeometryExTests
             Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 3.0);
             Assert.Contains(polygon.Vertices, p => p.X == 3.0 && p.Y == 0.0);
         }
+
+        [Fact]
+        public void RectangleByRatio()
+        {
+            var polygon = Shaper.RectangleByRatio(2.0);
+
+            Assert.Equal(2.0, polygon.Area());
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 0.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 1.0 && p.Y == 0.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 1.0 && p.Y == 2.0);
+            Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 2.0);
+        }
     }
 }
