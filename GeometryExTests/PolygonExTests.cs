@@ -287,9 +287,9 @@ namespace GeometryExTests
                         new Vector3(0.0, 4.0)
                     }
                 );
-            polygon = polygon.MoveFromTo(Vector3.Origin, new Vector3(4.0, 4.0));
-            Assert.Contains(new Vector3(4.0, 4.0), polygon.Vertices);
-            Assert.Contains(new Vector3(8.0, 8.0), polygon.Vertices);
+            polygon = polygon.MoveFromTo(Vector3.Origin, new Vector3(4.0, 4.0, 4.0));
+            Assert.Contains(new Vector3(4.0, 4.0, 4.0), polygon.Vertices);
+            Assert.Contains(new Vector3(8.0, 8.0, 4.0), polygon.Vertices);
         }
 
         [Fact]

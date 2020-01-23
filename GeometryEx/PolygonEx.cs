@@ -209,7 +209,7 @@ namespace GeometryEx
                 }
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
-                tryPoly = t.OfPolygon(polygon);
+                tryPoly = t.OfPolygon(tryPoly);
                 var tBox = tryPoly.Compass();
                 var from = tBox.PointBy(origin);
                 tryPoly = tryPoly.MoveFromTo(from, position);
@@ -222,8 +222,8 @@ namespace GeometryEx
                     tryPoly = tryPoly.Difference(among).First();
                 }
             }
-            while ((!Shaper.NearEqual(tryPoly.Area(), area, area * tolerance)) &&
-                    !Shaper.NearEqual(tryPoly.Area(), tryArea, tryArea * tolerance));
+            while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
+                    !Shaper.NearEqual(tryPoly.Area(), tryArea, tolerance));
             return tryPoly;
         }
 
@@ -376,7 +376,7 @@ namespace GeometryEx
         public static Polygon MoveFromTo(this Polygon polygon, Vector3 from, Vector3 to)
         {
             var t = new Transform();
-            t.Move(new Vector3(to.X - from.X, to.Y - from.Y));
+            t.Move(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
             return t.OfPolygon(polygon);
         }
 
