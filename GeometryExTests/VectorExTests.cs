@@ -24,6 +24,17 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void MoveFromTo()
+        {
+            var point = new Vector3(5.0, 5.0, 5.0);
+            point = point.MoveFromTo(Vector3.Origin, new Vector3(5.0, 5.0, 5.0));
+
+            Assert.Equal(10.0, point.X);
+            Assert.Equal(10.0, point.Y);
+            Assert.Equal(10.0, point.Z);
+        }
+
+        [Fact]
         public void NearestTo()
         {
             var point = Vector3.Origin;

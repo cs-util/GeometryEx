@@ -367,7 +367,7 @@ namespace GeometryEx
         /// <summary>
         /// Returns a new Polygon displaced along a 2D vector calculated between the supplied Vector3 points.
         /// </summary>
-        /// <param name="polygon">Polygon instance to be copied.</param>
+        /// <param name="polygon">This Polygon.</param>
         /// <param name="from">Vector3 base point of the move.</param>
         /// <param name="to">Vector3 target point of the move.</param>
         /// <returns>

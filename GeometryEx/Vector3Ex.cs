@@ -27,6 +27,22 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the Vector3 point moved to a new relative location.
+        /// </summary>
+        /// <param name="vector">This Vector3.</param>
+        /// <param name="from">Vector3 base point of the move.</param>
+        /// <param name="to">Vector3 target point of the move.</param>
+        /// <returns>
+        /// A Vector3.
+        /// </returns>
+        public static Vector3 MoveFromTo(this Vector3 vector, Vector3 from, Vector3 to)
+        {
+            var t = new Transform();
+            t.Move(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
+            return t.OfPoint(vector);
+        }
+
+        /// <summary>
         /// Returns the Vector3 point in a List closest to this point.
         /// </summary>
         /// <param name="points">List of Vector3 points to compare.</param>
