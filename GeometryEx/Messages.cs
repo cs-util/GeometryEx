@@ -9,10 +9,12 @@ namespace GeometryEx
     /// </summary>
     public static class Messages
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        public const string NEGATIVE_VALUE_EXCEPTION = "Value must be zero or greater.";
+
         public const string POLYGON_SHAPE_EXCEPTION = "Values will result in an unexpected shape. Examine polygon relationships and dimensions.";
 
+        public const string POLYGON_NULL_EXCEPTION = "Null value instead of Polygon.";
+
+        public const string ZERO_VALUE_EXCEPTION = "Value must not be zero.";
     }
 }

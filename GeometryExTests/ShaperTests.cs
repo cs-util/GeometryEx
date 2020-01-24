@@ -119,10 +119,10 @@ namespace GeometryExTests
             polygon = polygon.ExpandtoArea(20.0, 0.1, Orient.C, within, among);
             var spaces = new List<Space>
             {
-                new Space(polygon, 3.0, new Material("blue", new Color(0.0f, 0.0f, 1.0f, 0.6f))),
-                new Space(within, 0.1, new Material("aqua", new Color(0.3f, 0.7f, 0.7f, 0.6f))),
-                new Space(among[0], 3.0, new Material("yellow", new Color(1.0f, 0.9f, 0.1f, 0.6f))),
-                new Space(among[1], 3.0, new Material("green", new Color(0.0f, 1.0f, 0.0f, 0.6f)))
+                new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
+                new Space(within, 0.1, new Material("aqua", Palette.Aqua)),
+                new Space(among[0], 3.0, new Material("yellow", Palette.Aqua)),
+                new Space(among[1], 3.0, new Material("green", Palette.Green))
             };
             var model = new Model();
             foreach (Space space in spaces)

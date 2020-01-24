@@ -51,7 +51,7 @@ namespace GeometryEx
         /// <returns>
         /// A new CoordGrid.
         /// </returns>
-        public CoordinateGrid(Polygon polygon, double xInterval = 1,  double yInterval = 1, double angle = 0.0)
+        public CoordinateGrid(Polygon polygon, double xInterval = 1.0,  double yInterval = 1.0, double angle = 0.0)
         {
             random = new Random();
             Allocated = new List<Vector3>();
