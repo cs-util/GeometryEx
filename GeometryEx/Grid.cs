@@ -136,12 +136,44 @@ namespace GeometryEx
             return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, IntervalY * -0.5));
         }
 
-        #endregion
+        #endregion Private
 
         #region Properties
 
+        /// <summary>
+        /// Returns all the points at the intersections of the grid lines.
+        /// Points are supplied in sequential rows of X coordinates of increasing Y value.
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> Intersections
+        {
+            get
+            {
+                var points = new List<Vector3>();
+                for (var x = 0; x < LinesX.Count; x++)
+                {
+                    for (var y = 0; y < LinesX.Count; y++)
+                    {
+                        points.Add(Intersection(x, y));
+                    }
+                }
+                return points;
+            }
+        }
+
+        /// <summary>
+        ///  Distance between X axis Grid lines.
+        /// </summary>
         public double IntervalX { get; }
+
+        /// <summary>
+        ///  Distance between Y axis Grid lines.
+        /// </summary>
         public double IntervalY { get; }
+
+        /// <summary>
+        /// List of all Grid lines.
+        /// </summary>
         public List<Line> Lines
         {
             get
@@ -152,22 +184,39 @@ namespace GeometryEx
             }
         }
 
+        /// <summary>
+        /// List of X axis lines.
+        /// </summary>
         public List<Line> LinesX { get; }
 
+        /// <summary>
+        /// List of Y axis lines.
+        /// </summary>
         public List<Line> LinesY { get; }
 
         /// <summary>
-        /// Polygon perimeter of the grid. 
+        /// Polygon perimeter generating the Grid. 
         /// </summary>
         public Polygon Perimeter { get; }
 
+
+        /// <summary>
+        /// Start position of the axis intervals.
+        /// </summary>
         public GridPosition Position { get; }
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
-        public Vector3 PointAt(int gridX, int gridY)
+        /// <summary>
+        /// Returns the point at the intersection of the grid lines at the specified axis indices.
+        /// Grid lines are numbered as two zero index lists from minimum to maximum X and Y coordinates.
+        /// </summary>
+        /// <param name="gridX">Index of a X axis grid line.</param>
+        /// <param name="gridY">Index of a Y axis grid line.</param>
+        /// <returns></returns>
+        public Vector3 Intersection(int gridX, int gridY)
         {
             if (gridX < 0 || gridY < 0)
             {
@@ -183,7 +232,7 @@ namespace GeometryEx
             return intersect;
         }
 
-        #endregion
+        #endregion Methods
 
     }
 }
