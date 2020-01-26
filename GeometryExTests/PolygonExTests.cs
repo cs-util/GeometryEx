@@ -107,6 +107,7 @@ namespace GeometryExTests
                 );
             var diffList = polygon.Difference(difference);
             Assert.Equal(3, diffList.Count);
+
         }
 
         [Fact]

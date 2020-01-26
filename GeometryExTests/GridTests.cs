@@ -35,6 +35,26 @@ namespace GeometryExTests
         }
 
         [Fact]
+        private void MakeGrid()
+        {
+            var polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(30.0, 0.0),
+                        new Vector3(30.0, 20.0),
+                        new Vector3(0.0, 20.0)
+                    }
+                );
+            var compass = polygon.Compass();
+            var intervalX = 10.0;
+            var intervalY = 10.0;
+            var grid = new Grid(polygon, intervalX, intervalY, 0.0, GridPosition.CenterXY);
+        }
+
+        [Fact]
         public void Intersect()
         {
             var perimeter = new Polygon
@@ -110,6 +130,24 @@ namespace GeometryExTests
             }
             Assert.Equal(20, grid.Lines.Count);
             model.ToGlTF("../../../../gridIntersectsCulled.glb");
+        }
+
+        [Fact]
+        public void Points()
+        {
+            var perimeter = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(0.0, 0.0, -1.0),
+                    new Vector3(100.0, 0.0, -1.0),
+                    new Vector3(100.0, 100.0, -1.0),
+                    new Vector3(0.0, 100.0, -1.0)
+                }
+            );
+            var grid = new Grid(perimeter, 10.0, 10.0, 0.0, GridPosition.CenterSpan);
+            var points = grid.Points;
+            Assert.Equal(140, points.Count);
         }
     }
 }

@@ -141,6 +141,38 @@ namespace GeometryEx
         #region Properties
 
         /// <summary>
+        /// End points of X axes.
+        /// </summary>
+        public List<Vector3> EndsX
+        {
+            get
+            {
+                var points = new List<Vector3>();
+                foreach (var line in LinesX)
+                {
+                    points.Add(line.End);
+                }
+                return points;
+            }
+        }
+
+        /// <summary>
+        /// Start points of Y axes.
+        /// </summary>
+        public List<Vector3> EndsY
+        {
+            get
+            {
+                var points = new List<Vector3>();
+                foreach (var line in LinesY)
+                {
+                    points.Add(line.End);
+                }
+                return points;
+            }
+        }
+
+        /// <summary>
         /// Returns all the points at the intersections of the grid lines.
         /// Points are supplied in sequential rows of X coordinates of increasing Y value.
         /// </summary>
@@ -199,11 +231,66 @@ namespace GeometryEx
         /// </summary>
         public Polygon Perimeter { get; }
 
+        /// <summary>
+        /// Returns all the points at the ends and intersections of the grid lines.
+        /// Points are supplied in sequential rows of X coordinates of increasing Y value.
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> Points
+        {
+            get
+            {
+                var points = new List<Vector3>(StartsY);
+                for (var x = 0; x < LinesX.Count; x++)
+                {
+                    points.Add(LinesX[x].Start);
+                    for (var y = 0; y < LinesX.Count; y++)
+                    {
+                        points.Add(Intersection(x, y));
+                    }
+                    points.Add(LinesX[x].End);
+                }
+                points.AddRange(EndsY);
+                return points;
+            }
+        }
 
         /// <summary>
         /// Start position of the axis intervals.
         /// </summary>
         public GridPosition Position { get; }
+
+        /// <summary>
+        /// Start points of X axes.
+        /// </summary>
+        public List<Vector3> StartsX
+        {
+            get
+            {
+                var points = new List<Vector3>();
+                foreach (var line in LinesX)
+                {
+                    points.Add(line.Start);
+                }
+                return points;
+            }
+        }
+
+        /// <summary>
+        /// Start points of Y axes.
+        /// </summary>
+        public List<Vector3> StartsY
+        {
+            get
+            {
+                var points = new List<Vector3>();
+                foreach (var line in LinesY)
+                {
+                    points.Add(line.Start);
+                }
+                return points;
+            }
+        }
 
         #endregion Properties
 
