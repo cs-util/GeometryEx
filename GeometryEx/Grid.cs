@@ -29,42 +29,45 @@ namespace GeometryEx
         {
             Perimeter = perimeter ?? throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
             Position = position;
-            IntervalX = intervalX != 0.0 ? Math.Abs(intervalX) : throw new ArgumentOutOfRangeException(Messages.ZERO_VALUE_EXCEPTION);
-            IntervalY = intervalY != 0.0 ? Math.Abs(intervalY) : throw new ArgumentOutOfRangeException(Messages.ZERO_VALUE_EXCEPTION);
+            if (intervalX <= 0.0 || intervalY <= 0.0)
+            {
+                throw new ArgumentOutOfRangeException(Messages.NON_POSITIVE_VALUE_EXCEPTION);
+            }
+            IntervalX = intervalX;
+            IntervalY = intervalY;
             var pivot = perimeter.Compass().C;
             var perimeterJig = perimeter.Rotate(pivot, angle * -1);
             compass = perimeterJig.Compass();
-            var start = StartPoint();
-            var anchorX = new Line(new Vector3(compass.W.X, start.Y), new Vector3(compass.E.X, start.Y));
-            var anchorY = new Line(new Vector3(start.X, compass.S.Y), new Vector3(start.X, compass.N.Y));
+
+            var axes = Axes();
             var gridX = new List<Line>();
             var gridY = new List<Line>();
-            gridX.Add(anchorX);
-            gridY.Add(anchorY);
+            gridX.Add(axes.First());
+            gridY.Add(axes.Last());
 
-            var mark = anchorX.Start.Y + IntervalY;
+            var mark = gridX.First().Start.Y + IntervalY;
             while (mark <= compass.N.Y)
             {
                 gridX.Add(new Line(new Vector3(compass.W.X, mark), new Vector3(compass.E.X, mark)));
                 mark += IntervalY;
             }
-            mark = anchorX.Start.Y - IntervalY;
+            mark = gridX.First().Start.Y - IntervalY;
             while (mark >= compass.S.Y)
             {
                 gridX.Add(new Line(new Vector3(compass.W.X, mark), new Vector3(compass.E.X, mark)));
                 mark -= IntervalY;
             }
-            mark = anchorY.Start.X + IntervalX;
+            mark = gridY.First().Start.X + IntervalX;
             while (mark <= compass.E.X)
             {
                 gridY.Add(new Line(new Vector3(mark, compass.S.Y), new Vector3(mark, compass.N.Y)));
-                mark += IntervalY;
+                mark += IntervalX;
             }
-            mark = anchorY.Start.X - IntervalX;
+            mark = gridY.First().Start.X - IntervalX;
             while (mark >= compass.W.X)
             {
                 gridY.Add(new Line(new Vector3(mark, compass.S.Y), new Vector3(mark, compass.N.Y)));
-                mark -= IntervalY;
+                mark -= IntervalX;
             }
 
             LinesX = new List<Line>();
@@ -86,54 +89,81 @@ namespace GeometryEx
 
         #region Private
 
-        private CompassBox compass;
+        private readonly CompassBox compass;
 
-        private Vector3 StartPoint ()
+        private List<Line> Axes ()
         {
+            var xCoord = 0.0;
+            var yCoord = 0.0;
             switch ((int)Position)
             {
                 case (int)GridPosition.CenterSpan:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, IntervalY * -0.5));
+                        xCoord = compass.C.X - (IntervalX * 0.5);
+                        yCoord = compass.C.Y - (IntervalY * 0.5);
+                        break;
                     }
                 case (int)GridPosition.CenterX:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(0.0, IntervalY * -0.5));
+                        xCoord = compass.C.X;
+                        yCoord = compass.C.Y - (IntervalY * 0.5);
+                        break;
                     }
                 case (int)GridPosition.CenterY:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, 0.0));
+                        xCoord = compass.C.X - (IntervalX * 0.5);
+                        yCoord = compass.C.Y;
+                        break;
                     }
                 case (int)GridPosition.CenterXY:
                     {
-                        return compass.C;
+                        xCoord = compass.C.X;
+                        yCoord = compass.C.Y;
+                        break;
                     }
                 case (int)GridPosition.MaxX:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(compass.SizeX * 0.5, IntervalY * -0.5));
+                        xCoord = compass.E.X;
+                        yCoord = compass.C.Y - (IntervalY * 0.5);
+                        break;
                     }
                 case (int)GridPosition.MaxY:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, compass.SizeY * 0.5));
+                        xCoord = compass.C.X - (IntervalX * 0.5);
+                        yCoord = compass.N.Y;
+                        break;
                     }
                 case (int)GridPosition.MaxXY:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(compass.SizeX * 0.5, compass.SizeY * 0.5));
+                        xCoord = compass.E.X;
+                        yCoord = compass.N.Y;
+                        break;
                     }
                 case (int)GridPosition.MinX:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(compass.SizeX * -0.5, IntervalY * -0.5));
+                        xCoord = compass.W.X;
+                        yCoord = compass.C.Y - (IntervalY * 0.5);
+                        break;
                     }
                 case (int)GridPosition.MinY:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, compass.SizeY * -0.5));
+                        xCoord = compass.C.X - (IntervalX * 0.5);
+                        yCoord = compass.S.Y;
+                        break;
                     }
                 case (int)GridPosition.MinXY:
                     {
-                        return compass.C.MoveFromTo(Vector3.Origin, new Vector3(compass.SizeX * -0.5, compass.SizeY * -0.5));
+                        xCoord = compass.W.X;
+                        yCoord = compass.S.Y;
+                        break;
                     }
             }
-            return compass.C.MoveFromTo(Vector3.Origin, new Vector3(IntervalX * -0.5, IntervalY * -0.5));
+            return
+                new List<Line>()
+                {
+                    new Line(new Vector3(compass.W.X, yCoord), new Vector3(compass.E.X, yCoord)),
+                    new Line(new Vector3(xCoord, compass.S.Y), new Vector3(xCoord, compass.N.Y))
+                };
         }
 
         #endregion Private
@@ -233,7 +263,7 @@ namespace GeometryEx
 
         /// <summary>
         /// Returns all the points at the ends and intersections of the grid lines.
-        /// Points are supplied in sequential rows of X coordinates of increasing Y value.
+        /// Points return in sequential rows of X coordinates of increasing Y value.
         /// </summary>
         /// <returns></returns>
         public List<Vector3> Points
@@ -244,7 +274,7 @@ namespace GeometryEx
                 for (var x = 0; x < LinesX.Count; x++)
                 {
                     points.Add(LinesX[x].Start);
-                    for (var y = 0; y < LinesX.Count; y++)
+                    for (var y = 0; y < LinesY.Count; y++)
                     {
                         points.Add(Intersection(x, y));
                     }
@@ -317,6 +347,50 @@ namespace GeometryEx
             var yPlane = new Plane(yLine.Start, yLine.End, yLine.End.MoveFromTo(Vector3.Origin, Vector3.ZAxis));
             LinesX[gridX].Intersects(yPlane, out Vector3 intersect);
             return intersect;
+        }
+
+        /// <summary>
+        /// Returns the points at the ends and intersections an X grid line at the supplied index in order of ascending X value.
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> PointsAlongX(int index)
+        {
+            if (index >= LinesX.Count)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            var points = new List<Vector3>()
+            {
+                LinesX[index].Start
+            };
+            for (var i = 0; i < LinesY.Count; i++)
+            {
+                points.Add(Intersection(index, i));
+            }
+            points.Add(LinesX[index].End);
+            return points;
+        }
+
+        /// <summary>
+        /// Returns the points at the ends and intersections an Y grid line at the supplied index in order of ascending Y value.
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> PointsAlongY(int index)
+        {
+            if (index >= LinesY.Count)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            var points = new List<Vector3>()
+            {
+                LinesY[index].Start
+            };
+            for (var i = 0; i < LinesX.Count; i++)
+            {
+                points.Add(Intersection(i, index));
+            }
+            points.Add(LinesY[index].End);
+            return points;
         }
 
         #endregion Methods

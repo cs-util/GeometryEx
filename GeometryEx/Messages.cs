@@ -15,6 +15,8 @@ namespace GeometryEx
 
         public const string POLYGON_NULL_EXCEPTION = "Null value instead of Polygon.";
 
+        public const string NON_POSITIVE_VALUE_EXCEPTION = "Value must be greater than zero.";
+
         public const string ZERO_VALUE_EXCEPTION = "Value must not be zero.";
     }
 }
