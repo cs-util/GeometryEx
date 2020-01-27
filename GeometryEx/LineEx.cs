@@ -353,7 +353,7 @@ namespace GeometryEx
         /// <returns>
         /// A list of lines of the specified length and a shorter line representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
         /// </returns>
-        public static List<Line> Segment(this Line line, double length, double minimum)
+        public static List<Line> Segment(this Line line, double length, double minimum = 1e-09)
         {
             var lines = new List<Line>();
             var segments = line.Length() / length;
@@ -402,7 +402,7 @@ namespace GeometryEx
         /// <returns>
         /// A list of lines of the specified length and shorter line or lines representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
         /// </returns>
-        public static List<Line> SegmentFrom(this Line line, double length, double minimum, DivideFrom from = DivideFrom.Start)
+        public static List<Line> SegmentFrom(this Line line, double length, DivideFrom from = DivideFrom.Start, double minimum = 1e-09)
         {
             var lines = new List<Line>();
             if (length >= line.Length())

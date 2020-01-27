@@ -17,21 +17,64 @@ namespace GeometryExTests
             (
                 new[]
                 {
-                    new Vector3(0.0, 0.0, -1.0),
-                    new Vector3(100.0, 0.0, -1.0),
-                    new Vector3(100.0, 50.0, -1.0),
-                    new Vector3(0.0, 50.0, -1.0)
+                    new Vector3(0.0, 0.0, 0.0),
+                    new Vector3(8.0, 0.0, 0.0),
+                    new Vector3(8.0, 8.0, 0.0),
+                    new Vector3(0.0, 8.0, 0.0)
                 }
             );
-            var grid = new Grid(perimeter, 5.0, 20.0, 0.0, GridPosition.CenterSpan);
+            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterXY);
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
             {
                 model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
             }
+            foreach (var cell in grid.Cells)
+            {
+                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
+            }
+            model.ToGlTF("../../../../gridCenterXY.glb");
+
+            grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterSpan);
+            model = new Model();
+            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
+            foreach (var line in grid.Lines)
+            {
+                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
+            }
+            foreach (var cell in grid.Cells)
+            {
+                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
+            }
             model.ToGlTF("../../../../gridCenterSpan.glb");
-            //Assert.Equal(20, grid.Lines.Count);
+
+            grid = new Grid(perimeter, 4.0, 2.0, 0.0, GridPosition.CenterX);
+            model = new Model();
+            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
+            foreach (var line in grid.Lines)
+            {
+                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
+            }
+            foreach (var cell in grid.Cells)
+            {
+                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
+            }
+            model.ToGlTF("../../../../gridCenterX.glb");
+
+            grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterY);
+            model = new Model();
+            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
+            foreach (var line in grid.Lines)
+            {
+                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
+            }
+            foreach (var cell in grid.Cells)
+            {
+                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
+            }
+            model.ToGlTF("../../../../gridCenterY.glb");
+
         }
 
         [Fact]
