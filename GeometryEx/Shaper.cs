@@ -131,8 +131,10 @@ namespace GeometryEx
         /// <returns>
         /// List of Polygons.
         /// </returns>
-        public static List<Polygon> Merge(List<Polygon> polygons)
+        public enum FillType { EvenOdd, NonZero, Positive, Negative };
+        public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
         {
+            var filtyp = (PolyFillType) fillType;
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon polygon in polygons)
             {
@@ -142,7 +144,7 @@ namespace GeometryEx
             clipper.AddPaths(polyPaths, PolyType.ptClip, true);
             clipper.AddPaths(polyPaths, PolyType.ptSubject, true);
             var solution = new List<List<IntPoint>>();
-            clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftNonZero);
+            clipper.Execute(ClipType.ctUnion, solution, filtyp);
             if (solution.Count == 0)
             {
                 return polygons;

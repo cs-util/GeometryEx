@@ -368,7 +368,7 @@ namespace GeometryEx
                 points.Add(Intersection(index, i));
             }
             points.Add(LinesX[index].End);
-            return points;
+            return points.Distinct().ToList();
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace GeometryEx
                 points.Add(Intersection(i, index));
             }
             points.Add(LinesY[index].End);
-            return points;
+            return points.Distinct().ToList();
         }
 
         #endregion Methods

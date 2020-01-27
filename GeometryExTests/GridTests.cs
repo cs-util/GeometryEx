@@ -157,18 +157,18 @@ namespace GeometryExTests
             (
                 new[]
                 {
-                    new Vector3(0.0, 0.0, -1.0),
-                    new Vector3(100.0, 0.0, -1.0),
-                    new Vector3(100.0, 100.0, -1.0),
-                    new Vector3(0.0, 100.0, -1.0)
+                    new Vector3(0.0, 0.0),
+                    new Vector3(8.0, 0.0),
+                    new Vector3(8.0, 8.0),
+                    new Vector3(0.0, 8.0)
                 }
             );
-            var grid = new Grid(perimeter, 10.0, 10.0, 0.0, GridPosition.CenterSpan);
+            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterXY);
             var points = grid.PointsAlongX(0);
-            Assert.Equal(12, points.Count);
+            Assert.Equal(5, points.Count);
 
             points = grid.PointsAlongY(0);
-            Assert.Equal(12, points.Count);
+            Assert.Equal(5, points.Count);
         }
     }
 }
