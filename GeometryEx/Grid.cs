@@ -234,7 +234,7 @@ namespace GeometryEx
                 var points = new List<Vector3>();
                 for (var x = 0; x < LinesX.Count; x++)
                 {
-                    for (var y = 0; y < LinesX.Count; y++)
+                    for (var y = 0; y < LinesY.Count; y++)
                     {
                         points.Add(Intersection(x, y));
                     }

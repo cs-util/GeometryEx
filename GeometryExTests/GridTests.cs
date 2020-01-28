@@ -23,7 +23,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0, 0.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterXY);
+            var grid = new Grid(perimeter, 2.0, 2.0, 45.0, GridPosition.CenterXY);
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
@@ -113,19 +113,19 @@ namespace GeometryExTests
             var grid = new Grid(perimeter, 10.0, 10.0, 0.0, GridPosition.CenterSpan);
             var intersect = grid.Intersection(1, 1);
             Assert.Equal(15.0, intersect.X);
-            Assert.Equal(10.0, intersect.Y);
+            Assert.Equal(20.0, intersect.Y);
 
             intersect = grid.Intersection(2, 2);
             Assert.Equal(25.0, intersect.X);
-            Assert.Equal(20.0, intersect.Y);
+            Assert.Equal(30.0, intersect.Y);
 
             grid = new Grid(perimeter, 10.0, 10.0, 0.0, GridPosition.CenterXY);
             intersect = grid.Intersection(1, 1);
-            Assert.Equal(10.0, intersect.X);
+            Assert.Equal(20.0, intersect.X);
             Assert.Equal(15.0, intersect.Y);
 
             intersect = grid.Intersection(2, 2);
-            Assert.Equal(20.0, intersect.X);
+            Assert.Equal(30.0, intersect.X);
             Assert.Equal(25.0, intersect.Y);
         }
 
@@ -143,7 +143,7 @@ namespace GeometryExTests
                 }
             );
             var grid = new Grid(perimeter, 10.0, 10.0, 45.0, GridPosition.CenterSpan);
-            Assert.Equal(100, grid.Intersections.Count);
+            Assert.Equal(400, grid.Intersections.Count);
 
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
@@ -155,7 +155,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Column(point, 3.0, Polygon.Ngon(8), BuiltInMaterials.Steel));
             }
-            Assert.Equal(20, grid.Lines.Count);
+            Assert.Equal(40, grid.Lines.Count);
             model.ToGlTF("../../../../gridIntersects.glb");
 
             model = new Model();
@@ -171,7 +171,7 @@ namespace GeometryExTests
                     model.AddElement(new Column(point, 3.0, Polygon.Ngon(8), BuiltInMaterials.Steel));
                 }               
             }
-            Assert.Equal(20, grid.Lines.Count);
+            Assert.Equal(40, grid.Lines.Count);
             model.ToGlTF("../../../../gridIntersectsCulled.glb");
         }
 
@@ -190,7 +190,7 @@ namespace GeometryExTests
             );
             var grid = new Grid(perimeter, 10.0, 10.0, 0.0, GridPosition.CenterSpan);
             var points = grid.Points;
-            Assert.Equal(140, points.Count);
+            Assert.Equal(460, points.Count);
         }
 
         [Fact]

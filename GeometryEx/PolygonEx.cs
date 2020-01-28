@@ -215,11 +215,19 @@ namespace GeometryEx
                 tryPoly = tryPoly.MoveFromTo(from, position);
                 if (within != null && tryPoly.Intersects(within))
                 {
-                    tryPoly = within.Intersection(tryPoly).First();
+                    var tryPolys = within.Intersection(tryPoly);
+                    if (tryPolys.Count > 0)
+                    {
+                        tryPoly = tryPolys.First();
+                    }
                 }
                 if (among != null && tryPoly.Intersects(among))
                 {
-                    tryPoly = tryPoly.Difference(among).First();
+                    var tryPolys = tryPoly.Difference(among);
+                    if (tryPolys.Count > 0)
+                    {
+                        tryPoly = tryPolys.First();
+                    }
                 }
             }
             while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
