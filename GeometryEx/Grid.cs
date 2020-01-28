@@ -27,51 +27,41 @@ namespace GeometryEx
         public Grid(Polygon perimeter, double intervalX = 1.0, double intervalY = 1.0, 
                     double angle = 0.0, GridPosition position = GridPosition.CenterSpan)
         {
-            Perimeter = perimeter ?? throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
-            Position = position;
+
             if (intervalX <= 0.0 || intervalY <= 0.0)
             {
                 throw new ArgumentOutOfRangeException(Messages.NON_POSITIVE_VALUE_EXCEPTION);
             }
+            Perimeter = perimeter ?? throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
             IntervalX = intervalX;
             IntervalY = intervalY;
-            LinesX = new List<Line>();
-            LinesY = new List<Line>();
+            Angle = angle;
+            Position = position;
             perimeterJig = perimeter.Rotate(Vector3.Origin, angle * -1);
             compass = perimeterJig.Compass();
-            Angle = angle;
+            var box = compass.Box;
             var origin = Origin();
-            var thruPoints = new List<Vector3>();
-            var x = origin.X;
-            var y = origin.Y;
-            while (x < compass.E.X)
+            var thruPoints = new List<Vector3>() { origin };
+            var point = new Vector3(origin.X + IntervalX, origin.Y + IntervalY);
+            while (box.Contains(point))
             {
-                thruPoints.Add(new Vector3(x, origin.Y));
-                x += IntervalX;
+                thruPoints.Add(point);
+                point = new Vector3(point.X + IntervalX, point.Y + IntervalY);
             }
-            while (y < compass.N.Y)
+            point = new Vector3(origin.X - IntervalX, origin.Y - IntervalY);
+            while (box.Contains(point))
             {
-                thruPoints.Add(new Vector3(origin.X, y));
-                y += IntervalY;
+                thruPoints.Add(point);
+                point = new Vector3(point.X - IntervalX, point.Y - IntervalY);
             }
-            x = origin.X - IntervalX;
-            y = origin.Y - IntervalY;
-            while (x > compass.W.X)
+            LinesX = new List<Line>();
+            LinesY = new List<Line>();
+            foreach (var pnt in thruPoints)
             {
-                thruPoints.Add(new Vector3(x, origin.Y));
-                x -= IntervalX;
-            }
-            while (y > compass.S.Y)
-            {
-                thruPoints.Add(new Vector3(origin.X, y));
-                y -= IntervalY;
-            }
-            foreach (var point in thruPoints)
-            {
-                LinesX.Add(new Line(new Vector3(compass.W.X, point.Y),
-                                    new Vector3(compass.E.X, point.Y)));
-                LinesY.Add(new Line(new Vector3(point.X, compass.S.Y),
-                                    new Vector3(point.X, compass.N.Y)));
+                LinesX.Add(new Line(new Vector3(compass.W.X, pnt.Y),
+                                    new Vector3(compass.E.X, pnt.Y)));
+                LinesY.Add(new Line(new Vector3(pnt.X, compass.S.Y),
+                                    new Vector3(pnt.X, compass.N.Y)));
             }
             LinesX = LinesX.OrderBy(g => g.Start.Y).ToList();
             LinesY = LinesY.OrderBy(g => g.Start.X).ToList();
@@ -202,7 +192,7 @@ namespace GeometryEx
                 {
                     points.Add(line.End);
                 }
-                return points.Distinct().ToList();
+                return points;
             }
         }
 
@@ -218,7 +208,7 @@ namespace GeometryEx
                 {
                     points.Add(line.End);
                 }
-                return points.Distinct().ToList();
+                return points;
             }
         }
 
@@ -322,7 +312,7 @@ namespace GeometryEx
                 {
                     points.Add(line.Start);
                 }
-                return points.Distinct().ToList();
+                return points;
             }
         }
 
@@ -338,7 +328,7 @@ namespace GeometryEx
                 {
                     points.Add(line.Start);
                 }
-                return points.Distinct().ToList();
+                return points;
             }
         }
 

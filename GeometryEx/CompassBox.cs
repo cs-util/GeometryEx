@@ -110,6 +110,17 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a Polygon of the SW, SE, NE, and NW points.
+        /// </summary>
+        public Polygon Box
+        {
+            get
+            {
+                return new Polygon(new List<Vector3>() { SW, SE, NE, NW });
+            }
+        }
+
+        /// <summary>
         /// X and Y dimensions of the TopoBox perimeter.
         /// </summary>
         public double SizeX { get; }
@@ -154,8 +165,6 @@ namespace GeometryEx
             NE = new Vector3(maxX, maxY);
             NNE = new Vector3(minX + (SizeX * 0.75), maxY);
         }
-
-
 
         /// <summary>
         /// Returns the requested bounding box location by orientation.
