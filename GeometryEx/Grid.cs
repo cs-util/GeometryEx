@@ -69,22 +69,8 @@ namespace GeometryEx
                                     new Vector3(pnt.X, compass.N.Y)));
                 }
             }
-            LinesX = LinesX.OrderBy(g => g.Start.Y).ToList();
-            LinesY = LinesY.OrderBy(g => g.Start.X).ToList();
-            Cells = new List<Polygon>();
             MakeCells();
-            var gridX = new List<Line>();
-            var gridY = new List<Line>();
-            foreach (var line in LinesX)
-            {
-                gridX.Add(line.Rotate(Vector3.Origin, angle));
-            }
-            foreach (var line in LinesY)
-            {
-                gridY.Add(line.Rotate(Vector3.Origin, angle));
-            }
-            LinesX = gridX.OrderBy(g => g.Start.Y).ToList();
-            LinesY = gridY.OrderBy(g => g.Start.X).ToList();
+            RotateOrder();
         }
 
         #endregion
@@ -97,6 +83,7 @@ namespace GeometryEx
 
         private void MakeCells()
         {
+            
             var SW = new List<Vector3>()
             {
                 compass.SW
@@ -112,16 +99,11 @@ namespace GeometryEx
             NE.Add(compass.NE);
             SW = SW.Distinct().ToList();
             NE = NE.Distinct().ToList();
-            var polygons = new List<Polygon>();
+            Cells = new List<Polygon>();
             for (var i = 0; i < SW.Count; i++)
             {
-                polygons.Add(Polygon.Rectangle(SW[i], NE[i]));
+                Cells.Add(Polygon.Rectangle(SW[i], NE[i]));
             }
-            foreach (var polygon in polygons)
-            {
-                Cells.Add(polygon.Rotate(Vector3.Origin, Angle));
-            }
-            Cells.OrderBy(c => c.Compass().C.X).ThenBy(c => c.Compass().C.Y);
         }
 
         private Vector3 Origin()
@@ -178,6 +160,28 @@ namespace GeometryEx
                     }
             }
             return origin;
+        }
+
+        private void RotateOrder()
+        {
+            var gridX = new List<Line>();
+            var gridY = new List<Line>();
+            foreach (var line in LinesX)
+            {
+                gridX.Add(line.Rotate(Vector3.Origin, Angle));
+            }
+            foreach (var line in LinesY)
+            {
+                gridY.Add(line.Rotate(Vector3.Origin, Angle));
+            }
+            LinesX = gridX.OrderBy(g => g.Start.Y).ToList();
+            LinesY = gridY.OrderBy(g => g.Start.X).ToList();
+            var gridCells = new List<Polygon>();
+            foreach (var cell in Cells)
+            {
+                gridCells.Add(cell.Rotate(Vector3.Origin, Angle));
+            }
+            Cells = gridCells.OrderBy(c => c.Compass().C.X).ThenBy(c => c.Compass().C.Y).ToList();
         }
 
         #endregion Private
@@ -265,17 +269,17 @@ namespace GeometryEx
         /// <summary>
         /// List of X axis lines.
         /// </summary>
-        public List<Line> LinesX { get; }
+        public List<Line> LinesX { get; private set; }
 
         /// <summary>
         /// List of Y axis lines.
         /// </summary>
-        public List<Line> LinesY { get; }
+        public List<Line> LinesY { get; private set; }
 
         /// <summary>
         /// Polygon perimeter generating the Grid. 
         /// </summary>
-        public Polygon Perimeter { get; }
+        public Polygon Perimeter { get; private set; }
 
         /// <summary>
         /// Returns all the points at the ends and intersections of the grid lines.

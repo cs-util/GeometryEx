@@ -11,74 +11,7 @@ namespace GeometryExTests
     public class GridTests
     {
         [Fact]
-        public void Create()
-        {
-            var perimeter = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0, 0.0),
-                    new Vector3(8.0, 0.0, 0.0),
-                    new Vector3(8.0, 8.0, 0.0),
-                    new Vector3(0.0, 8.0, 0.0)
-                }
-            );
-            var grid = new Grid(perimeter, 2.0, 2.0, 45.0, GridPosition.CenterXY);
-            var model = new Model();
-            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
-            foreach (var line in grid.Lines)
-            {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
-            }
-            foreach (var cell in grid.Cells)
-            {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
-            }
-            model.ToGlTF("../../../../gridCenterXY.glb");
-
-            grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterSpan);
-            model = new Model();
-            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
-            foreach (var line in grid.Lines)
-            {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
-            }
-            foreach (var cell in grid.Cells)
-            {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
-            }
-            model.ToGlTF("../../../../gridCenterSpan.glb");
-
-            grid = new Grid(perimeter, 4.0, 2.0, 0.0, GridPosition.CenterX);
-            model = new Model();
-            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
-            foreach (var line in grid.Lines)
-            {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
-            }
-            foreach (var cell in grid.Cells)
-            {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
-            }
-            model.ToGlTF("../../../../gridCenterX.glb");
-
-            grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterY);
-            model = new Model();
-            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
-            foreach (var line in grid.Lines)
-            {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(0.1, 0.1)), BuiltInMaterials.Steel));
-            }
-            foreach (var cell in grid.Cells)
-            {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
-            }
-            model.ToGlTF("../../../../gridCenterY.glb");
-
-        }
-
-        [Fact]
-        private void MakeGrid()
+        private void Create()
         {
             var perimeter =
                 new Polygon
@@ -91,7 +24,7 @@ namespace GeometryExTests
                         new Vector3(0.0, 20.0)
                     }
                 );
-            var grid = new Grid(perimeter, 15.0, 5.0, 0.0, GridPosition.CenterXY);
+            var grid = new Grid(perimeter, 15.0, 5.0, 45.0, GridPosition.CenterXY);
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
@@ -102,7 +35,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
             }
-            model.ToGlTF("../../../../MakeGrid.glb");
+            model.ToGlTF("../../../../gridCreate.glb");
         }
 
         [Fact]
@@ -150,8 +83,8 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0, -1.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterSpan);
-            Assert.Equal(16, grid.Intersections.Count);
+            var grid = new Grid(perimeter, 2.0, 2.0, 45.0, GridPosition.CenterSpan);
+            Assert.Equal(36, grid.Intersections.Count);
 
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
@@ -163,7 +96,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Column(point, 3.0, Polygon.Ngon(8), BuiltInMaterials.Steel));
             }
-            Assert.Equal(8, grid.Lines.Count);
+            Assert.Equal(12, grid.Lines.Count);
             model.ToGlTF("../../../../gridIntersects.glb");
 
             model = new Model();
@@ -179,7 +112,7 @@ namespace GeometryExTests
                     model.AddElement(new Column(point, 3.0, Polygon.Ngon(8), BuiltInMaterials.Steel));
                 }               
             }
-            Assert.Equal(8, grid.Lines.Count);
+            Assert.Equal(12, grid.Lines.Count);
             model.ToGlTF("../../../../gridIntersectsCulled.glb");
         }
 

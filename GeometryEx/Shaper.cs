@@ -497,6 +497,60 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Constructs a list of line segments in order from pairs in a list of vertices.
+        /// </summary>
+        /// <param name="vertices">List of vertices to convert to line segments.</param>
+        /// <returns>List of Lines.</returns>
+        public static List<Line> LinesFromPoints(List<Vector3> points)
+        {
+            var lines = new List<Line>();
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                lines.Add(new Line(points[i], points[i + 1]));
+            }
+            return lines;
+        }
+
+        /// <summary>
+        /// Check if any of lines have zero length.
+        /// </summary>
+        public static bool ZeroLength(List<Line> lines)
+        {
+            foreach (var s in lines)
+            {
+                if (s.Length() == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check for self-intersection in the supplied lines.
+        /// </summary>
+        /// <param name="lines">List of lines to check.</param>
+        public static bool Intersects(List<Line> lines)
+        {
+            for (var i = 0; i < lines.Count; i++)
+            {
+                for (var j = 0; j < lines.Count; j++)
+                {
+                    if (i == j)
+                    {
+                        // Don't check against itself.
+                        continue;
+                    }
+                    if (lines[i].Intersects2D(lines[j]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Tests if two doubles are effectively equal within a tolerance.
         /// </summary>
         /// <param name="thisValue">The lower bound of the random range.</param>

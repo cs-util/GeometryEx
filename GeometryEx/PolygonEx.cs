@@ -470,7 +470,15 @@ namespace GeometryEx
         /// <returns></returns>
         internal static Polygon ToPolygon(this List<IntPoint> p)
         {
-            return new Polygon(p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToArray());
+            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
+            var lines = Shaper.LinesFromPoints(points);
+            if (Shaper.ZeroLength(lines) || Shaper.Intersects(lines))
+            {
+                return null;
+            }
+            return new Polygon(points.ToArray());
         }
+
+
     }
 }
