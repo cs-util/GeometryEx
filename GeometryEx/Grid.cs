@@ -43,13 +43,13 @@ namespace GeometryEx
             var origin = Origin();
             var thruPoints = new List<Vector3>() { origin };
             var point = new Vector3(origin.X + IntervalX, origin.Y + IntervalY);
-            while (box.Contains(point))
+            while (point.X < compass.E.X || point.Y < compass.N.Y)
             {
                 thruPoints.Add(point);
                 point = new Vector3(point.X + IntervalX, point.Y + IntervalY);
             }
             point = new Vector3(origin.X - IntervalX, origin.Y - IntervalY);
-            while (box.Contains(point))
+            while (point.X > compass.W.X || point.Y > compass.S.Y)
             {
                 thruPoints.Add(point);
                 point = new Vector3(point.X - IntervalX, point.Y - IntervalY);
@@ -58,13 +58,20 @@ namespace GeometryEx
             LinesY = new List<Line>();
             foreach (var pnt in thruPoints)
             {
-                LinesX.Add(new Line(new Vector3(compass.W.X, pnt.Y),
-                                    new Vector3(compass.E.X, pnt.Y)));
-                LinesY.Add(new Line(new Vector3(pnt.X, compass.S.Y),
+                if (pnt.Y > compass.S.Y && pnt.Y < compass.N.Y)
+                {
+                    LinesX.Add(new Line(new Vector3(compass.W.X, pnt.Y),
+                                        new Vector3(compass.E.X, pnt.Y)));
+                }
+                if (pnt.X > compass.W.X && pnt.X < compass.E.X)
+                {
+                    LinesY.Add(new Line(new Vector3(pnt.X, compass.S.Y),
                                     new Vector3(pnt.X, compass.N.Y)));
+                }
             }
             LinesX = LinesX.OrderBy(g => g.Start.Y).ToList();
             LinesY = LinesY.OrderBy(g => g.Start.X).ToList();
+            Cells = new List<Polygon>();
             MakeCells();
             var gridX = new List<Line>();
             var gridY = new List<Line>();
@@ -110,7 +117,6 @@ namespace GeometryEx
             {
                 polygons.Add(Polygon.Rectangle(SW[i], NE[i]));
             }
-            Cells = new List<Polygon>();
             foreach (var polygon in polygons)
             {
                 Cells.Add(polygon.Rotate(Vector3.Origin, Angle));
