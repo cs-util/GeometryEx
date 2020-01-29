@@ -111,41 +111,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs the geometric difference between this Polygon and the supplied Polygons.
-        /// </summary>
-        /// <param name="difPolys">The list of intersecting Polygons.</param>
-        /// <returns>
-        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon.
-        /// Returns null if the area of this Polygon is entirely subtracted.
-        /// Returns a list containing a representation of the perimeter of this Polygon if the two Polygons do not intersect.
-        /// </returns>
-        public static List<Polygon> Difference(this Polygon polygon, IList<Polygon> difPolys)
-        {
-            var thisPath = ToClipperPath(polygon);
-            var polyPaths = new List<List<IntPoint>>();
-            foreach (Polygon poly in difPolys)
-            {
-                polyPaths.Add(poly.ToClipperPath());
-            }
-            Clipper clipper = new Clipper();
-            clipper.AddPath(thisPath, PolyType.ptSubject, true);
-            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
-            var solution = new List<List<IntPoint>>();
-            clipper.Execute(ClipType.ctDifference, solution);
-            if (solution.Count == 0)
-            {
-                return null;
-            }
-            var polygons = new List<Polygon>();
-            foreach (List<IntPoint> path in solution)
-            {
-                var vertices = path.Distinct().ToList();
-                polygons.Add(ToPolygon(vertices));
-            }
-            return polygons;
-        }
-
-        /// <summary>
         /// Tests if the supplied Vector3 point is outside this Polygon when compared on a shared plane.
         /// </summary>
         /// <param name="point">The Vector3 point to compare to this Polygon.</param>
@@ -298,37 +263,65 @@ namespace GeometryEx
         /// <returns>
         /// A list of Polygons.
         /// </returns>
-        public static Polygon FitTo(this Polygon polygon, Polygon within = null, List<Polygon> among = null)
+        public static Polygon FitTo(this Polygon polygon, Polygon within, List<Polygon> among)
         {
-            var polyWithin = new List<Polygon>();
-            if (within != null && polygon.Intersects(within))
+            polygon = FitWithin(polygon, within);
+            if (polygon == null)
             {
-                polyWithin.AddRange(within.Intersection(polygon));
+                return null;
             }
-            else
-            {
-                polyWithin.Add(polygon);
-            }
-            if (among == null)
-            {
-                polyWithin = polyWithin.OrderByDescending(p => Math.Abs(p.Area())).ToList();
-                return polyWithin.First();
-            }
+            return FitAmong(polygon, among);
+        }
+
+        /// <summary>
+        /// Creates the largest Polygon fitted to supplied intersecting Polygons.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
+        /// <returns>
+        /// A Polygons.
+        /// </returns>
+        public static Polygon FitAmong(this Polygon polygon, List<Polygon> among = null)
+        {
             var polyAmong = new List<Polygon>();
-            foreach (Polygon poly in polyWithin)
+            var polygons = polygon.Difference(among);
+            if (polygons == null)
             {
-                var polygons = poly.Difference(among);
-                if (polygons != null)
-                {
-                    polyAmong.AddRange(polygons);
-                }
-                else
-                {
-                    polyAmong.Add(poly);
-                }
+                return null;
             }
-            polyAmong = polyAmong.OrderByDescending(p => Math.Abs(p.Area())).ToList();
-            return polyAmong.First();
+            polygons = polygons.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            if (polygons.First().IsClockWise())
+            {
+                return polygons.First().Reversed();
+            }
+            return polygons.First();
+        }
+
+        /// <summary>
+        /// Creates the largest Polygon fitted within a supplied intersecting perimeter.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <returns>
+        /// A Polygon.
+        /// </returns>
+        public static Polygon FitWithin(this Polygon polygon, Polygon within)
+        {
+            if (!within.Intersects(polygon))
+            {
+                return null;
+            }
+            var polygons = within.Intersection(polygon);
+            if (polygons.Count == 0)
+            {
+                return null;
+            }
+            polygons = polygons.OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            if (polygons.First().IsClockWise())
+            {
+                return polygons.First().Reversed();
+            }
+            return polygons.First();
         }
 
         /// <summary>

@@ -102,7 +102,12 @@ namespace GeometryEx
             Cells = new List<Polygon>();
             for (var i = 0; i < SW.Count; i++)
             {
-                Cells.Add(Polygon.Rectangle(SW[i], NE[i]));
+                var points = new List<Vector3>();
+                points.Add(SW[i]);
+                points.Add(new Vector3(NE[i].X, SW[i].Y));
+                points.Add(NE[i]);
+                points.Add(new Vector3(SW[i].X, NE[i].Y));
+                Cells.Add(new Polygon(points));
             }
         }
 

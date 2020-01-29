@@ -24,14 +24,24 @@ namespace GeometryExTests
                         new Vector3(0.0, 20.0)
                     }
                 );
-            var grid = new Grid(perimeter, 15.0, 5.0, 45.0, GridPosition.CenterXY);
+            var grid = new Grid(perimeter, 20.0, 5.0, 45.0, GridPosition.CenterXY);
+            var cells = new List<Polygon>();
+            foreach (var cell in grid.Cells)
+            {
+                var addCell = cell.FitWithin(perimeter);
+                if (addCell == null)
+                {
+                    continue;
+                }
+                cells.Add(addCell);
+            }
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
             {
                 model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(1.0, 1.0)), BuiltInMaterials.Steel));
             }
-            foreach (var cell in grid.Cells)
+            foreach (var cell in cells)
             {
                 model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
             }
