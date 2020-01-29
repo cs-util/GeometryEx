@@ -25,6 +25,11 @@ namespace GeometryExTests
                     }
                 );
             var grid = new Grid(perimeter, 20.0, 5.0, 45.0, GridPosition.CenterXY);
+            var fitAmong = new List<Polygon>();
+            foreach (var line in grid.Lines)
+            {
+                fitAmong.Add(line.Thicken(2.0));
+            }
             var cells = new List<Polygon>();
             foreach (var cell in grid.Cells)
             {
@@ -33,17 +38,22 @@ namespace GeometryExTests
                 {
                     continue;
                 }
+                addCell = addCell.FitAmong(fitAmong);
+                if (addCell == null)
+                {
+                    continue;
+                }
                 cells.Add(addCell);
             }
             var model = new Model();
-            model.AddElement(new Panel(perimeter, BuiltInMaterials.Concrete, null, null, Guid.NewGuid(), ""));
+            model.AddElement(new Panel(perimeter, BuiltInMaterials.Glass, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
             {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(1.0, 1.0)), BuiltInMaterials.Steel));
+                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(2.0, 2.0)), BuiltInMaterials.Steel));
             }
             foreach (var cell in cells)
             {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Glass));
+                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Concrete));
             }
             model.ToGlTF("../../../../gridCreate.glb");
         }

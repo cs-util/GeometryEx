@@ -8,6 +8,8 @@ namespace GeometryEx
 {
     public static class PolygonEx
     {
+        public const double scale = 1024.0;
+
         /// <summary>
         /// The ratio of the longer side to the shorter side of the Polygon's bounding box.
         /// </summary>
@@ -53,9 +55,9 @@ namespace GeometryEx
             {
                 return false;
             }
-            var thisPath = ToClipperPath(polygon);
+            var thisPath = Shaper.ToClipperPath(polygon);
    
-            var intPoint = new IntPoint(point.X * scale, point.Y * scale);
+            var intPoint = new IntPoint(point.X * Shaper.scale, point.Y * scale);
             if (Clipper.PointInPolygon(intPoint, thisPath) != 1)
             {
                 return false;
@@ -76,7 +78,7 @@ namespace GeometryEx
             {
                 return false;
             }
-            var thisPath = ToClipperPath(polygon);
+            var thisPath = Shaper.ToClipperPath(polygon);
             var intPoint = new IntPoint(point.X * scale, point.Y * scale);
             if (Clipper.PointInPolygon(intPoint, thisPath) == 0)
             {
@@ -123,7 +125,7 @@ namespace GeometryEx
             {
                 return true;
             }
-            var thisPath = ToClipperPath(polygon);
+            var thisPath = Shaper.ToClipperPath(polygon);
             var intPoint = new IntPoint(point.X * scale, point.Y * scale);
             if (Clipper.PointInPolygon(intPoint, thisPath) != 0)
             {
@@ -284,17 +286,12 @@ namespace GeometryEx
         public static Polygon FitAmong(this Polygon polygon, List<Polygon> among = null)
         {
             var polyAmong = new List<Polygon>();
-            var polygons = polygon.Difference(among);
-            if (polygons == null)
+            polygon = Shaper.Difference(polygon, among);
+            if (polygon.IsClockWise())
             {
-                return null;
+                polygon.Reversed();
             }
-            polygons = polygons.OrderByDescending(p => Math.Abs(p.Area())).ToList();
-            if (polygons.First().IsClockWise())
-            {
-                return polygons.First().Reversed();
-            }
-            return polygons.First();
+            return polygon;
         }
 
         /// <summary>
@@ -418,6 +415,67 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Creates a new CCW Polygon of the same vertices with the start point now at the specified Polygon vertex.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="startFrom">The point from which to start the new Polygon.</param>
+        /// <returns>A Polygon.</returns>
+        public static Polygon RewindFrom(this Polygon polygon, Vector3 startFrom)
+        {
+            var vertices = polygon.Vertices;
+            if (!vertices.Contains(startFrom))
+            {
+                return null;
+            }
+            var points = new List<Vector3>();
+            var start = vertices.IndexOf(startFrom);
+            points.Add(vertices[start]);
+            var i = start + 1;
+            while (i < vertices.Count)
+            {
+                points.Add(vertices[i]);
+                i++;
+            }
+            i = 0;
+            while (i < start)
+            {
+                points.Add(vertices[i]);
+                i++;
+            }
+            return new Polygon(points);
+        }
+
+        /// <summary>
+        /// Creates a new CCW Polygon of the same vertices with the start point now at the indexed Polygon vertex.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="start">The index of the point from which to start the new Polygon.</param>
+        /// <returns>A Polygon.</returns>
+        public static Polygon RewindFrom(this Polygon polygon, int start)
+        {
+            var vertices = polygon.Vertices;
+            if (start > vertices.Count - 1)
+            {
+                return null;
+            }
+            var points = new List<Vector3>();
+            points.Add(vertices[start]);
+            var i = start + 1;
+            while (i < vertices.Count)
+            {
+                points.Add(vertices[i]);
+                i++;
+            }
+            i = 0;
+            while (i < start)
+            {
+                points.Add(vertices[i]);
+                i++;
+            }
+            return new Polygon(points);
+        }
+
+        /// <summary>
         /// Tests if the supplied Vector3 point is coincident with an edge of this Polygon when compared on a shared plane.
         /// </summary>
         /// <param name="point">The Vector3 point to compare to this Polygon.</param>
@@ -430,7 +488,7 @@ namespace GeometryEx
             {
                 return false;
             }
-            var thisPath = ToClipperPath(polygon);
+            var thisPath = Shaper.ToClipperPath(polygon);
             var intPoint = new IntPoint(point.X * scale, point.Y * scale);
             if (Clipper.PointInPolygon(intPoint, thisPath) != -1)
             {
@@ -438,40 +496,5 @@ namespace GeometryEx
             }
             return true;
         }
-
-        private const double scale = 1024.0;
-
-        /// <summary>
-        /// Construct a clipper path from a Polygon.
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        internal static List<IntPoint> ToClipperPath(this Polygon p)
-        {
-            var path = new List<IntPoint>();
-            foreach (var v in p.Vertices)
-            {
-                path.Add(new IntPoint(v.X * scale, v.Y * scale));
-            }
-            return path.Distinct().ToList();
-        }
-
-        /// <summary>
-        /// Construct a Polygon from a clipper path 
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        internal static Polygon ToPolygon(this List<IntPoint> p)
-        {
-            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
-            var lines = Shaper.LinesFromPoints(points);
-            if (Shaper.ZeroLength(lines) || Shaper.Intersects(lines))
-            {
-                return null;
-            }
-            return new Polygon(points.ToArray());
-        }
-
-
     }
 }

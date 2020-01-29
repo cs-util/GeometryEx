@@ -294,6 +294,51 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void RewindFrom()
+        {
+            var polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 4.0),
+                        new Vector3(0.0, 4.0)
+                    }
+                );
+            polygon = polygon.RewindFrom(new Vector3(4.0, 0.0));
+            Assert.Equal(4.0, polygon.Vertices[0].X);
+            Assert.Equal(0.0, polygon.Vertices[0].Y);
+
+            polygon = polygon.RewindFrom(new Vector3(0.0, 4.0));
+            Assert.Equal(0.0, polygon.Vertices[0].X);
+            Assert.Equal(4.0, polygon.Vertices[0].Y);
+
+            polygon = polygon.RewindFrom(new Vector3(1.0, 4.0));
+            Assert.Null(polygon);
+
+            polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 4.0),
+                        new Vector3(0.0, 4.0)
+                    }
+                );
+
+            polygon = polygon.RewindFrom(1);
+            Assert.Equal(4.0, polygon.Vertices[0].X);
+            Assert.Equal(0.0, polygon.Vertices[0].Y);
+
+            polygon = polygon.RewindFrom(5);
+            Assert.Null(polygon);
+        }
+
+        [Fact]
         public void Rotate()
         {
             var polygon =

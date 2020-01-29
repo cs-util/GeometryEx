@@ -133,6 +133,54 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Difference()
+        {
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(4.0, 0.0),
+                    new Vector3(4.0, 4.0),
+                    new Vector3(0.0, 4.0)
+                }
+            );
+            var among = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(1.0, 1.0),
+                    new Vector3(8.0, 1.0),
+                    new Vector3(8.0, 8.0),
+                    new Vector3(1.0, 8.0)
+                }
+            );
+            polygon = Shaper.Difference(polygon, new List<Polygon>() { among });
+            var vertices = polygon.Vertices;
+
+            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
+            Assert.Contains(vertices, p => p.X == 4.0 && p.Y == 0.0);
+            Assert.Contains(vertices, p => p.X == 4.0 && p.Y == 1.0);
+            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 1.0);
+            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 4.0);
+            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 4.0);
+
+            among = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(0.0, 0.0),
+                    new Vector3(8.0, 0.0),
+                    new Vector3(8.0, 8.0),
+                    new Vector3(0.0, 8.0)
+                }
+            );
+
+            polygon = Shaper.Difference(polygon, new List<Polygon>() { among });
+            Assert.Null(polygon);
+        }
+
+        [Fact]
         public void FitTo()
         {
             var polygon = new Polygon

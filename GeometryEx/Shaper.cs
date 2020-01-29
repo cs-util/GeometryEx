@@ -85,6 +85,38 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Constructs the largest geometric difference between this Polygon and the supplied Polygons.
+        /// </summary>
+        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <returns>
+        /// Returns a Polygon representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
+        /// </returns>
+        public static Polygon Difference(Polygon polygon, IList<Polygon> difPolys)
+        {
+            foreach (Polygon differ in difPolys)
+            {
+                var thisPath = polygon.ToClipperPath();
+                var clipper = new Clipper();
+                clipper.AddPath(thisPath, PolyType.ptSubject, true);
+                clipper.AddPath(differ.ToClipperPath(), PolyType.ptClip, true);
+                var solution = new List<List<IntPoint>>();
+                clipper.Execute(ClipType.ctDifference, solution);
+                if (solution.Count == 0)
+                {
+                    // polygon has disappeared into a larger polygon.
+                    return null;
+                }
+                var polygons = new List<Polygon>();
+                foreach (List<IntPoint> path in solution)
+                {
+                    polygons.Add(ToPolygon(path.Distinct().ToList()));
+                }
+                polygon = polygons.OrderByDescending(p => Math.Abs(p.Area())).First();
+            }    
+            return polygon;
+        }
+
+        /// <summary>
         /// Creates a new list of Polygons fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
         /// </summary>
         /// <param name="polygon">Polygon to fit to the context.</param>
@@ -581,6 +613,39 @@ namespace GeometryEx
             var rnd = new Random();
             double next = rnd.Next((int)Math.Round(minvalue * scale), (int)Math.Round(maxvalue * scale));
             return next / scale;
+        }
+
+        public const double scale = 1024.0;
+
+        /// <summary>
+        /// Construct a clipper path from a Polygon.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        internal static List<IntPoint> ToClipperPath(this Polygon p)
+        {
+            var path = new List<IntPoint>();
+            foreach (var v in p.Vertices)
+            {
+                path.Add(new IntPoint(v.X * scale, v.Y * scale));
+            }
+            return path.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Construct a Polygon from a clipper path 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        internal static Polygon ToPolygon(this List<IntPoint> p)
+        {
+            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
+            var lines = Shaper.LinesFromPoints(points);
+            if (Shaper.ZeroLength(lines) || Shaper.Intersects(lines))
+            {
+                return null;
+            }
+            return new Polygon(points);
         }
     }
 }
