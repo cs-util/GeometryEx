@@ -11,7 +11,7 @@ namespace GeometryExTests
     public class GridTests
     {
         [Fact]
-        private void Create()
+        public void Create()
         {
             var perimeter =
                 new Polygon
@@ -51,11 +51,14 @@ namespace GeometryExTests
             {
                 model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(2.0, 2.0)), BuiltInMaterials.Steel));
             }
+            var matl = new Material("test", Palette.Aqua);
             foreach (var cell in cells)
             {
-                model.AddElement(new Space(new Profile(cell), 3.0, BuiltInMaterials.Concrete));
+                model.AddElement(new Space(new Profile(cell), 3.0, matl));
             }
             model.ToGlTF("../../../../gridCreate.glb");
+
+            // Assert.Equal()
         }
 
         [Fact]

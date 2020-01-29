@@ -222,7 +222,7 @@ namespace GeometryExTests
                         new Vector3(1.0, 6.0),
                     })
             };
-            polygon = Shaper.FitTo(polygon, within, among).First();
+            polygon = polygon.FitTo(within, among);
             var spaces = new List<Space>
             {
                 new Space(polygon, 3.0, new Material("blue", new Color(0.0f, 0.0f, 1.0f, 0.6f))),

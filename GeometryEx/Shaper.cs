@@ -14,7 +14,7 @@ namespace GeometryEx
     {
         /// <summary>
         /// Creates a rectilinear Polygon in the specified adjacent quadrant to the supplied Polygon's bounding box.
-        /// </summary>
+        /// </summary>    
         /// <param name="area">The area of the new Polygon.</param>
         /// <param name="orient">The relative cardinal direction in which the new Polygon will be placed.</param>
         /// <returns>
@@ -114,46 +114,6 @@ namespace GeometryEx
                 polygon = polygons.OrderByDescending(p => Math.Abs(p.Area())).First();
             }    
             return polygon;
-        }
-
-        /// <summary>
-        /// Creates a new list of Polygons fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
-        /// </summary>
-        /// <param name="polygon">Polygon to fit to the context.</param>
-        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
-        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
-        /// <returns>
-        /// A list of Polygons.
-        /// </returns>
-        public static List<Polygon> FitTo(Polygon polygon, Polygon within = null, List<Polygon> among = null)
-        {
-            var polyWithin = new List<Polygon>();
-            if (within != null && polygon.Intersects(within))
-            {
-                polyWithin.AddRange(within.Intersection(polygon));
-            }
-            else
-            {
-                polyWithin.Add(polygon);
-            }
-            if (among == null)
-            {
-                return polyWithin;
-            }
-            var polyAmong = new List<Polygon>();
-            foreach (Polygon poly in polyWithin)
-            {
-                var polygons = poly.Difference(among);
-                if (polygons != null)
-                {
-                    polyAmong.AddRange(polygons);
-                }
-                else
-                {
-                    polyAmong.Add(poly);
-                }
-            }
-            return polyAmong;
         }
 
         /// <summary>

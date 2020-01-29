@@ -69,6 +69,8 @@ namespace GeometryEx
                                     new Vector3(pnt.X, compass.N.Y)));
                 }
             }
+            LinesX = LinesX.OrderBy(x => x.Start.Y).ToList();
+            LinesY = LinesY.OrderBy(y => y.Start.X).ToList();
             MakeCells();
             RotateOrder();
         }
@@ -83,7 +85,6 @@ namespace GeometryEx
 
         private void MakeCells()
         {
-            
             var SW = new List<Vector3>()
             {
                 compass.SW
@@ -102,11 +103,13 @@ namespace GeometryEx
             Cells = new List<Polygon>();
             for (var i = 0; i < SW.Count; i++)
             {
-                var points = new List<Vector3>();
-                points.Add(SW[i]);
-                points.Add(new Vector3(NE[i].X, SW[i].Y));
-                points.Add(NE[i]);
-                points.Add(new Vector3(SW[i].X, NE[i].Y));
+                var points = new List<Vector3>()
+                {
+                    SW[i],
+                    new Vector3(NE[i].X, SW[i].Y),
+                    NE[i],
+                    new Vector3(SW[i].X, NE[i].Y)
+                };
                 Cells.Add(new Polygon(points));
             }
         }
