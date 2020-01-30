@@ -83,6 +83,9 @@ namespace GeometryEx
         private readonly CompassBox compass;
         private readonly Polygon perimeterJig;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void MakeCells()
         {
             var SW = new List<Vector3>()
@@ -91,7 +94,7 @@ namespace GeometryEx
             };
             SW.AddRange(StartsY);
             var NE = new List<Vector3>();
-            for (var i = 0; i < LinesX.Count; i++)
+            for (var i = 0; i < LinesX.Count - 1; i++)
             {
                 SW.AddRange(PointsAlongX(i).SkipLast(1));
                 NE.AddRange(PointsAlongX(i).Skip(1));
@@ -114,6 +117,10 @@ namespace GeometryEx
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private Vector3 Origin()
         {
             var origin = compass.C;
@@ -396,7 +403,7 @@ namespace GeometryEx
                 points.Add(Intersection(index, i));
             }
             points.Add(LinesX[index].End);
-            return points.Distinct().ToList();
+            return points;
         }
 
         /// <summary>
@@ -418,7 +425,7 @@ namespace GeometryEx
                 points.Add(Intersection(i, index));
             }
             points.Add(LinesY[index].End);
-            return points.Distinct().ToList();
+            return points;
         }
 
         #endregion Methods

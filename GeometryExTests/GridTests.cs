@@ -18,13 +18,13 @@ namespace GeometryExTests
                 (
                     new[]
                     {
-                        new Vector3(0.0, 0.0),
-                        new Vector3(30.0, 0.0),
-                        new Vector3(30.0, 20.0),
-                        new Vector3(0.0, 20.0)
+                    new Vector3(0.0, 0.0, 0.0),
+                    new Vector3(30.0, 0.0, 0.0),
+                    new Vector3(30.0, 20.0, 0.0),
+                    new Vector3(0.0, 20.0, 0.0)
                     }
                 );
-            var grid = new Grid(perimeter, 20.0, 5.0, 45.0, GridPosition.CenterXY);
+            var grid = new Grid(perimeter, 20.0, 5.0, 6.0, GridPosition.CenterXY);
             var fitAmong = new List<Polygon>();
             foreach (var line in grid.Lines)
             {

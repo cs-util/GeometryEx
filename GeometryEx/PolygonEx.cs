@@ -285,8 +285,11 @@ namespace GeometryEx
         /// </returns>
         public static Polygon FitAmong(this Polygon polygon, List<Polygon> among = null)
         {
-            var polyAmong = new List<Polygon>();
             polygon = Shaper.Difference(polygon, among);
+            if (polygon == null)
+            {
+                return null;
+            }
             if (polygon.IsClockWise())
             {
                 polygon.Reversed();
