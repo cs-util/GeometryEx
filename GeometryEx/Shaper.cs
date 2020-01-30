@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using ClipperLib;
 using System.Linq;
 using Elements.Geometry;
@@ -600,8 +599,8 @@ namespace GeometryEx
         internal static Polygon ToPolygon(this List<IntPoint> p)
         {
             var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
-            var lines = Shaper.LinesFromPoints(points);
-            if (Shaper.ZeroLength(lines) || Shaper.Intersects(lines))
+            var lines = LinesFromPoints(points);
+            if (ZeroLength(lines) || Intersects(lines))
             {
                 return null;
             }

@@ -177,9 +177,11 @@ namespace GeometryEx
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
                 tryPoly = t.OfPolygon(tryPoly);
+
                 var tBox = tryPoly.Compass();
                 var from = tBox.PointBy(origin);
                 tryPoly = tryPoly.MoveFromTo(from, position);
+
                 if (within != null && tryPoly.Intersects(within))
                 {
                     var tryPolys = within.Intersection(tryPoly);
