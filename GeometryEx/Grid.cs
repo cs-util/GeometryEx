@@ -96,7 +96,7 @@ namespace GeometryEx
             var NE = new List<Vector3>();
             for (var i = 0; i < LinesX.Count - 1; i++)
             {
-                SW.AddRange(PointsAlongX(i).SkipLast(1));
+                SW.AddRange(PointsAlongX(i).Take(PointsAlongX(i).Count - 1));
                 NE.AddRange(PointsAlongX(i).Skip(1));
             }
             NE.AddRange(EndsY);
