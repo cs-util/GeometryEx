@@ -181,6 +181,46 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Differences()
+        {
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(3.0, 0.0),
+                    new Vector3(5.0, 0.0),
+                    new Vector3(5.0, 10.0),
+                    new Vector3(3.0, 10.0)
+                }
+            );
+            var among = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(1.0, 1.0),
+                    new Vector3(8.0, 1.0),
+                    new Vector3(8.0, 8.0),
+                    new Vector3(1.0, 8.0)
+                }
+            );
+            var polygons = Shaper.Differences(polygon, new List<Polygon>() { among });
+            var vertices = new List<Vector3>(polygons.First().Vertices);
+            vertices.AddRange(polygons.Last().Vertices);
+            
+            Assert.Equal(2, polygons.Count);
+            
+            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 0.0);
+            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 0.0);
+            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 1.0);
+            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 1.0);
+            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 8.0);
+            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 8.0);
+            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 10.0);
+            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 10.0);
+        }
+
+
+        [Fact]
         public void FitTo()
         {
             var polygon = new Polygon
@@ -276,51 +316,6 @@ namespace GeometryExTests
             };
             var merged = Shaper.Merge(polygons);
             Assert.Equal(2, merged.Count);
-        }
-
-        [Fact]
-        public void PointWithin()
-        {
-            var polygons = new List<Polygon>
-            {
-                new Polygon
-                (
-                    new []
-                    {
-                        Vector3.Origin,
-                        new Vector3(8.0, 0.0),
-                        new Vector3(8.0, 9.0),
-                        new Vector3(0.0, 9.0)
-                    }
-                ),
-                new Polygon
-                (
-                    new []
-                    {
-                        new Vector3(52.0, 0.0),
-                        new Vector3(60.0, 0.0),
-                        new Vector3(60.0, 6.0),
-                        new Vector3(52.0, 6.0)
-                    }
-                ),
-                new Polygon
-                (
-                    new []
-                    {
-                        new Vector3(24.0, 33.0),
-                        new Vector3(32.0, 33.0),
-                        new Vector3(32.0, 36.0),
-                        new Vector3(24.0, 36.0)
-                    }
-                )
-            };
-            var point1 = new Vector3(-1.1, -1.1);
-            var point2 = new Vector3(26.2, 34.2);
-            var point3 = new Vector3(54.5, 3.3);
-
-            Assert.False(Shaper.PointWithin(point1, polygons));
-            Assert.True(Shaper.PointWithin(point2, polygons));
-            Assert.True(Shaper.PointWithin(point3, polygons));
         }
 
         [Fact]
