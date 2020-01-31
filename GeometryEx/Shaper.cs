@@ -145,7 +145,7 @@ namespace GeometryEx
                 if (solution.Count == 0)
                 {
                     // polygon has disappeared into a larger polygon.
-                    return null;
+                    return polygons;
                 }
                 foreach (List<IntPoint> path in solution)
                 {
