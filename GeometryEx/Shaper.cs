@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using ClipperLib;
 using System.Linq;
 using Elements.Geometry;
@@ -109,11 +108,60 @@ namespace GeometryEx
                 var polygons = new List<Polygon>();
                 foreach (List<IntPoint> path in solution)
                 {
-                    polygons.Add(ToPolygon(path.Distinct().ToList()));
+                    polygon = ToPolygon(path.Distinct().ToList());
+                    if (polygon == null)
+                    {
+                        continue;
+                    }
+                    polygons.Add(polygon);
                 }
                 polygon = polygons.OrderByDescending(p => Math.Abs(p.Area())).First();
-            }    
+            }
+            if (polygon.IsClockWise())
+            {
+                return polygon.Reversed();
+            }
             return polygon;
+        }
+
+        /// <summary>
+        /// Constructs the geometric differences between this Polygon and the supplied Polygons.
+        /// </summary>
+        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <returns>
+        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
+        /// </returns>
+        public static List<Polygon> Differences(Polygon polygon, IList<Polygon> difPolys)
+        {
+            var polygons = new List<Polygon>();
+            foreach (Polygon differ in difPolys)
+            {
+                var thisPath = polygon.ToClipperPath();
+                var clipper = new Clipper();
+                clipper.AddPath(thisPath, PolyType.ptSubject, true);
+                clipper.AddPath(differ.ToClipperPath(), PolyType.ptClip, true);
+                var solution = new List<List<IntPoint>>();
+                clipper.Execute(ClipType.ctDifference, solution);
+                if (solution.Count == 0)
+                {
+                    // polygon has disappeared into a larger polygon.
+                    return polygons;
+                }
+                foreach (List<IntPoint> path in solution)
+                {
+                    polygon = ToPolygon(path.Distinct().ToList());
+                    if (polygon == null)
+                    {
+                        continue;
+                    }
+                    if (polygon.IsClockWise())
+                    {
+                        polygon = polygon.Reversed();
+                    }
+                    polygons.Add(polygon);
+                }
+            }
+            return polygons.OrderByDescending(p => Math.Abs(p.Area())).ToList();
         }
 
         /// <summary>
@@ -141,34 +189,19 @@ namespace GeometryEx
             {
                 return polygons;
             }
-            var uPolygons = new List<Polygon>();
+            var mergePolygons = new List<Polygon>();
             foreach (var solved in solution)
             {
-                uPolygons.Add(solved.Distinct().ToList().ToPolygon());
-            }
-            return uPolygons;
-        }
-
-
-        /// <summary>
-        /// Tests whether the supplied Vector3 point falls within or on any Polygon in the supplied collection when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to test.</param>
-        /// <param name="polygons">The collection of Polygons to test for point coincidence.</param>
-        /// <returns>
-        /// True if the supplied Vector3 point falls within or on the perimeter of any of supplied Polygon.
-        /// </returns>
-        public static bool PointWithin(Vector3 point, IList<Polygon> polygons)
-        {
-            foreach(Polygon polygon in polygons)
-            {
-                if (polygon.Covers(point))
+                var polygon = solved.Distinct().ToList().ToPolygon();
+                if (polygon.IsClockWise())
                 {
-                    return true;
+                    polygon = polygon.Reversed();
                 }
+                mergePolygons.Add(polygon);
             }
-            return false;
+            return mergePolygons;
         }
+
 
         /// <summary>
         /// Creates an C-shaped Polygon within a specified rectangle with its southwest corner at the origin.
@@ -185,8 +218,6 @@ namespace GeometryEx
             {
                 throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
-            var halfWidth = width * 0.5;
-            var xAxis = size.Y * 0.5;
             return
                 new Polygon
                 (
@@ -600,8 +631,8 @@ namespace GeometryEx
         internal static Polygon ToPolygon(this List<IntPoint> p)
         {
             var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
-            var lines = Shaper.LinesFromPoints(points);
-            if (Shaper.ZeroLength(lines) || Shaper.Intersects(lines))
+            var lines = LinesFromPoints(points);
+            if (ZeroLength(lines) || Intersects(lines))
             {
                 return null;
             }

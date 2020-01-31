@@ -94,7 +94,7 @@ namespace GeometryEx
             };
             SW.AddRange(StartsY);
             var NE = new List<Vector3>();
-            for (var i = 0; i < LinesX.Count - 1; i++)
+            for (var i = 0; i < LinesX.Count; i++)
             {
                 SW.AddRange(PointsAlongX(i).Take(PointsAlongX(i).Count - 1));
                 NE.AddRange(PointsAlongX(i).Skip(1));
@@ -173,6 +173,10 @@ namespace GeometryEx
                         origin = compass.SW;
                         break;
                     }
+            }
+            if (!perimeterJig.Covers(origin))
+            {
+                return compass.C;
             }
             return origin;
         }

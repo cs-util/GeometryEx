@@ -13,9 +13,9 @@ namespace GeometryEx
         /// </summary>
         /// <param name="difPolys">The list of intersecting Polygons.</param>
         /// <returns>
-        /// Returns a list of Lines representing the subtraction of the Lines intersecting the supplied list of Polygons.
+        /// Returns the longest Line representing the subtraction of the Line intersecting the supplied list of Polygons.
         /// </returns>
-        public static List<Line> Difference(this Line line, IList<Polygon> difPolys)
+        public static Line Difference(this Line line, IList<Polygon> difPolys)
         {
             var thisPath = ToClipperPath(line);
             var polyPaths = new List<List<IntPoint>>();
@@ -33,6 +33,35 @@ namespace GeometryEx
             {
                 return null;
             }
+            var lines = new List<Line>();
+            foreach (List<IntPoint> path in soLines)
+            {
+                lines.Add(ToLine(path.Distinct().ToList()));
+            }
+            return lines.OrderByDescending(l => l.Length()).ToList().First();
+        }
+
+        /// <summary>
+        /// Constructs the geometric difference between this Line and the supplied Polygons.
+        /// </summary>
+        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <returns>
+        /// Returns a list of Lines representing the subtraction of the Lines intersecting the supplied list of Polygons.
+        /// </returns>
+        public static List<Line> Differences(this Line line, IList<Polygon> difPolys)
+        {
+            var thisPath = ToClipperPath(line);
+            var polyPaths = new List<List<IntPoint>>();
+            foreach (Polygon poly in difPolys)
+            {
+                polyPaths.Add(poly.ToClipperPath());
+            }
+            Clipper clipper = new Clipper();
+            clipper.AddPath(thisPath, PolyType.ptSubject, false);
+            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
+            var solution = new PolyTree();
+            clipper.Execute(ClipType.ctDifference, solution);
+            var soLines = Clipper.OpenPathsFromPolyTree(solution);
             var lines = new List<Line>();
             foreach (List<IntPoint> path in soLines)
             {
