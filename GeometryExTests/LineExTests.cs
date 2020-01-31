@@ -12,6 +12,27 @@ namespace GeometryExTests
         [Fact]
         public void Difference()
         {
+            var line = new Line(new Vector3(-5.0, 5.0), new Vector3(16.0, 5.0));
+            var polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(10.0, 0.0),
+                        new Vector3(10.0, 10.0),
+                        new Vector3(0.0, 10.0)
+                    }
+                )
+            };
+            line = line.Difference(polygons);
+            Assert.Equal(6.0, line.Length());
+        }
+
+        [Fact]
+        public void Differences()
+        {
             var line = new Line(new Vector3(-5.0, 5.0), new Vector3(15.0, 5.0));
             var polygons = new List<Polygon>
             {
@@ -26,9 +47,9 @@ namespace GeometryExTests
                     }
                 )
             };
-            var lines = line.Difference(polygons);
+            var lines = line.Differences(polygons);
             var points = new List<Vector3>();
-            foreach (Line segment in lines)
+            foreach (var segment in lines)
             {
                 points.Add(segment.Start);
                 points.Add(segment.End);

@@ -39,6 +39,7 @@ namespace GeometryEx
                 lines.Add(ToLine(path.Distinct().ToList()));
             }
             return lines.OrderByDescending(l => l.Length()).ToList().First();
+        }
 
         /// <summary>
         /// Constructs the geometric difference between this Line and the supplied Polygons.
