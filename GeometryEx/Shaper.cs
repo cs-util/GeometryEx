@@ -21,6 +21,10 @@ namespace GeometryEx
         /// </returns>
         public static Polygon AdjacentArea(Polygon polygon, double area, Orient orient)
         {
+            if (polygon == null)
+            {
+                return null;
+            }
             var box = new CompassBox(polygon);
             double sizeX = 0.0;
             double sizeY = 0.0;
@@ -71,6 +75,10 @@ namespace GeometryEx
         /// </returns>
         public static Line AxisQuad(Polygon polygon)
         {
+            if (polygon == null)
+            {
+                return null;
+            }
             var segments = polygon.Segments();
             if (segments.Count() != 4)
             {
@@ -86,12 +94,16 @@ namespace GeometryEx
         /// <summary>
         /// Constructs the largest geometric difference between this Polygon and the supplied Polygons.
         /// </summary>
-        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <param name="difPolygons">The list of intersecting Polygons.</param>
         /// <returns>
         /// Returns a Polygon representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
         /// </returns>
         public static Polygon Difference(Polygon polygon, IList<Polygon> difPolys)
         {
+            if (polygon == null)
+            {
+                return null;
+            }
             foreach (Polygon differ in difPolys)
             {
                 var thisPath = polygon.ToClipperPath();
@@ -131,10 +143,14 @@ namespace GeometryEx
         /// <returns>
         /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
         /// </returns>
-        public static List<Polygon> Differences(Polygon polygon, IList<Polygon> difPolys)
+        public static List<Polygon> Differences(Polygon polygon, IList<Polygon> difPolygons)
         {
             var polygons = new List<Polygon>();
-            foreach (Polygon differ in difPolys)
+            if (polygon == null)
+            {
+                return polygons;
+            }
+            foreach (Polygon differ in difPolygons)
             {
                 var thisPath = polygon.ToClipperPath();
                 var clipper = new Clipper();
@@ -174,6 +190,10 @@ namespace GeometryEx
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
         public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
         {
+            if (polygons.Count == 0)
+            {
+                return polygons;
+            }
             var filtyp = (PolyFillType) fillType;
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon polygon in polygons)
@@ -527,6 +547,10 @@ namespace GeometryEx
         public static List<Line> LinesFromPoints(List<Vector3> points)
         {
             var lines = new List<Line>();
+            if (points.Count == 0)
+            {
+                return lines;
+            }
             for (var i = 0; i < points.Count - 1; i++)
             {
                 lines.Add(new Line(points[i], points[i + 1]));
@@ -539,6 +563,10 @@ namespace GeometryEx
         /// </summary>
         public static bool ZeroLength(List<Line> lines)
         {
+            if (lines.Count == 0)
+            {
+                return false;
+            }
             foreach (var s in lines)
             {
                 if (s.Length() == 0)
@@ -555,6 +583,10 @@ namespace GeometryEx
         /// <param name="lines">List of lines to check.</param>
         public static bool Intersects(List<Line> lines)
         {
+            if (lines.Count == 0)
+            {
+                return false;
+            }
             for (var i = 0; i < lines.Count; i++)
             {
                 for (var j = 0; j < lines.Count; j++)

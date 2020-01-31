@@ -134,6 +134,10 @@ namespace GeometryEx
         /// </returns>
         public CompassBox(Polygon polygon)
         {
+            if (polygon == null)
+            {
+                throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
+            }
             var vertices = new List<Vector3>(polygon.Vertices);
             vertices.Sort((a, b) => a.X.CompareTo(b.X));
             var minX = vertices[0].X;

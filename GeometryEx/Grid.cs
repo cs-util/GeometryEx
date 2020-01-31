@@ -298,7 +298,7 @@ namespace GeometryEx
         /// <summary>
         /// Polygon perimeter generating the Grid. 
         /// </summary>
-        public Polygon Perimeter { get; private set; }
+        public Polygon Perimeter { get; }
 
         /// <summary>
         /// Returns all the points at the ends and intersections of the grid lines.
@@ -394,14 +394,12 @@ namespace GeometryEx
         /// <returns></returns>
         public List<Vector3> PointsAlongX(int index)
         {
+            var points = new List<Vector3>();
             if (index >= LinesX.Count)
             {
-                throw new ArgumentOutOfRangeException();
+                return points;
             }
-            var points = new List<Vector3>()
-            {
-                LinesX[index].Start
-            };
+            points.Add(LinesX[index].Start);
             for (var i = 0; i < LinesY.Count; i++)
             {
                 points.Add(Intersection(index, i));
@@ -416,14 +414,12 @@ namespace GeometryEx
         /// <returns></returns>
         public List<Vector3> PointsAlongY(int index)
         {
+            var points = new List<Vector3>();
             if (index >= LinesY.Count)
             {
-                throw new ArgumentOutOfRangeException();
+                return points;
             }
-            var points = new List<Vector3>()
-            {
-                LinesY[index].Start
-            };
+            points.Add(LinesY[index].Start);
             for (var i = 0; i < LinesX.Count; i++)
             {
                 points.Add(Intersection(i, index));

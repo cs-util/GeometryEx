@@ -53,6 +53,10 @@ namespace GeometryEx
         /// </returns>
         public CoordinateGrid(Polygon polygon, double xInterval = 1.0,  double yInterval = 1.0, double angle = 0.0)
         {
+            if (polygon == null)
+            {
+                throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
+            }
             random = new Random();
             Allocated = new List<Vector3>();
             Available = new List<Vector3>();
@@ -135,6 +139,10 @@ namespace GeometryEx
         /// </returns>
         public void Allocate(Polygon polygon)
         {
+            if (polygon == null)
+            {
+                return;
+            }
             var rmvPoints = new List<int>();
             var index = 0;
             foreach (Vector3 point in Available)
@@ -162,7 +170,10 @@ namespace GeometryEx
         /// </returns>
         public void Allocate(IList<Polygon> polygons)
         {
-            var rmvPoints = new List<int>();
+            if (polygons.Count == 0)
+            {
+                return;
+            }
             var index = 0;
             var allocate = new List<Vector3>();
             foreach (Vector3 point in Available)
