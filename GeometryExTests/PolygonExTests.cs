@@ -196,6 +196,33 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void FitWithin()
+        {
+            var within = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(1.0, 1.0),
+                    new Vector3(8.0, 1.0),
+                    new Vector3(8.0, 8.0),
+                    new Vector3(1.0, 8.0)
+                }
+            );
+            var fit = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(0.0, 0.0),
+                    new Vector3(4.0, 0.0),
+                    new Vector3(4.0, 4.0),
+                    new Vector3(0.0, 4.0),
+                }
+            );
+            fit = fit.FitMost(within);
+            Assert.True(fit.Fits(within, null));
+        }
+
+        [Fact]
         public void Intersects()
         {
             var p1 = new Polygon

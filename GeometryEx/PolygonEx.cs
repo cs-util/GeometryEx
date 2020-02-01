@@ -259,25 +259,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates the largest Polygon fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
-        /// </summary>
-        /// <param name="polygon">This Polygon.</param>
-        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
-        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
-        /// <returns>
-        /// A list of Polygons.
-        /// </returns>
-        public static Polygon FitTo(this Polygon polygon, Polygon within, List<Polygon> among)
-        {
-            polygon = FitWithin(polygon, within);
-            if (polygon == null)
-            {
-                return null;
-            }
-            return FitAmong(polygon, among);
-        }
-
-        /// <summary>
         /// Creates the largest Polygon fitted to supplied intersecting Polygons.
         /// </summary>
         /// <param name="polygon">This Polygon.</param>
@@ -307,7 +288,7 @@ namespace GeometryEx
         /// <returns>
         /// A Polygon.
         /// </returns>
-        public static Polygon FitWithin(this Polygon polygon, Polygon within)
+        public static Polygon FitMost(this Polygon polygon, Polygon within)
         {
             if (!within.Intersects(polygon))
             {
@@ -324,6 +305,25 @@ namespace GeometryEx
                 return polygons.First().Reversed();
             }
             return polygons.First();
+        }
+
+        /// <summary>
+        /// Creates the largest Polygon fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
+        /// </summary>
+        /// <param name="polygon">This Polygon.</param>
+        /// <param name="within">Polygon acting as a constraining outer boundary.</param>
+        /// <param name="among">List of Polygons against which this Polygon must conform.</param>
+        /// <returns>
+        /// A list of Polygons.
+        /// </returns>
+        public static Polygon FitTo(this Polygon polygon, Polygon within, List<Polygon> among)
+        {
+            polygon = FitMost(polygon, within);
+            if (polygon == null)
+            {
+                return null;
+            }
+            return FitAmong(polygon, among);
         }
 
         /// <summary>
@@ -397,7 +397,7 @@ namespace GeometryEx
             var adjCompass = adjTo.Compass();
             return polygon.MoveFromTo(thisCompass.PointBy(from), adjCompass.PointBy(to));
         }
-
+        
         /// <summary>
         /// Returns a new Polygon rotated around a supplied Vector3 by the specified angle in degrees.
         /// </summary>

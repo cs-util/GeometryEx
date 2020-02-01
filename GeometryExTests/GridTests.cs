@@ -33,7 +33,7 @@ namespace GeometryExTests
             var cells = new List<Polygon>();
             foreach (var cell in grid.Cells)
             {
-                var addCell = cell.FitWithin(perimeter);
+                var addCell = cell.FitMost(perimeter);
                 if (addCell == null)
                 {
                     continue;
