@@ -71,6 +71,7 @@ namespace GeometryExTests
                 }
             );
             Assert.True(p1.Covers(p2));
+            Assert.True(p1.Covers(p2.Reversed()));
             Assert.False(p1.Covers(new Vector3(-1.1, -1.1)));
             Assert.True(p1.Covers(new Vector3(2.0, 5.0)));
             Assert.True(p1.Covers(new Vector3(2.0, 0.0)));

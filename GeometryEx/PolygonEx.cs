@@ -102,6 +102,9 @@ namespace GeometryEx
             }
             var clipper = new Clipper();
             var solution = new List<List<IntPoint>>();
+            if (cover.IsClockWise() != polygon.IsClockWise()) {
+                polygon = polygon.Reversed();
+            }
             clipper.AddPath(cover.ToClipperPath(), PolyType.ptSubject, true);
             clipper.AddPath(polygon.ToClipperPath(), PolyType.ptClip, true);
             clipper.Execute(ClipType.ctUnion, solution);
