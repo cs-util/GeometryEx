@@ -66,53 +66,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Tests if the supplied Vector3 point is within this Polygon or coincident with an edge when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if the supplied Vector3 point is within this Polygon or coincident with an edge when compared on a shared plane. Returns false if the supplied point is outside this Polygon, or if the supplied Vector3 point is null.
-        /// </returns>
-        public static bool Covers(this Polygon polygon, Vector3 point)
-        {
-            if (point.IsNaN())
-            {
-                return false;
-            }
-            var thisPath = Shaper.ToClipperPath(polygon);
-            var intPoint = new IntPoint(point.X * scale, point.Y * scale);
-            if (Clipper.PointInPolygon(intPoint, thisPath) == 0)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the supplied Polygon is within this Polygon with or without edge coincident vertices when compared on a shared plane.
-        /// </summary>
-        /// <param name="polygon">The Polygon to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if every vertex of the supplied Polygon is within this Polygon or coincident with an edge when compared on a shared plane. Returns false if any vertex of the supplied Polygon is outside this Polygon, or if the supplied Polygon is null.
-        /// </returns>
-        private static bool Covers(Polygon cover, Polygon polygon)
-        {
-            if (polygon == null)
-            {
-                return false;
-            }
-            var clipper = new Clipper();
-            var solution = new List<List<IntPoint>>();
-            clipper.AddPath(cover.ToClipperPath(), PolyType.ptSubject, true);
-            clipper.AddPath(polygon.ToClipperPath(), PolyType.ptClip, true);
-            clipper.Execute(ClipType.ctUnion, solution);
-            if (solution.Count != 1)
-            {
-                return false;
-            }
-            return Math.Abs(solution.First().ToPolygon().Area() - cover.ToClipperPath().ToPolygon().Area()) <= 0.0001;
-        }
-
-        /// <summary>
         /// Tests if the supplied Vector3 point is outside this Polygon when compared on a shared plane.
         /// </summary>
         /// <param name="point">The Vector3 point to compare to this Polygon.</param>
@@ -347,24 +300,6 @@ namespace GeometryEx
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Calculates whether this polygon is configured clockwise.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns>True if the polygon is oriented clockwise.</returns>
-        public static bool IsClockWise(this Polygon polygon)
-        {
-            // https://en.wikipedia.org/wiki/Shoelace_formula
-            var sum = 0.0;
-            for (int i = 0; i < polygon.Vertices.Count; i++)
-            {
-                var point = polygon.Vertices[i];
-                var nextPoint = polygon.Vertices[(i + 1) % polygon.Vertices.Count];
-                sum += (nextPoint.X - point.X) * (nextPoint.Y + point.Y);
-            }
-            return sum > 0;
         }
 
         /// <summary>
