@@ -204,7 +204,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Fits(this Polygon polygon, Polygon within = null, IList<Polygon> among = null)
         {
-            if (within != null && !Covers(within, polygon))
+            if (within != null && !within.Covers(polygon))
             {
                 return false;
             }

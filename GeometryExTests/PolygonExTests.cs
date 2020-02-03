@@ -48,35 +48,6 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void Covers()
-        {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0, 0),
-                    new Vector3(20, 0),
-                    new Vector3(20, 20),
-                    new Vector3(0, 20)
-                }
-            );
-            var p2 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0, 0),
-                    new Vector3(10, 0),
-                    new Vector3(10, 10),
-                    new Vector3(0, 10)
-                }
-            );
-            Assert.True(p1.Covers(p2));
-            Assert.False(p1.Covers(new Vector3(-1.1, -1.1)));
-            Assert.True(p1.Covers(new Vector3(2.0, 5.0)));
-            Assert.True(p1.Covers(new Vector3(2.0, 0.0)));
-        }
-
-        [Fact]
         public void Difference()
         {
             var polygon = 
@@ -249,29 +220,6 @@ namespace GeometryExTests
             Assert.False(p1.Intersects(p3));
             Assert.True(p3.Intersects(p4));
             Assert.True(p1.Intersects(polygons));
-        }
-
-        [Fact]
-        public void IsClockWise()
-        {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 5.0),
-                    new Vector3(5.0, 5.0),
-                    new Vector3(0.0, 10.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(10.0, 5.0),
-                    new Vector3(5.0, 0.0),
-                    new Vector3(0.0, 0.0)
-                 }
-            );
-            Assert.True(p1.IsClockWise());
-            var verts = new List<Vector3>(p1.Vertices);
-            verts.Reverse();
-            var p2 = new Polygon(verts.ToArray());
-            Assert.False(p2.IsClockWise());
         }
 
         [Fact]
