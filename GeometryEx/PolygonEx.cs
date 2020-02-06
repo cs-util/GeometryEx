@@ -389,7 +389,8 @@ namespace GeometryEx
             {
                 var rX = (Math.Cos(theta) * (vertex.X - pivot.X)) - (Math.Sin(theta) * (vertex.Y - pivot.Y)) + pivot.X;
                 var rY = (Math.Sin(theta) * (vertex.X - pivot.X)) + (Math.Cos(theta) * (vertex.Y - pivot.Y)) + pivot.Y;
-                vertices.Add(new Vector3(rX, rY));
+                var rZ = vertex.Z;
+                vertices.Add(new Vector3(rX, rY, rZ));
             }
             return new Polygon(vertices.ToArray());
         }
