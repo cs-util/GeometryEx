@@ -21,11 +21,14 @@ namespace GeometryEx
         /// <param name="xInterval">Spacing of the grid along the x-axis.</param>
         /// <param name="yInterval">Spacing of the grid along the y-axis.</param>
         /// <param name="angle">Rotation of the grid around the Polygon centroid.</param>
+        /// <param name="position">Alignment of Grid to perimeter.</param>
+        /// <param name="splitCells">Split cells north to south.</param>
         /// <returns>
         /// A new CoordGrid.
         /// </returns>
-        public Grid(Polygon perimeter, double intervalX = 1.0, double intervalY = 1.0, 
-                    double angle = 0.0, GridPosition position = GridPosition.CenterSpan)
+        public Grid(Polygon perimeter, double intervalX, double intervalY, double angle = 0.0,
+                    double cellOffset = 0.0, bool splitCells = false, bool fit = true,
+                    GridPosition position = GridPosition.CenterXY)
         {
 
             if (intervalX <= 0.0 || intervalY <= 0.0)
@@ -71,7 +74,7 @@ namespace GeometryEx
             }
             LinesX = LinesX.OrderBy(x => x.Start.Y).ToList();
             LinesY = LinesY.OrderBy(y => y.Start.X).ToList();
-            MakeCells();
+            MakeCells(cellOffset, splitCells);
             RotateOrder();
         }
 
@@ -86,7 +89,7 @@ namespace GeometryEx
         /// <summary>
         /// 
         /// </summary>
-        private void MakeCells()
+        private void MakeCells(double cellOffset = 0.0, bool splitCells = false, bool fit = true)
         {
             var SW = new List<Vector3>()
             {
@@ -103,7 +106,7 @@ namespace GeometryEx
             NE.Add(compass.NE);
             SW = SW.Distinct().ToList();
             NE = NE.Distinct().ToList();
-            Cells = new List<Polygon>();
+            var cells = new List<Polygon>();
             for (var i = 0; i < SW.Count; i++)
             {
                 var points = new List<Vector3>()
@@ -113,7 +116,34 @@ namespace GeometryEx
                     NE[i],
                     new Vector3(SW[i].X, NE[i].Y)
                 };
-                Cells.Add(new Polygon(points));
+                var polygon = new Polygon(points);
+                var polygons = polygon.Offset(cellOffset * -1);
+                if (polygons.Count() > 0)
+                {
+                    polygon = polygons.OrderByDescending(p => Math.Abs(p.Area())).First();
+                }
+                if (splitCells)
+                {
+                    var cps = polygon.Compass();
+                    cells.Add(new Polygon(new[] { cps.W, cps.E, cps.NE, cps.NW }));
+                    cells.Add(new Polygon(new[] { cps.SW, cps.SE, cps.E, cps.W }));
+                    continue;
+                }
+                cells.Add(polygon);
+            }
+            if (!fit)
+            {
+                Cells = new List<Polygon>(cells);
+            }
+            Cells = new List<Polygon>();
+            foreach (var cell in cells)
+            {
+                var polygon = cell.FitMost(perimeterJig);
+                if (polygon == null)
+                {
+                    continue;
+                }
+                Cells.Add(polygon);
             }
         }
 

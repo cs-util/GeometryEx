@@ -15,50 +15,28 @@ namespace GeometryExTests
         {
             var perimeter =
                 new Polygon
-                (
-                    new[]
-                    {
-                    new Vector3(0.0, 0.0, 0.0),
-                    new Vector3(30.0, 0.0, 0.0),
-                    new Vector3(30.0, 20.0, 0.0),
-                    new Vector3(0.0, 20.0, 0.0)
-                    }
-                );
-            var grid = new Grid(perimeter, 20.0, 5.0, 6.0, GridPosition.CenterXY);
-            var fitAmong = new List<Polygon>();
-            foreach (var line in grid.Lines)
-            {
-                fitAmong.Add(line.Thicken(2.0));
-            }
-            var cells = new List<Polygon>();
-            foreach (var cell in grid.Cells)
-            {
-                var addCell = cell.FitMost(perimeter);
-                if (addCell == null)
-                {
-                    continue;
-                }
-                addCell = addCell.FitAmong(fitAmong);
-                if (addCell == null)
-                {
-                    continue;
-                }
-                cells.Add(addCell);
-            }
+                 (
+                     new[]
+                     {
+                            new Vector3(22.4239, -11.4625,0.0000),
+                            new Vector3(41.3779, -11.4625,0.0000),
+                            new Vector3(41.3779, 35.0399, 0.0000),
+                            new Vector3(-22.4239, 35.0399, 0.0000)
+                     }
+                 );
+            var grid = new Grid(perimeter, 31.900910660932219, 11.625584573198932, 69.39415549558927, 1.0, true, true, GridPosition.CenterXY);
             var model = new Model();
             model.AddElement(new Panel(perimeter, BuiltInMaterials.Glass, null, null, Guid.NewGuid(), ""));
             foreach (var line in grid.Lines)
             {
-                model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(2.0, 2.0)), BuiltInMaterials.Steel));
+                //model.AddElement(new Beam(line, new Profile(Polygon.Rectangle(2.0, 2.0)), BuiltInMaterials.Steel));
             }
             var matl = new Material("test", Palette.Aqua);
-            foreach (var cell in cells)
+            foreach (var cell in grid.Cells)
             {
                 model.AddElement(new Space(new Profile(cell), 3.0, matl));
             }
             model.ToGlTF("../../../../gridCreate.glb");
-
-            // Assert.Equal()
         }
 
         [Fact]
@@ -74,7 +52,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0, 0.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterSpan);
+            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, 0.0, false, false, GridPosition.CenterSpan);
             var intersect = grid.Intersection(1, 1);
             Assert.Equal(3.0, intersect.X);
             Assert.Equal(3.0, intersect.Y);
@@ -83,7 +61,7 @@ namespace GeometryExTests
             Assert.Equal(5.0, intersect.X);
             Assert.Equal(5.0, intersect.Y);
 
-            grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterXY);
+            grid = new Grid(perimeter, 2.0, 2.0, 0.0, 0.0, false, false, GridPosition.CenterXY);
             intersect = grid.Intersection(1, 1);
             Assert.Equal(4.0, intersect.X);
             Assert.Equal(4.0, intersect.Y);
@@ -106,7 +84,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0, -1.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 45.0, GridPosition.CenterSpan);
+            var grid = new Grid(perimeter, 2.0, 2.0, 45.0, 0.0, false, false, GridPosition.CenterSpan);
             Assert.Equal(36, grid.Intersections.Count);
 
             var model = new Model();
@@ -152,7 +130,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0, 0.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterSpan);
+            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, 0.0, false, false, GridPosition.CenterSpan);
             var points = grid.Points;
             Assert.Equal(32, points.Count);
         }
@@ -170,7 +148,7 @@ namespace GeometryExTests
                     new Vector3(0.0, 8.0)
                 }
             );
-            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, GridPosition.CenterXY);
+            var grid = new Grid(perimeter, 2.0, 2.0, 0.0, 0.0, false, false, GridPosition.CenterXY);
             var points = grid.PointsAlongX(0);
             Assert.Equal(5, points.Count);
 

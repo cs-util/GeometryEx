@@ -156,6 +156,10 @@ namespace GeometryEx
             }
             foreach (Polygon differ in difPolygons)
             {
+                if (polygon == null || differ == null)
+                {
+                    continue;
+                }
                 var thisPath = polygon.ToClipperPath();
                 var clipper = new Clipper();
                 clipper.AddPath(thisPath, PolyType.ptSubject, true);
@@ -617,11 +621,11 @@ namespace GeometryEx
         /// Check for self-intersection in the supplied lines.
         /// </summary>
         /// <param name="lines">List of lines to check.</param>
-        public static bool Intersects(List<Line> lines)
+        public static bool SelfIntersects(List<Line> lines)
         {
             if (lines.Count == 0)
             {
-                return false;
+                return true;
             }
             for (var i = 0; i < lines.Count; i++)
             {
@@ -700,11 +704,20 @@ namespace GeometryEx
         {
             var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
             var lines = LinesFromPoints(points);
-            if (ZeroLength(lines) || Intersects(lines))
+            if (ZeroLength(lines) || SelfIntersects(lines))
             {
                 return null;
             }
-            return new Polygon(points);
+            Polygon polygon;
+            try
+            {
+                polygon = new Polygon(points);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return polygon;
         }
     }
 }

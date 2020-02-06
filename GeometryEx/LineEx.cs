@@ -21,7 +21,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon poly in difPolys)
             {
-                polyPaths.Add(poly.ToClipperPath());
+                polyPaths.Add(Shaper.ToClipperPath(poly));
             }
             Clipper clipper = new Clipper();
             clipper.AddPath(thisPath, PolyType.ptSubject, false);
@@ -54,7 +54,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon poly in difPolys)
             {
-                polyPaths.Add(poly.ToClipperPath());
+                polyPaths.Add(Shaper.ToClipperPath(poly));
             }
             Clipper clipper = new Clipper();
             clipper.AddPath(thisPath, PolyType.ptSubject, false);
@@ -337,6 +337,26 @@ namespace GeometryEx
         {
             var v = new Vector3(to.X - from.X, to.Y - from.Y);
             return new Line(line.Start + v, line.End + v);
+        }
+
+        /// <summary>
+        /// Tests whether a point falls along this line.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private static bool PointOnLine(this Line line, Vector3 point)
+        {
+            var deltaXp = point.X - line.Start.X;
+            var deltaYp = point.Y - line.Start.Y;
+            var deltaXl = line.End.X - line.Start.X;
+            var deltaYl = line.End.Y - line.Start.Y;
+            var cross = deltaXp * deltaYl - deltaYp * deltaXl;
+            if (Math.Abs(cross) < Vector3.Epsilon)
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>

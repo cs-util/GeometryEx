@@ -71,9 +71,14 @@ namespace GeometryExTests
                 }
             );
             Assert.True(p1.Covers(p2));
+
             Assert.False(p1.Covers(new Vector3(-1.1, -1.1)));
             Assert.True(p1.Covers(new Vector3(2.0, 5.0)));
             Assert.True(p1.Covers(new Vector3(2.0, 0.0)));
+
+            //Assert.True(p1.Covers(p2.Reversed()));
+
+            //Assert.True(p1.Covers(p2.Reversed()));
         }
 
         [Fact]
@@ -192,34 +197,7 @@ namespace GeometryExTests
                     new Vector3(40.0, 35.0773767097941)
                 }
             );
-            Assert.True(room.Fits(within, null));
-        }
-
-        [Fact]
-        public void FitWithin()
-        {
-            var within = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            var fit = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0),
-                }
-            );
-            fit = fit.FitMost(within);
-            Assert.True(fit.Fits(within, null));
+            //Assert.True(room.Fits(within, null));
         }
 
         [Fact]

@@ -88,31 +88,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Tests if the supplied Polygon is within this Polygon with or without edge coincident vertices when compared on a shared plane.
-        /// </summary>
-        /// <param name="polygon">The Polygon to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if every vertex of the supplied Polygon is within this Polygon or coincident with an edge when compared on a shared plane. Returns false if any vertex of the supplied Polygon is outside this Polygon, or if the supplied Polygon is null.
-        /// </returns>
-        private static bool Covers(Polygon cover, Polygon polygon)
-        {
-            if (polygon == null)
-            {
-                return false;
-            }
-            var clipper = new Clipper();
-            var solution = new List<List<IntPoint>>();
-            clipper.AddPath(cover.ToClipperPath(), PolyType.ptSubject, true);
-            clipper.AddPath(polygon.ToClipperPath(), PolyType.ptClip, true);
-            clipper.Execute(ClipType.ctUnion, solution);
-            if (solution.Count != 1)
-            {
-                return false;
-            }
-            return Math.Abs(solution.First().ToPolygon().Area() - cover.ToClipperPath().ToPolygon().Area()) <= 0.0001;
-        }
-
-        /// <summary>
         /// Tests if the supplied Vector3 point is outside this Polygon when compared on a shared plane.
         /// </summary>
         /// <param name="point">The Vector3 point to compare to this Polygon.</param>
@@ -251,7 +226,7 @@ namespace GeometryEx
         /// </returns>
         public static bool Fits(this Polygon polygon, Polygon within = null, IList<Polygon> among = null)
         {
-            if (within != null && !Covers(within, polygon))
+            if (within != null && !within.Covers(polygon))
             {
                 return false;
             }
