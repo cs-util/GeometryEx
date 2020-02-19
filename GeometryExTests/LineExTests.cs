@@ -127,7 +127,7 @@ namespace GeometryExTests
         [Fact]
         public void IsParallelTo()
         {
-            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            var line = new Line(new Vector3(6.0, 6.0), new Vector3(1.0, 1.0));
             var intr = new Line(new Vector3(5.0, 5.0), new Vector3(8.0, 8.0));
             Assert.True(line.IsParallelTo(intr));
 

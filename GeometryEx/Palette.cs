@@ -1,4 +1,5 @@
 using Elements.Geometry;
+using System.Collections.Generic;
 
 namespace GeometryEx
 {
@@ -8,6 +9,68 @@ namespace GeometryEx
     /// </summary>
     public static class Palette
     {
+        public static Dictionary<string, Color> Colors
+        {
+            get
+            {
+                return
+                    new Dictionary<string, Color>
+                    {
+                        { "Amber",  Amber},
+                        { "Aqua", Aqua },
+                        { "Beige", Beige },
+                        { "Black", Black },
+                        { "Blue", Blue },
+                        { "Brown", Brown },
+                        { "Cobalt", Cobalt },
+                        { "Coral", Coral },
+                        { "Crimson", Crimson },
+                        { "Cyan", Cyan },
+                        { "Darkgray", Darkgray },
+                        { "Emerald", Emerald },
+                        { "Granite", Granite },
+                        { "Gray", Gray },
+                        { "Green", Green },
+                        { "Lavender", Lavender },
+                        { "Lime", Lime },
+                        { "Magenta", Magenta },
+                        { "Maroon", Maroon },
+                        { "Mint", Mint },
+                        { "Navy", Navy },
+                        { "Ochre", Ochre },
+                        { "Olive", Olive },
+                        { "Orange", Orange },
+                        { "Pink", Pink },
+                        { "Purple", Purple },
+                        { "Red", Red },
+                        { "Sand", Sand },
+                        { "Stone", Stone },
+                        { "Teal", Teal },
+                        { "White", White },
+                        { "Yellow", Yellow }
+                    };
+            }
+        }
+
+        /// <summary>
+        /// Returns all the Palette Colors as a list.
+        /// </summary>
+        /// <returns></returns>
+        public static List<Color> ColorList()
+        {
+            var colors = new List<Color>();
+            foreach (var key in Colors.Keys)
+            {
+                colors.Add(Colors[key]);
+            }
+            return colors;
+        }
+
+        /// <summary>
+        /// Amber
+        /// </summary>
+        public static Color Amber => new Color(0.9f, 0.6f, 0.1f, 0.6f);
+
         /// <summary>
         /// Aqua
         /// </summary>
@@ -109,6 +172,11 @@ namespace GeometryEx
         public static Color Navy => new Color(0.0f, 0.0f, 0.5f, 0.6f);
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static Color Ochre => new Color(0.8f, 0.4f, 0.0f, 0.6f);
+
+        /// <summary>
         /// Olive
         /// </summary>
         public static Color Olive => new Color(0.5f, 0.5f, 0.0f, 0.6f);
@@ -157,5 +225,7 @@ namespace GeometryEx
         /// Yellow
         /// </summary>
         public static Color Yellow => new Color(1.0f, 0.9f, 0.1f, 0.6f);
+
+
     }
 }

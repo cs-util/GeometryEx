@@ -221,8 +221,8 @@ namespace GeometryEx
         /// </returns>
         public static bool IsParallelTo(this Line line, Line thatLine)
         {
-            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
+            var lineSlope = Math.Round((line.End.Y - line.Start.Y) / (line.End.X - line.Start.X), 1);
+            var thatSlope = Math.Round((thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X), 1);
             if (lineSlope == double.NegativeInfinity)
             {
                 lineSlope = double.PositiveInfinity;
@@ -247,8 +247,8 @@ namespace GeometryEx
         /// </returns>
         public static bool IsPerpendicularTo(this Line line, Line thatLine)
         {
-            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
+            var lineSlope = Math.Round((line.End.Y - line.Start.Y) / (line.End.X - line.Start.X), 1);
+            var thatSlope = Math.Round((thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X), 1);
             if (((lineSlope == double.PositiveInfinity || lineSlope == double.NegativeInfinity) && thatSlope == 0.0) ||
                 ((thatSlope == double.PositiveInfinity || thatSlope == double.NegativeInfinity) && lineSlope == 0.0))
             {
@@ -352,7 +352,7 @@ namespace GeometryEx
             var deltaXl = line.End.X - line.Start.X;
             var deltaYl = line.End.Y - line.Start.Y;
             var cross = deltaXp * deltaYl - deltaYp * deltaXl;
-            if (Math.Abs(cross) < Vector3.Epsilon)
+            if (Math.Abs(cross) < Vector3.EPSILON)
             {
                 return true;
             }
