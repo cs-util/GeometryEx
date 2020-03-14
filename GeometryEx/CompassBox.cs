@@ -110,6 +110,17 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the x : y aspect ratio of the bounding box.
+        /// </summary>
+        public double AspectRatio
+        {
+            get
+            {
+                return SizeX / SizeY;
+            }
+        }
+
+        /// <summary>
         /// Returns a Polygon of the SW, SE, NE, and NW points.
         /// </summary>
         public Polygon Box

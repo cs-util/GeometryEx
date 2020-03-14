@@ -12,6 +12,29 @@ namespace GeometryEx
     public static class Shaper
     {
         /// <summary>
+        /// Mode to apply a boolean operation
+        /// </summary>
+        public enum BooleanMode
+        {
+            /// <summary>
+            /// A and not B
+            /// </summary>
+            Difference,
+            /// <summary>
+            /// A or B
+            /// </summary>
+            Union,
+            /// <summary>
+            /// A and B
+            /// </summary>
+            Intersection,
+            /// <summary>
+            /// Exclusive or — either A or B but not both. 
+            /// </summary>
+            XOr
+        }
+
+        /// <summary>
         /// Creates a rectilinear Polygon in the specified adjacent quadrant to the supplied Polygon's bounding box.
         /// </summary>    
         /// <param name="area">The area of the new Polygon.</param>
@@ -92,6 +115,84 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the List of Polygons that can merge with the supplied polygon.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="polygons"></param>
+        /// <returns></returns>
+        public static List<Polygon> CanMerge(Polygon polygon, List<Polygon> polygons)
+        {
+            var mrgPolygons = new List<Polygon>();
+            foreach (var poly in polygons)
+            {
+                if (Merge(new List<Polygon>() { polygon, poly }).Count == 1)
+                {
+                    mrgPolygons.Add(poly);
+                }
+            }
+            return mrgPolygons;
+        }
+
+        /// <summary>
+        /// Apply a boolean operation (Union, Difference, Intersection, or XOr) to two lists of Polygons.
+        /// </summary>
+        /// <param name="subjectPolygons">Polygons to clip</param>
+        /// <param name="clippingPolygons">Polygons with which to clip</param>
+        /// <param name="mode">The operation to apply: Union, Difference, Intersection, or XOr</param>
+        /// <returns></returns>
+        public static IList<Polygon> CombinePolygons(IList<Polygon> subjectPolygons, IList<Polygon> clippingPolygons, BooleanMode mode)
+        {
+            var subjectPaths = subjectPolygons.Select(s => s.ToClipperPath()).ToList();
+            var clipPaths = clippingPolygons.Select(s => s.ToClipperPath()).ToList();
+            Clipper clipper = new Clipper();
+            clipper.AddPaths(subjectPaths, PolyType.ptSubject, true);
+            clipper.AddPaths(clipPaths, PolyType.ptClip, true);
+            var solution = new List<List<IntPoint>>();
+            var executionMode = ClipType.ctDifference;
+            switch (mode)
+            {
+                case BooleanMode.Difference:
+                    executionMode = ClipType.ctDifference;
+                    break;
+                case BooleanMode.Union:
+                    executionMode = ClipType.ctUnion;
+                    break;
+                case BooleanMode.Intersection:
+                    executionMode = ClipType.ctIntersection;
+                    break;
+                case BooleanMode.XOr:
+                    executionMode = ClipType.ctXor;
+                    break;
+            }
+            clipper.Execute(executionMode, solution);
+            var polygons = new List<Polygon>();
+            if (solution.Count == 0)
+            {
+                return polygons;
+            }
+            foreach (List<IntPoint> path in solution)
+            {
+                polygons.Add(ToPolygon(path));
+            }
+            return polygons;
+        }
+
+        /// <summary>
+        /// Creates a convex hull Polygon from the vertices of all supplied Polygons.
+        /// </summary>
+        /// <param name="polygons">A list of Polygons from which to extract vertices.</param>
+        /// <returns></returns>
+        public static Polygon ConvexHullFromPolygons(List<Polygon> polygons)
+        {
+            var points = new List<Vector3>();
+            foreach (var polygon in polygons)
+            {
+                points.AddRange(polygon.Vertices);
+            }
+            return new Polygon(ConvexHull.MakeHull(points));
+        }
+
+        /// <summary>
         /// Constructs the largest geometric difference between this Polygon and the supplied Polygons.
         /// </summary>
         /// <param name="difPolygons">The list of intersecting Polygons.</param>
@@ -139,6 +240,48 @@ namespace GeometryEx
             }
             return polygon;
         }
+
+        /// <summary>
+        /// Constructs the geometric differences between this Polygon and the supplied Polygon.
+        /// </summary>
+        /// <param name="diff">The intersecting Polygon.</param>
+        /// <returns>
+        /// Returns a Polygon representing the largest subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
+        /// </returns>
+        public static Polygon Difference(Polygon polygon, Polygon diff)
+        {
+            if (polygon == null || diff == null)
+            {
+                return null;
+            }
+            var thisPath = polygon.ToClipperPath();
+            var clipper = new Clipper();
+            clipper.AddPath(thisPath, PolyType.ptSubject, true);
+            clipper.AddPath(diff.ToClipperPath(), PolyType.ptClip, true);
+            var solution = new List<List<IntPoint>>();
+            clipper.Execute(ClipType.ctDifference, solution);
+            if (solution.Count == 0)
+            {
+                // polygon has disappeared into a larger polygon.
+                return null;
+            }
+            var polygons = new List<Polygon>();
+            foreach (List<IntPoint> path in solution)
+            {
+                polygon = ToPolygon(path);
+                if (polygon == null)
+                {
+                    continue;
+                }
+                if (polygon.IsClockWise())
+                {
+                    polygon = polygon.Reversed();
+                }
+                polygons.Add(polygon);
+            }
+            return polygons.OrderByDescending(p => Math.Abs(p.Area())).ToList().First();
+        }
+
 
         /// <summary>
         /// Constructs the geometric differences between this Polygon and the supplied Polygons.
@@ -222,6 +365,68 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the List of Polygons in the specified coordinate system quadrant.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="polygons"></param>
+        /// <returns></returns>
+        public static List<Polygon> InQuadrant(List<Polygon> polygons, Quadrant quad)
+        {
+            var quadPolygons = new List<Polygon>();
+            foreach (var polygon in polygons)
+            {
+                var inQuad = true;
+                foreach (var vertex in polygon.Vertices)
+                {
+                    if (quad == Quadrant.I && (vertex.X < 0.0 || vertex.Y < 0.0))
+                    {
+                        inQuad = false;
+                        break;
+                    }
+                    if (quad == Quadrant.II && (vertex.X > 0.0 || vertex.Y < 0.0))
+                    {
+                        inQuad = false;
+                        break;
+                    }
+                    if (quad == Quadrant.III && (vertex.X > 0.0 || vertex.Y > 0.0))
+                    {
+                        inQuad = false;
+                        break;
+                    }
+                    if (quad == Quadrant.IV && (vertex.X < 0.0 || vertex.Y > 0.0))
+                    {
+                        inQuad = false;
+                        break;
+                    }
+                }
+                if (inQuad)
+                {
+                    quadPolygons.Add(polygon);
+                }
+            }
+            return quadPolygons;
+        }
+
+        /// <summary>
+        /// Constructs a list of line segments in order from pairs in a list of vertices.
+        /// </summary>
+        /// <param name="vertices">List of vertices to convert to line segments.</param>
+        /// <returns>List of Lines.</returns>
+        public static List<Line> LinesFromPoints(List<Vector3> points)
+        {
+            var lines = new List<Line>();
+            if (points.Count == 0)
+            {
+                return lines;
+            }
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                lines.Add(new Line(points[i], points[i + 1]));
+            }
+            return lines;
+        }
+
+        /// <summary>
         /// Constructs the geometric union of the supplied list of Polygons.
         /// </summary>
         /// <param name="polygons">The list of Polygons to be combined.</param>
@@ -264,22 +469,75 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs a list of line segments in order from pairs in a list of vertices.
+        /// Returns the List of Polygons that do not intersect the supplied polygon.
         /// </summary>
-        /// <param name="vertices">List of vertices to convert to line segments.</param>
-        /// <returns>List of Lines.</returns>
-        public static List<Line> LinesFromPoints(List<Vector3> points)
+        /// <param name="polygon"></param>
+        /// <param name="polygons"></param>
+        /// <returns></returns>
+        public static List<Polygon> NonIntersecting(Polygon polygon, List<Polygon> polygons)
         {
-            var lines = new List<Line>();
-            if (points.Count == 0)
+            var nonPolygons = new List<Polygon>();
+            foreach (var poly in polygons)
             {
-                return lines;
+                if (!polygon.Intersects(poly))
+                {
+                    nonPolygons.Add(poly);
+                }
             }
-            for (var i = 0; i < points.Count - 1; i++)
+            return nonPolygons;
+        }
+
+        /// <summary>
+        /// Returns the List of Polygons that do not intersect the supplied polygons.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="polygons"></param>
+        /// <returns></returns>
+        public static List<Polygon> NonIntersecting(List<Polygon> placed, List<Polygon> polygons)
+        {
+            var nonPolygons = new List<Polygon>();
+            foreach (var polygon in polygons)
             {
-                lines.Add(new Line(points[i], points[i + 1]));
+                if (polygon.Intersects(placed))
+                {
+                    continue;
+                }
+                nonPolygons.Add(polygon);
             }
-            return lines;
+            return nonPolygons;
+        }
+
+        /// <summary>
+        /// Constructs the set of nearby Polygons from 8 bounding boxes (as delivered by the nearPolygon and its orthogonal) at each vertex of polygon.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="nearPolygon"></param>
+        /// <returns></returns>
+        public static List<Polygon> NearPolygons(Polygon polygon, Polygon nearPolygon, bool rotated = false) 
+        {
+            var polygons = new List<Polygon>();
+            var points = polygon.Vertices;
+            var compass = nearPolygon.Compass();
+            foreach (var point in points)
+            {
+                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
+            }
+            if (!rotated)
+            {
+                return polygons;
+            }
+            compass = nearPolygon.Rotate(Vector3.Origin, 90.0).Compass();
+            foreach (var point in points)
+            {
+                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
+            }
+            return polygons;
         }
 
         /// <summary>
@@ -297,7 +555,17 @@ namespace GeometryEx
             {
                 throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
-            return Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area * ratio), area / Math.Sqrt(area * ratio)));
+            var x = Math.Sqrt(area * ratio);
+            var y = area / Math.Sqrt(area * ratio);
+            var vertices =
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(x, 0.0),
+                    new Vector3(x, y),
+                    new Vector3(0.0, y)
+                };
+            return Polygon.Rectangle(Vector3.Origin, new Vector3(x, y));
         }
 
         /// <summary>
@@ -708,16 +976,14 @@ namespace GeometryEx
             {
                 return null;
             }
-            Polygon polygon;
             try
             {
-                polygon = new Polygon(points);
+                return new Polygon(points);
             }
             catch (Exception)
             {
                 return null;
             }
-            return polygon;
         }
     }
 }

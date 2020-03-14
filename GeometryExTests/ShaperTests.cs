@@ -155,7 +155,7 @@ namespace GeometryExTests
                     new Vector3(1.0, 8.0)
                 }
             );
-            polygon = Shaper.Difference(polygon, new List<Polygon>() { among });
+            polygon = Shaper.Difference(polygon, among);
             var vertices = polygon.Vertices;
 
             Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
@@ -298,7 +298,58 @@ namespace GeometryExTests
             Assert.Contains(vertices, p => p.X == 30.0 && p.Y == 30.0);
             Assert.Contains(vertices, p => p.X == 40.0 && p.Y == 20.0);
             Assert.Contains(vertices, p => p.X == 40.0 && p.Y == 30.0);
-
+        }
+        
+        [Fact]
+        public void InQuadrant()
+        {
+            var polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new []
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(-5.0, 0.0),
+                        new Vector3(-8.0, 0.0),
+                        new Vector3(-8.0, 20.0),
+                        new Vector3(-5.0, 20.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(-10.0, -1.0),
+                        new Vector3(-20.0, -1.0),
+                        new Vector3(-20.0, -3.0),
+                        new Vector3(-10.0, -3.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(10.0, 0.0),
+                        new Vector3(20.0, 0.0),
+                        new Vector3(20.0, -3.0),
+                        new Vector3(10.0, -3.0)
+                    }
+                )
+            };
+            Assert.Single(Shaper.InQuadrant(polygons, Quadrant.I));
+            Assert.Single(Shaper.InQuadrant(polygons, Quadrant.II));
+            Assert.Single(Shaper.InQuadrant(polygons, Quadrant.III));
+            Assert.Single(Shaper.InQuadrant(polygons, Quadrant.IV));
         }
 
         [Fact]
@@ -339,6 +390,90 @@ namespace GeometryExTests
             };
             var merged = Shaper.Merge(polygons);
             Assert.Equal(2, merged.Count);
+            polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new []
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(8.0, 3.0),
+                        new Vector3(12.0, 3.0),
+                        new Vector3(12.0, 6.0),
+                        new Vector3(8.0, 6.0)
+                    }
+                )
+            };
+            merged = Shaper.Merge(polygons);
+            Assert.Equal(2, merged.Count);
+        }
+
+        [Fact]
+        public void NearPolygons()
+        {
+            var polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                );
+            var nearPolygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(5.0, 0.0),
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 20.0),
+                        new Vector3(5.0, 20.0)
+                    }
+                );
+            var polygons = Shaper.NearPolygons(polygon, nearPolygon, true);
+            Assert.Equal(32, polygons.Count);
+        }
+
+        [Fact]
+        public void NonIntersecting()
+        {
+            var polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                );
+            var nearPolygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(5.0, 0.0),
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 20.0),
+                        new Vector3(5.0, 20.0)
+                    }
+                );
+            var polygons = Shaper.NearPolygons(polygon, nearPolygon, true);
+            polygons = Shaper.NonIntersecting(polygon, polygons);
+            Assert.Equal(24, polygons.Count);
         }
 
         [Fact]
@@ -476,8 +611,9 @@ namespace GeometryExTests
         [Fact]
         public void RectangleByArea()
         {
-            var polygon = Shaper.RectangleByArea(9.0, 1.0);
+            //var polygon = Shaper.RectangleByArea(136.5, 1.3877787807814457);
 
+            var polygon = Shaper.RectangleByArea(9.0, 1.0);
             Assert.Equal(9.0, polygon.Area());
             Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 0.0);
             Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 3.0);

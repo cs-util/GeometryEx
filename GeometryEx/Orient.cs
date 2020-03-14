@@ -30,18 +30,5 @@ namespace GeometryEx
     /// </summary>
     public enum Corner { NE = 3, SE = 7, SW = 11, NW = 15 };
 
-    /// <summary>
-    /// A list of box corners as compass designations.
-    /// CenterSpan = Span the center of the bounding box on X and Y axes.
-    /// CenterX = Pass a grid line through the center of the bounding box on the X axis.
-    /// CenterY = Pass a grid line through the center of the bounding box on the Y axis.
-    /// CenterXY = Pass a grid line through the center of the bounding box on both the X and Y axes.
-    /// MaxX = Pass a grid line through the maximum X axis of the bounding box and CenterSpan Y axis grid lines.
-    /// MaxY = Pass a grid line through the maximum Y axis of the bounding box and CenterSpan X axis grid lines.
-    /// MaxXY = Pass X and Y grid lines through the maximum axes of the bounding box.
-    /// MinX = Pass a grid line through the minimum X axis of the bounding box and CenterSpan Y axis grid lines.
-    /// MinY = Pass a grid line through the minimum Y axis of the bounding box and CenterSpan X axis grid lines.
-    /// MinXY = Pass X and Y grid lines through the minimum axes of the bounding box. 
-    /// </summary>
-    public enum GridPosition { CenterSpan, CenterX, CenterY, CenterXY, MaxX, MaxY, MaxXY, MinX, MinY, MinXY };
+    public enum Quadrant { I, II, III, IV };
 }
