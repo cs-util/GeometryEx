@@ -7,6 +7,7 @@ namespace GeometryEx
     /// Commonly used colors for Space rendering.
     /// These colors are translucent to allow viewing of representions several layers deep.
     /// </summary>
+    /// TODO: Move To ELEMENTS
     public static class Palette
     {
         public static Dictionary<string, Color> Colors

@@ -45,6 +45,8 @@ namespace GeometryExTests
             Assert.False(polygon.Contains(pnt1));
             Assert.True(polygon.Contains(pnt2));
             Assert.False(polygon.Contains(pnt3));
+
+            Assert.False(polygon.Contains(polygon));
         }
 
         [Fact]
@@ -263,19 +265,14 @@ namespace GeometryExTests
             (
                 new[]
                 {
+                    new Vector3(0.0, 0.0),
                     new Vector3(0.0, 5.0),
                     new Vector3(5.0, 5.0),
-                    new Vector3(0.0, 10.0),
-                    new Vector3(10.0, 10.0),
-                    new Vector3(10.0, 5.0),
-                    new Vector3(5.0, 0.0),
-                    new Vector3(0.0, 0.0)
+                    new Vector3(5.0, 0.0)
                  }
             );
             Assert.True(p1.IsClockWise());
-            var verts = new List<Vector3>(p1.Vertices);
-            verts.Reverse();
-            var p2 = new Polygon(verts.ToArray());
+            var p2 = p1.Reversed();
             Assert.False(p2.IsClockWise());
         }
 

@@ -8,8 +8,6 @@ namespace GeometryEx
 {
     public static class PolygonEx
     {
-        public const double scale = 1024.0;
-
         /// <summary>
         /// The ratio of the longer side to the shorter side of the Polygon's bounding box.
         /// </summary>
@@ -40,73 +38,6 @@ namespace GeometryEx
                 box.NE,
                 box.NW
             };
-        }
-
-        /// <summary>
-        /// Tests if the supplied Vector3 point is within this Polygon without coincidence with an edge when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if the supplied Vector3 point is within this Polygon when compared on a shared plane. Returns false if the Vector3 point is outside this Polygon or if the supplied Vector3 point is null.
-        /// </returns>
-        public static bool Contains(this Polygon polygon, Vector3 point)
-        {
-            if (point.IsNaN())
-            {
-                return false;
-            }
-            var thisPath = Shaper.ToClipperPath(polygon);
-   
-            var intPoint = new IntPoint(point.X * Shaper.scale, point.Y * scale);
-            if (Clipper.PointInPolygon(intPoint, thisPath) != 1)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the supplied Vector3 point is within this Polygon or coincident with an edge when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if the supplied Vector3 point is within this Polygon or coincident with an edge when compared on a shared plane. Returns false if the supplied point is outside this Polygon, or if the supplied Vector3 point is null.
-        /// </returns>
-        public static bool Covers(this Polygon polygon, Vector3 point)
-        {
-            if (point.IsNaN())
-            {
-                return false;
-            }
-            var thisPath = Shaper.ToClipperPath(polygon);
-            var intPoint = new IntPoint(point.X * scale, point.Y * scale);
-            if (Clipper.PointInPolygon(intPoint, thisPath) == 0)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Tests if the supplied Vector3 point is outside this Polygon when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if the supplied Vector3 point is outside this Polygon when compared on a shared plane or if the supplied Vector3 point is null.
-        /// </returns>
-        public static bool Disjoint(this Polygon polygon, Vector3 point)
-        {
-            if (point.IsNaN())
-            {
-                return true;
-            }
-            var thisPath = Shaper.ToClipperPath(polygon);
-            var intPoint = new IntPoint(point.X * scale, point.Y * scale);
-            if (Clipper.PointInPolygon(intPoint, thisPath) != 0)
-            {
-                return false;
-            }
-            return true;
         }
 
         /// <summary>
@@ -243,7 +174,7 @@ namespace GeometryEx
         /// </returns>
         public static Polygon FitAmong(this Polygon polygon, List<Polygon> among = null)
         {
-            polygon = Shaper.Difference(polygon, among);
+            polygon = Polygon.Difference(new List<Polygon>() { polygon }, among).OrderByDescending(p => Math.Abs(p.Area())).First();
             if (polygon == null)
             {
                 return null;
@@ -308,6 +239,7 @@ namespace GeometryEx
         /// <returns>
         /// Returns true if any of the supplied Polygons share one or more areas with this Polygon when compared on a shared plane or if the list of supplied Polygons is null. Returns false if the none of the supplied Polygons share an area with this Polygon or if the supplied list of Polygons is null.
         /// </returns>
+        /// TODO: Move to ELEMENTS
         public static bool Intersects(this Polygon polygon, IList<Polygon> polygons)
         {
             if (polygons == null)
@@ -322,24 +254,6 @@ namespace GeometryEx
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Calculates whether this polygon is configured clockwise.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns>True if the polygon is oriented clockwise.</returns>
-        public static bool IsClockWise(this Polygon polygon)
-        {
-            // https://en.wikipedia.org/wiki/Shoelace_formula
-            var sum = 0.0;
-            for (int i = 0; i < polygon.Vertices.Count; i++)
-            {
-                var point = polygon.Vertices[i];
-                var nextPoint = polygon.Vertices[(i + 1) % polygon.Vertices.Count];
-                sum += (nextPoint.X - point.X) * (nextPoint.Y + point.Y);
-            }
-            return sum > 0;
         }
 
         /// <summary>
@@ -435,47 +349,21 @@ namespace GeometryEx
         public static Polygon RewindFrom(this Polygon polygon, int start)
         {
             var vertices = polygon.Vertices;
-            if (start > vertices.Count - 1)
+            if (start < 0 || start > vertices.Count - 1)
             {
                 return null;
             }
-            var points = new List<Vector3>();
-            points.Add(vertices[start]);
+            var points = new List<Vector3>()
+            {
+                vertices[start]
+            };
             var i = start + 1;
             while (i < vertices.Count)
             {
-                points.Add(vertices[i]);
-                i++;
-            }
-            i = 0;
-            while (i < start)
-            {
-                points.Add(vertices[i]);
+                points.Add(vertices[i % vertices.Count]);
                 i++;
             }
             return new Polygon(points);
-        }
-
-        /// <summary>
-        /// Tests if the supplied Vector3 point is coincident with an edge of this Polygon when compared on a shared plane.
-        /// </summary>
-        /// <param name="point">The Vector3 point to compare to this Polygon.</param>
-        /// <returns>
-        /// Returns true if the supplied Vector3 point coincides with an edge of this Polygon when compared on a shared plane. Returns false if the supplied Vector3 point is not coincident with an edge of this Polygon, or if the supplied Vector3 point is null.
-        /// </returns>
-        public static bool Touches(this Polygon polygon, Vector3 point)
-        {
-            if (point.IsNaN())
-            {
-                return false;
-            }
-            var thisPath = Shaper.ToClipperPath(polygon);
-            var intPoint = new IntPoint(point.X * scale, point.Y * scale);
-            if (Clipper.PointInPolygon(intPoint, thisPath) != -1)
-            {
-                return false;
-            }
-            return true;
         }
     }
 }

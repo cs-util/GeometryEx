@@ -133,90 +133,76 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void Difference()
+        public void CombinePolygons()
         {
             var polygon = new Polygon
-            (
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0)
-                }
-            );
-            var among = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            polygon = Shaper.Difference(polygon, among);
-            var vertices = polygon.Vertices;
-
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 4.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 4.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 4.0);
-
-            among = new Polygon
             (
                 new[]
                 {
                     new Vector3(0.0, 0.0),
-                    new Vector3(8.0, 0.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(0.0, 8.0)
+                    new Vector3(12.0, 0.0),
+                    new Vector3(12.0, 12.0),
+                    new Vector3(0.0, 12.0)
                 }
             );
-
-            polygon = Shaper.Difference(polygon, new List<Polygon>() { among });
-            Assert.Null(polygon);
-        }
-
-        [Fact]
-        public void Differences()
-        {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(3.0, 0.0),
-                    new Vector3(5.0, 0.0),
-                    new Vector3(5.0, 10.0),
-                    new Vector3(3.0, 10.0)
-                }
-            );
-            var among = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            var polygons = Shaper.Differences(polygon, new List<Polygon>() { among });
-            var vertices = new List<Vector3>(polygons.First().Vertices);
-            vertices.AddRange(polygons.Last().Vertices);
-            
-            Assert.Equal(2, polygons.Count);
-            
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 8.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 8.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 10.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 10.0);
+            var among = new List<Polygon>()
+            {
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(7.0, 0.0),
+                        new Vector3(7.0, 4.0),
+                        new Vector3(0.0, 4.0)
+                    }),
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(0.0, 6.0),
+                        new Vector3(3.0, 6.0),
+                        new Vector3(3.0, 12.0),
+                        new Vector3(0.0, 12.0)
+                    }
+                 ),
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(3.0, 4.0),
+                        new Vector3(7.0, 4.0),
+                        new Vector3(7.0, 9.0),
+                        new Vector3(3.0, 9.0)
+                    }
+                 ),
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(5.0, 9.0),
+                        new Vector3(8.0, 9.0),
+                        new Vector3(8.0, 12.0),
+                        new Vector3(5.0, 12.0)
+                    }
+                 ),
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(7.0, 2.0),
+                        new Vector3(12.0, 2.0),
+                        new Vector3(12.0, 7.0),
+                        new Vector3(7.0, 7.0)
+                    }
+                 ),
+                new Polygon(
+                    new[]
+                    {
+                        new Vector3(9.0, 7.0),
+                        new Vector3(12.0, 7.0),
+                        new Vector3(12.0, 12.0),
+                        new Vector3(9.0, 12.0)
+                    }
+                 ),
+            };
+            var polygons = Polygon.Difference(new List<Polygon> { polygon }, among);
+            Assert.Equal(4, polygons.Count);
         }
 
 
@@ -350,71 +336,6 @@ namespace GeometryExTests
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.II));
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.III));
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.IV));
-        }
-
-        [Fact]
-        public void Merge()
-        {
-            var polygons = new List<Polygon>
-            {
-                new Polygon
-                (
-                    new []
-                    {
-                        Vector3.Origin,
-                        new Vector3(8.0, 0.0),
-                        new Vector3(8.0, 3.0),
-                        new Vector3(0.0, 3.0)
-                    }
-                ),
-                new Polygon
-                (
-                    new []
-                    {
-                        new Vector3(5.0, 0.0),
-                        new Vector3(8.0, 0.0),
-                        new Vector3(8.0, 20.0),
-                        new Vector3(5.0, 20.0)
-                    }
-                ),
-                new Polygon
-                (
-                    new []
-                    {
-                        new Vector3(10.0, 0.0),
-                        new Vector3(20.0, 0.0),
-                        new Vector3(20.0, 3.0),
-                        new Vector3(10.0, 3.0)
-                    }
-                )
-            };
-            var merged = Shaper.Merge(polygons);
-            Assert.Equal(2, merged.Count);
-            polygons = new List<Polygon>
-            {
-                new Polygon
-                (
-                    new []
-                    {
-                        Vector3.Origin,
-                        new Vector3(8.0, 0.0),
-                        new Vector3(8.0, 3.0),
-                        new Vector3(0.0, 3.0)
-                    }
-                ),
-                new Polygon
-                (
-                    new []
-                    {
-                        new Vector3(8.0, 3.0),
-                        new Vector3(12.0, 3.0),
-                        new Vector3(12.0, 6.0),
-                        new Vector3(8.0, 6.0)
-                    }
-                )
-            };
-            merged = Shaper.Merge(polygons);
-            Assert.Equal(2, merged.Count);
         }
 
         [Fact]

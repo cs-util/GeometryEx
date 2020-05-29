@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package > 
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
@@ -11,6 +11,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>$PackageReleaseNotes$</releaseNotes>
-    <copyright>Copyright 2019</copyright>
+    <copyright>Copyright 2020</copyright>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>    
   </metadata>
 </package>

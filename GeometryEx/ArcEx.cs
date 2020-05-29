@@ -16,6 +16,7 @@ namespace GeometryEx
         /// <returns>
         /// A List of Vector3 points.
         /// </returns>
+        /// TODO: Add to ELEMENTS
         public static IList<Vector3> Divide(this Arc arc, int segments)
         {
             var pointList = new List<Vector3>()
