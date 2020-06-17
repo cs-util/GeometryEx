@@ -339,6 +339,46 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Merge()
+        {
+            var polygons = new List<Polygon>
+            {
+                new Polygon
+                (
+                    new []
+                    {
+                        Vector3.Origin,
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 3.0),
+                        new Vector3(0.0, 3.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(5.0, 0.0),
+                        new Vector3(8.0, 0.0),
+                        new Vector3(8.0, 20.0),
+                        new Vector3(5.0, 20.0)
+                    }
+                ),
+                new Polygon
+                (
+                    new []
+                    {
+                        new Vector3(10.0, 0.0),
+                        new Vector3(20.0, 0.0),
+                        new Vector3(20.0, 3.0),
+                        new Vector3(10.0, 3.0)
+                    }
+                )
+            };
+            var merged = Shaper.Merge(polygons);
+            Assert.Equal(2, merged.Count);
+        }
+
+        [Fact]
         public void NearPolygons()
         {
             var polygon =

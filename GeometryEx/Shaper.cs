@@ -221,6 +221,48 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Constructs the geometric union of the supplied list of Polygons.
+        /// </summary>
+        /// <param name="polygons">The list of Polygons to be combined.</param>
+        /// <returns>
+        /// List of Polygons.
+        /// </returns>
+        public enum FillType { EvenOdd, NonZero, Positive, Negative };
+        public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
+        {
+            if (polygons.Count == 0)
+            {
+                return polygons;
+            }
+            var filtyp = (PolyFillType)fillType;
+            var polyPaths = new List<List<IntPoint>>();
+            foreach (Polygon polygon in polygons)
+            {
+                polyPaths.Add(polygon.ToClipperPath());
+            }
+            Clipper clipper = new Clipper();
+            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
+            clipper.AddPaths(polyPaths, PolyType.ptSubject, true);
+            var solution = new List<List<IntPoint>>();
+            clipper.Execute(ClipType.ctUnion, solution, filtyp);
+            if (solution.Count == 0)
+            {
+                return polygons;
+            }
+            var mergePolygons = new List<Polygon>();
+            foreach (var solved in solution)
+            {
+                var polygon = solved.Distinct().ToList().ToPolygon();
+                if (polygon.IsClockWise())
+                {
+                    polygon = polygon.Reversed();
+                }
+                mergePolygons.Add(polygon);
+            }
+            return mergePolygons;
+        }
+
+        /// <summary>
         /// Returns the List of Polygons that do not intersect the supplied polygon.
         /// </summary>
         /// <param name="polygon"></param>
