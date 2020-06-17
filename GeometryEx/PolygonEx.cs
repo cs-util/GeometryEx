@@ -82,7 +82,7 @@ namespace GeometryEx
                 }
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
-                tryPoly = t.OfPolygon(tryPoly);
+                tryPoly = tryPoly.TransformedPolygon(t);
 
                 var tBox = tryPoly.Compass();
                 var from = tBox.PointBy(origin);
@@ -269,7 +269,7 @@ namespace GeometryEx
         {
             var t = new Transform();
             t.Move(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
-            return t.OfPolygon(polygon);
+            return polygon.TransformedPolygon(t); ;
         }
 
         /// <summary>
