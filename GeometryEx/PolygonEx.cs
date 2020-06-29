@@ -82,7 +82,7 @@ namespace GeometryEx
                 }
                 var t = new Transform();
                 t.Scale(new Vector3(factor, factor));
-                tryPoly = tryPoly.TransformedPolygon(t);
+                tryPoly = t.OfPolygon(tryPoly);
 
                 var tBox = tryPoly.Compass();
                 var from = tBox.PointBy(origin);
@@ -172,16 +172,21 @@ namespace GeometryEx
         /// <returns>
         /// A Polygons.
         /// </returns>
-        public static Polygon FitAmong(this Polygon polygon, List<Polygon> among = null)
+        public static Polygon FitAmong(this Polygon polygon, List<Polygon> among)
         {
-            polygon = Polygon.Difference(new List<Polygon>() { polygon }, among).OrderByDescending(p => Math.Abs(p.Area())).First();
-            if (polygon == null)
+            if (among == null)
             {
                 return null;
             }
+            var polygons = Polygon.Difference(new List<Polygon>() { polygon }, among);
+            if (polygons == null || polygons.Count == 0)
+            {
+                return null;
+            }
+            polygon = polygons.OrderByDescending(p => Math.Abs(p.Area())).First();
             if (polygon.IsClockWise())
             {
-                polygon.Reversed();
+                return polygon.Reversed();
             }
             return polygon;
         }
@@ -269,7 +274,7 @@ namespace GeometryEx
         {
             var t = new Transform();
             t.Move(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
-            return polygon.TransformedPolygon(t); ;
+            return t.OfPolygon(polygon);
         }
 
         /// <summary>

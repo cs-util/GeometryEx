@@ -230,9 +230,10 @@ namespace GeometryEx
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
         public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
         {
-            if (polygons.Count == 0)
+            var mergePolygons = new List<Polygon>();
+            if (polygons == null || polygons.Count == 0)
             {
-                return polygons;
+                return mergePolygons;
             }
             var filtyp = (PolyFillType)fillType;
             var polyPaths = new List<List<IntPoint>>();
@@ -247,12 +248,15 @@ namespace GeometryEx
             clipper.Execute(ClipType.ctUnion, solution, filtyp);
             if (solution.Count == 0)
             {
-                return polygons;
+                return mergePolygons;
             }
-            var mergePolygons = new List<Polygon>();
             foreach (var solved in solution)
             {
                 var polygon = solved.Distinct().ToList().ToPolygon();
+                if (polygon == null)
+                {
+                    continue;
+                }
                 if (polygon.IsClockWise())
                 {
                     polygon = polygon.Reversed();
