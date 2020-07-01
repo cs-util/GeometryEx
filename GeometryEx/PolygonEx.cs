@@ -74,14 +74,14 @@ namespace GeometryEx
                 double factor;
                 if (tryArea >= area)
                 {
-                    factor = Math.Sqrt(tryArea / area);
+                    factor = 1 - (tolerance * 0.5);
                 }
                 else
                 {
-                    factor = Math.Sqrt(area / tryArea);
+                    factor = 1 + (tolerance * 0.5);
                 }
                 var t = new Transform();
-                t.Scale(new Vector3(factor, factor));
+                t.Scale(factor, tryPoly.Centroid());
                 tryPoly = t.OfPolygon(tryPoly);
 
                 var tBox = tryPoly.Compass();
@@ -96,6 +96,7 @@ namespace GeometryEx
                         tryPoly = tryPolys.First();
                     }
                 }
+
                 if (among != null && tryPoly.Intersects(among))
                 {
                     var tryPolys = tryPoly.Difference(among);
