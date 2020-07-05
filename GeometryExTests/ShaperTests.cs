@@ -438,6 +438,102 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void PlaceOrthogonal()
+        {
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(10.0, 0.0),
+                    new Vector3(10.0, 6.0),
+                    new Vector3(0.0, 6.0)
+                }
+            );
+            var place = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(6.0, 0.0),
+                    new Vector3(6.0, 3.0),
+                    new Vector3(0.0, 3.0)
+                }
+            );
+
+            // Horizontal polygon, northeast, minimum coord
+            place = Shaper.PlaceOrthogonal(polygon, place, true, true);
+            var points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 9.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 9.0));
+
+            // Vertical polygon, northeast, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 6.0));
+
+            // Horizontal polygon, northeast, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 9.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 9.0));
+
+            // Vertical polygon, northeast, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 4.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 4.0));
+
+            // Horizontal polygon, southwest, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, -3.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, -3.0));
+
+            // Vertical polygon, southwast, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 6.0));
+
+            // Horizontal polygon, southwest, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, -3.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, -3.0));
+
+            // Vertical polygon, southwest, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
+        }
+
+        [Fact]
         public void C()
         {
             var polygon = Shaper.C(new Vector3(2.0, 2.0), new Vector3(3.0, 5.0), 1.0);
