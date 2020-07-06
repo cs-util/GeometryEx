@@ -75,64 +75,6 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void ExpandToArea()
-        {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0)
-                }
-            );
-            var within = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            var among = new List<Polygon>
-            {
-                new Polygon(
-                    new []
-                    {
-                        new Vector3(3.0, 1.0),
-                        new Vector3(7.0, 1.0),
-                        new Vector3(7.0, 5.0),
-                        new Vector3(3.0, 5.0)
-                    }),
-                new Polygon(
-                    new[]
-                    {
-                        new Vector3(1.0, 3.0),
-                        new Vector3(2.0, 3.0),
-                        new Vector3(2.0, 6.0),
-                        new Vector3(1.0, 6.0),
-                    })
-            };
-            polygon = polygon.ExpandtoArea(20.0, 0.1, Orient.C, within, among);
-            var spaces = new List<Space>
-            {
-                new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, new Material("yellow", Palette.Aqua)),
-                new Space(among[1], 3.0, new Material("green", Palette.Green))
-            };
-            var model = new Model();
-            foreach (Space space in spaces)
-            {
-                model.AddElement(space);
-            }
-            model.ToGlTF("../../../../expandToArea.glb");
-        }
-
-        [Fact]
         public void CombinePolygons()
         {
             var polygon = new Polygon
