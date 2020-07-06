@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>4.3.0</Version>
+    <Version>4.3.1</Version>
     <Author>Anthony A. Hauck</Author>
     <Company>Hypar Inc.</Company>
     <Description>Extensions to to Hypar.Elements.Geometry and Polygon creation utilities.</Description>
@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/hypar-io/GeometryEx</RepositoryUrl>
     <PackageTags>Hypar Elements Geometry Extensions Polygon</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <AssemblyVersion>4.3.0.0</AssemblyVersion>
-    <FileVersion>4.3.0.0</FileVersion>
+    <AssemblyVersion>4.3.1.0</AssemblyVersion>
+    <FileVersion>4.3.1.0</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
