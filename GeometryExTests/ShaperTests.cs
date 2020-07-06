@@ -75,64 +75,6 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void ExpandToArea()
-        {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0)
-                }
-            );
-            var within = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            var among = new List<Polygon>
-            {
-                new Polygon(
-                    new []
-                    {
-                        new Vector3(3.0, 1.0),
-                        new Vector3(7.0, 1.0),
-                        new Vector3(7.0, 5.0),
-                        new Vector3(3.0, 5.0)
-                    }),
-                new Polygon(
-                    new[]
-                    {
-                        new Vector3(1.0, 3.0),
-                        new Vector3(2.0, 3.0),
-                        new Vector3(2.0, 6.0),
-                        new Vector3(1.0, 6.0),
-                    })
-            };
-            polygon = polygon.ExpandtoArea(20.0, 0.1, Orient.C, within, among);
-            var spaces = new List<Space>
-            {
-                new Space(polygon, 3.0, new Material("blue", Palette.Blue)),
-                new Space(within, 0.1, new Material("aqua", Palette.Aqua)),
-                new Space(among[0], 3.0, new Material("yellow", Palette.Aqua)),
-                new Space(among[1], 3.0, new Material("green", Palette.Green))
-            };
-            var model = new Model();
-            foreach (Space space in spaces)
-            {
-                model.AddElement(space);
-            }
-            model.ToGlTF("../../../../expandToArea.glb");
-        }
-
-        [Fact]
         public void CombinePolygons()
         {
             var polygon = new Polygon
@@ -435,6 +377,102 @@ namespace GeometryExTests
             var polygons = Shaper.NearPolygons(polygon, nearPolygon, true);
             polygons = Shaper.NonIntersecting(polygon, polygons);
             Assert.Equal(24, polygons.Count);
+        }
+
+        [Fact]
+        public void PlaceOrthogonal()
+        {
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(10.0, 0.0),
+                    new Vector3(10.0, 6.0),
+                    new Vector3(0.0, 6.0)
+                }
+            );
+            var place = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(6.0, 0.0),
+                    new Vector3(6.0, 3.0),
+                    new Vector3(0.0, 3.0)
+                }
+            );
+
+            // Horizontal polygon, northeast, minimum coord
+            place = Shaper.PlaceOrthogonal(polygon, place, true, true);
+            var points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 9.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 9.0));
+
+            // Vertical polygon, northeast, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 6.0));
+
+            // Horizontal polygon, northeast, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 9.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 9.0));
+
+            // Vertical polygon, northeast, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, true, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 4.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 3.0) && Shaper.NearEqual(p.Y, 4.0));
+
+            // Horizontal polygon, southwest, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 0.0) && Shaper.NearEqual(p.Y, -3.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 6.0) && Shaper.NearEqual(p.Y, -3.0));
+
+            // Vertical polygon, southwast, minimum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, true);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 6.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 6.0));
+
+            // Horizontal polygon, southwest, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, -90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, 0.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 4.0) && Shaper.NearEqual(p.Y, -3.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, 10.0) && Shaper.NearEqual(p.Y, -3.0));
+
+            // Vertical polygon, southwest, maximum coord
+            polygon = polygon.Rotate(Vector3.Origin, 90.0);
+            place = Shaper.PlaceOrthogonal(polygon, place, false, false);
+            points = place.Vertices;
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 10.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
+            Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
         }
 
         [Fact]

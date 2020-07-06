@@ -52,7 +52,7 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon ExpandtoArea(this Polygon polygon, double area,
+        public static Polygon ExpandToArea(this Polygon polygon, double area,
                                            double tolerance = 0.1, Orient origin = Orient.C,
                                            Polygon within = null, List<Polygon> among = null)
         {
@@ -60,54 +60,39 @@ namespace GeometryEx
             {
                 polygon = polygon.Reversed();
             }
-            if (Math.Abs(polygon.Area() - area) <= tolerance * area)
+            if (Math.Abs(polygon.Area() - area) <= Math.Abs(tolerance * area))
             {
                 return polygon;
             }
-            var pBox = polygon.Compass();
-            var position = pBox.PointBy(origin);
-            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 1.0));
-            double tryArea;
+            var position = polygon.Compass().PointBy(origin);
+            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area), Math.Sqrt(area)));
+            tryPoly = tryPoly.MoveFromTo(tryPoly.Compass().PointBy(origin), position);
+            double tryArea = tryPoly.Area();
             do
             {
-                tryArea = tryPoly.Area();
-                double factor;
-                if (tryArea >= area)
-                {
-                    factor = 1 - (tolerance * 0.5);
-                }
-                else
-                {
-                    factor = 1 + (tolerance * 0.5);
-                }
                 var t = new Transform();
-                t.Scale(factor, tryPoly.Centroid());
+                t.Scale(tryArea / area, tryPoly.Compass().PointBy(origin));
                 tryPoly = t.OfPolygon(tryPoly);
-
-                var tBox = tryPoly.Compass();
-                var from = tBox.PointBy(origin);
-                tryPoly = tryPoly.MoveFromTo(from, position);
-
                 if (within != null && tryPoly.Intersects(within))
                 {
                     var tryPolys = within.Intersection(tryPoly);
-                    if (tryPolys.Count > 0)
+                    if (tryPolys != null && tryPolys.Count > 0)
                     {
                         tryPoly = tryPolys.First();
                     }
                 }
-
                 if (among != null && tryPoly.Intersects(among))
                 {
                     var tryPolys = tryPoly.Difference(among);
-                    if (tryPolys.Count > 0)
+                    if (tryPolys != null && tryPolys.Count > 0)
                     {
                         tryPoly = tryPolys.First();
                     }
                 }
+                tryArea = tryPoly.Area();
             }
-            while ((!Shaper.NearEqual(tryPoly.Area(), area, tolerance)) &&
-                    !Shaper.NearEqual(tryPoly.Area(), tryArea, tolerance));
+            while (!Shaper.NearEqual(tryPoly.Area(), area, tolerance * area) &&
+                   !Shaper.NearEqual(tryPoly.Area(), tryArea, tolerance));
             return tryPoly;
         }
 

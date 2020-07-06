@@ -339,6 +339,79 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a Polygon positioned diagonally adjacent to another Polygon.
+        /// </summary>
+        /// <param name="polygon">The static Polygon.</param>
+        /// <param name="place">The Polygon to be placed adjacent to the static Polygon.</param>
+        /// <param name="corner">The corner at which to place the second Polygon as determined by the Polygon bounding boxes.</param>
+        /// <returns>A new Polygon placed diagonally adjacent to the static Polygon.</returns>
+        public static Polygon PlaceDiagonal(Polygon polygon, Polygon place, Corner corner)
+        {
+            var comPly = polygon.Compass();
+            var comPlc = place.Compass();
+            switch (corner)
+            {
+                case Corner.NW:
+                    place = place.MoveFromTo(comPlc.SE, comPly.NW);
+                    break;
+                case Corner.NE:
+                    place = place.MoveFromTo(comPlc.SW, comPly.NE);
+                    break;
+                case Corner.SW:
+                    place = place.MoveFromTo(comPlc.NE, comPly.SW);
+                    break;
+                case Corner.SE:
+                    place = place.MoveFromTo(comPlc.NW, comPly.SE);
+                    break;
+            }
+            return place;
+        }
+
+
+
+        /// <summary>
+        /// Returns a Polygon positioned orthogonally adjacent to another Polygon by determining the minimal x or y expansion of the first Polygon with the additional second as derived from the bounding boxes of the delivered Polygons. The second Polygon is rotated to achieve a minimal dimensional expansion relative to the bounding box of the first Polygon.
+        /// </summary>
+        /// <param name="polygon">The static Polygon.</param>
+        /// <param name="place">The Polygon to be placed adjacent to the static Polygon.</param>
+        /// <param name="northeast">Place the Polygon north or east of the static Polygon, otherwise place it west or south.</param>
+        /// <param name="minCoord">If true, minimize x or y coordinate placement.</param>
+        /// <returns>A new Polygon rotated and placed adjacent to the static Polygon.</returns>
+        public static Polygon PlaceOrthogonal(Polygon polygon, Polygon place, 
+                                              bool northeast = true, bool minCoord = true)
+        {
+            var vrtPly = false;
+            var vrtPlc = false;
+            var comPly = polygon.Compass();
+            var comPlc = place.Compass();
+            if (comPly.AspectRatio < 1.0) { vrtPly = true; }
+            if (comPlc.AspectRatio < 1.0) { vrtPlc = true; }
+            if (vrtPly != vrtPlc) { place = place.Rotate(place.Centroid(), 90.0); }
+            comPlc = place.Compass();
+            if (northeast && vrtPly)
+            {
+                if (minCoord) { place = place.MoveFromTo(comPlc.SW, comPly.SE); }
+                else { place = place.MoveFromTo(comPlc.NW, comPly.NE); }
+            }
+            if (northeast && !vrtPly)
+            {
+                if (minCoord) { place = place.MoveFromTo(comPlc.SW, comPly.NW); }
+                else { place = place.MoveFromTo(comPlc.SE, comPly.NE); }
+            }
+            if (!northeast && vrtPly)
+            {
+                if (minCoord) { place = place.MoveFromTo(comPlc.SE, comPly.SW); }
+                else { place = place.MoveFromTo(comPlc.NE, comPly.NW); }
+            }
+            if (!northeast && !vrtPly)
+            {
+                if (minCoord) { place = place.MoveFromTo(comPlc.NW, comPly.SW); }
+                else { place = place.MoveFromTo(comPlc.NE, comPly.SE); }
+            }
+            return place;
+        }
+
+        /// <summary>
         /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
@@ -355,14 +428,6 @@ namespace GeometryEx
             }
             var x = Math.Sqrt(area * ratio);
             var y = area / Math.Sqrt(area * ratio);
-            var vertices =
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(x, 0.0),
-                    new Vector3(x, y),
-                    new Vector3(0.0, y)
-                };
             return Polygon.Rectangle(Vector3.Origin, new Vector3(x, y));
         }
 
