@@ -432,7 +432,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
+        /// Creates a rectangular Polygon of the supplied length to width proportion with its southwest corner at the origin.
         /// </summary>
         /// <param name="ratio">Ratio of width to depth.</param>
         /// <param name="moveTo">Location of the southwest corner of the new Polygon.</param>

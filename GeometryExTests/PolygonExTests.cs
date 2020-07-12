@@ -198,7 +198,7 @@ namespace GeometryExTests
                         new Vector3(1.0, 6.0),
                     })
             };
-            polygon = polygon.ExpandToArea(200.0, 0.1, Orient.C, within, among);
+            polygon = polygon.ExpandToArea(30.0, 0.5, 0.1, Orient.C, within, among);
             var spaces = new List<Space>
             {
                 new Space(polygon, 3.0, new Material("blue", Palette.Blue)),

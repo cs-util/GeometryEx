@@ -45,7 +45,7 @@ namespace GeometryEx
             {
                 hull.Add(new Vector3(point.x, point.y));
             }
-            return hull;
+            return hull.Distinct().ToList();
         }
 
         // Returns the convex hull, assuming that each points[i] <= points[i + 1]. Runs in O(n) time.

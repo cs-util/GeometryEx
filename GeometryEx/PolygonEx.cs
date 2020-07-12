@@ -52,7 +52,7 @@ namespace GeometryEx
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon ExpandToArea(this Polygon polygon, double area,
+        public static Polygon ExpandToArea(this Polygon polygon, double area, double ratio,
                                            double tolerance = 0.1, Orient origin = Orient.C,
                                            Polygon within = null, List<Polygon> among = null)
         {
@@ -65,7 +65,7 @@ namespace GeometryEx
                 return polygon;
             }
             var position = polygon.Compass().PointBy(origin);
-            Polygon tryPoly = Polygon.Rectangle(Vector3.Origin, new Vector3(Math.Sqrt(area), Math.Sqrt(area)));
+            Polygon tryPoly = Shaper.RectangleByArea(area, ratio);
             tryPoly = tryPoly.MoveFromTo(tryPoly.Compass().PointBy(origin), position);
             double tryArea = tryPoly.Area();
             do
