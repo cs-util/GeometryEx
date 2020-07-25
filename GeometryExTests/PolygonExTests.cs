@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using Elements;
@@ -401,50 +403,65 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void Touches()
+        public void Simplify()
         {
-            var p1 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(10.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 20.0),
-                    new Vector3(10.0, 20.0)
-                }
-            );
+            var points = new List<Vector3>()
+            {
+                Vector3.Origin,
+                new Vector3(5.0, 0.0),
+                new Vector3(7.0, 7.0),
+                new Vector3(10.0, 15.0),
+                new Vector3(15.0, 20.0),
+                new Vector3(10.0, 20.0),
+                new Vector3(5.0, 10.0),
+            };
+            var polygon = new Polygon(points).Simplify(0.5);
+            Assert.Equal(3, polygon.Vertices.Count);
+        }
 
-            var p2 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(20.0, 0.0),
-                    new Vector3(20.0, 10.0),
-                    new Vector3(0.0, 10.0)
-                }
-            );
+        [Fact]
+        public void Ribs()
+        {
+            var ribs = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            Assert.Equal(6, ribs.Count);
+            ribs = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            Assert.Equal(8, ribs.Count);
+            ribs = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            Assert.Equal(12, ribs.Count);
+        }
 
-            var p3 = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(10.0, 0.0),
-                    new Vector3(5.0, 5.0),
-                    new Vector3(0.0, 5.0)
-                }
-            );
+        [Fact]
+        public void Skeleton()
+        {
+            var skeleton = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            Assert.Equal(8, skeleton.Count);
+            skeleton = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            Assert.Equal(11, skeleton.Count);
+            skeleton = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            Assert.Equal(16, skeleton.Count);
+        }
 
-            var point1 = new Vector3(-1.1, -1.1);
-            var point2 = new Vector3(0.0, 5.0);
-
-            Assert.False(p1.Touches(p2));
-            Assert.True(p1.Touches(p3));
-            Assert.False(p2.Touches(p3));
-
-            Assert.False(p1.Touches(point1));
-            Assert.True(p2.Touches(point2));
+        [Fact]
+        public void Spine()
+        {
+            var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            Assert.Equal(2, spine.Count);
+            spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            Assert.Equal(3, spine.Count);
+            spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            Assert.Equal(4, spine.Count);
+            var model = new Model();
+            var corridors = new List<Polygon>();
+            foreach (var line in spine)
+            {
+                corridors.Add(new Polyline(new[] { line.Start, line.End }).Offset(1.0, EndType.Square).First());
+            }
+            corridors = Shaper.Merge(corridors);
+            foreach (var corridor in corridors)
+            {
+                model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
+            }
+            model.ToGlTF("../../../../spine.glb");
         }
     }
 }

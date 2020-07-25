@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elements.Geometry;
-using ClipperLib;
+using StraightSkeletonNet;
+using StraightSkeletonNet.Primitives;
 
 namespace GeometryEx
 {
@@ -258,8 +259,7 @@ namespace GeometryEx
         /// </returns>
         public static Polygon MoveFromTo(this Polygon polygon, Vector3 from, Vector3 to)
         {
-            var t = new Transform();
-            t.Move(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
+            var t = new Transform(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
             return t.OfPolygon(polygon);
         }
 
@@ -355,6 +355,96 @@ namespace GeometryEx
                 i++;
             }
             return new Polygon(points);
+        }
+
+        /// <summary>
+        /// Reduces Polygon vertices.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public static Polygon Simplify(this Polygon polygon, double tolerance)
+        {
+            var points = Shaper.Simplify(polygon.Vertices.ToList(), tolerance);
+            if (points.Count < 3)
+            {
+                return polygon;
+            }
+            return new Polygon(points);
+        }
+
+        /// <summary>
+        /// Returns a List of Lines forming the Polygon skeleton's connections between Polygon's spine and vertcies.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns>A List of Lines</Line></returns>
+        public static List<Line> Ribs(this Polygon polygon)
+        {
+            var skeleton = polygon.Skeleton();
+            var lines = new List<Line>();
+            foreach (var line in skeleton)
+            {
+                if (polygon.Contains(line.Start) ^ polygon.Contains(line.End))
+                {
+                    lines.Add(line);
+                }
+            }
+            return lines.OrderBy(l => l.Midpoint()).ToList();
+        }
+
+        /// <summary>
+        /// Returns a List of Lines forming the Polygon's skeleton sorted by the ascending midpoint of each Line.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns>A List of Lines</Line></returns>
+        public static List<Line> Skeleton(this Polygon polygon)
+        {
+            var vertices2d = new List<Vector2d>();
+            foreach (var vertex in polygon.Vertices)
+            {
+                vertices2d.Add(new Vector2d(vertex.X, vertex.Y));
+            }
+            var skeleton = SkeletonBuilder.Build(vertices2d);
+            var lines = new List<Line>();
+            foreach (var edgeResult in skeleton.Edges)
+            {
+                var vertices = new List<Vector3>();
+                foreach (var vertex in edgeResult.Polygon)
+                {
+                    vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
+                }
+                var poly = new Polygon(vertices);
+                var segments = (poly.Segments());
+                foreach (var segment in segments)
+                {
+                    if ((polygon.Contains(segment.Start) || polygon.Contains(segment.End)) &&
+                        !segment.IsListed(lines))
+                    {
+                        lines.Add(segment);
+                    }
+                }
+            }
+            return lines.OrderBy(l => l.Midpoint()).ToList();
+        }
+
+
+        /// <summary>
+        /// Returns a List of Lines forming the Polygon's centerline sorted by the ascending midpoint of each Line.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns>A List of Lines</Line></returns>
+        public static List<Line> Spine(this Polygon polygon)
+        {
+            var skeleton = polygon.Skeleton();
+            var lines = new List<Line>();
+            foreach (var line in skeleton)
+            {
+                if(polygon.Contains(line.Start) && polygon.Contains(line.End))
+                {
+                    lines.Add(line);
+                }
+            }
+            return lines.OrderBy(l => l.Midpoint()).ToList();
         }
     }
 }

@@ -197,6 +197,40 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Return true if the supplied Line has the sme endpoints as this Line.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="thatLine"></param>
+        /// <returns></returns>
+        public static bool IsEqualTo(this Line line, Line thatLine)
+        {
+            if ((line.Start.IsAlmostEqualTo(thatLine.Start) || line.Start.IsAlmostEqualTo(thatLine.End)) &&
+               ((line.End.IsAlmostEqualTo(thatLine.Start) || line.End.IsAlmostEqualTo(thatLine.End))))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Return true if an Equal Line appears in the supplied list.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="thatLine"></param>
+        /// <returns></returns>
+        public static bool IsListed(this Line line, List<Line> lines)
+        {
+            foreach (var entry in lines)
+            {
+                if (line.IsEqualTo(entry))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns whether a line is parallel to the x-axis.
         /// </summary>
         /// <returns>
@@ -337,6 +371,24 @@ namespace GeometryEx
         {
             var v = new Vector3(to.X - from.X, to.Y - from.Y);
             return new Line(line.Start + v, line.End + v);
+        }
+
+        /// <summary>
+        /// Returns the perpendicular distance from this Line to the supplied point.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static double PerpendicularDistanceTo(this Line line, Vector3 point)
+        {
+            var area = Math.Abs(
+                0.5 * 
+                (line.Start.X * line.End.Y + line.End.X *
+                 point.Y + point.X * line.Start.Y - line.End.X * 
+                 line.Start.Y - point.X * line.End.Y - line.Start.X * point.Y));
+            double bottom = Math.Sqrt(Math.Pow(line.Start.X - line.End.X, 2) +
+            Math.Pow(line.Start.Y - line.End.Y, 2));
+            return area / bottom * 2.0;
         }
 
         /// <summary>

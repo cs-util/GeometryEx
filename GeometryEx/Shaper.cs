@@ -126,6 +126,45 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Constructs the geometric differences between this Polygon and the supplied Polygons.
+        /// </summary>
+        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <returns>
+        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
+        /// </returns>
+        public static List<Polygon> Differences(Polygon polygon, IList<Polygon> difPolys)
+        {
+            var polygons = new List<Polygon>();
+            foreach (Polygon differ in difPolys)
+            {
+                var thisPath = polygon.ToClipperPath();
+                var clipper = new Clipper();
+                clipper.AddPath(thisPath, PolyType.ptSubject, true);
+                clipper.AddPath(differ.ToClipperPath(), PolyType.ptClip, true);
+                var solution = new List<List<IntPoint>>();
+                clipper.Execute(ClipType.ctDifference, solution);
+                if (solution.Count == 0)
+                {
+                    continue;
+                }
+                foreach (List<IntPoint> path in solution)
+                {
+                    polygon = ToPolygon(path);
+                    if (polygon == null)
+                    {
+                        continue;
+                    }
+                    if (polygon.IsClockWise())
+                    {
+                        polygon = polygon.Reversed();
+                    }
+                    polygons.Add(polygon);
+                }
+            }
+            return Merge(polygons).OrderByDescending(p => Math.Abs(p.Area())).ToList();
+        }
+
+        /// <summary>
         /// Creates a list of Polygons fitted within a supplied intersecting perimeter.
         /// </summary>
         /// <param name="polygon">This Polygon.</param>
@@ -252,7 +291,7 @@ namespace GeometryEx
             }
             foreach (var solved in solution)
             {
-                var polygon = solved.Distinct().ToList().ToPolygon();
+                var polygon = solved.ToList().ToPolygon();
                 if (polygon == null)
                 {
                     continue;
@@ -264,6 +303,39 @@ namespace GeometryEx
                 mergePolygons.Add(polygon);
             }
             return mergePolygons;
+        }
+
+        /// <summary>
+        /// Constructs the set of nearby Polygons from 8 bounding boxes (as delivered by the nearPolygon and its orthogonal) at each vertex of polygon.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="nearPolygon"></param>
+        /// <returns></returns>
+        public static List<Polygon> NearPolygons(Polygon polygon, Polygon nearPolygon, bool rotated = false) 
+        {
+            var polygons = new List<Polygon>();
+            var points = polygon.Vertices;
+            var compass = nearPolygon.Compass();
+            foreach (var point in points)
+            {
+                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
+            }
+            if (!rotated)
+            {
+                return polygons;
+            }
+            compass = nearPolygon.Rotate(Vector3.Origin, 90.0).Compass();
+            foreach (var point in points)
+            {
+                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
+                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
+            }
+            return polygons;
         }
 
         /// <summary>
@@ -306,39 +378,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs the set of nearby Polygons from 8 bounding boxes (as delivered by the nearPolygon and its orthogonal) at each vertex of polygon.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="nearPolygon"></param>
-        /// <returns></returns>
-        public static List<Polygon> NearPolygons(Polygon polygon, Polygon nearPolygon, bool rotated = false) 
-        {
-            var polygons = new List<Polygon>();
-            var points = polygon.Vertices;
-            var compass = nearPolygon.Compass();
-            foreach (var point in points)
-            {
-                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
-            }
-            if (!rotated)
-            {
-                return polygons;
-            }
-            compass = nearPolygon.Rotate(Vector3.Origin, 90.0).Compass();
-            foreach (var point in points)
-            {
-                polygons.Add(nearPolygon.MoveFromTo(compass.SW, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.SE, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.NE, point));
-                polygons.Add(nearPolygon.MoveFromTo(compass.NW, point));
-            }
-            return polygons;
-        }
-
-        /// <summary>
         /// Returns a Polygon positioned diagonally adjacent to another Polygon.
         /// </summary>
         /// <param name="polygon">The static Polygon.</param>
@@ -367,10 +406,8 @@ namespace GeometryEx
             return place;
         }
 
-
-
         /// <summary>
-        /// Returns a Polygon positioned orthogonally adjacent to another Polygon by determining the minimal x or y expansion of the first Polygon with the additional second as derived from the bounding boxes of the delivered Polygons. The second Polygon is rotated to achieve a minimal dimensional expansion relative to the bounding box of the first Polygon.
+        /// Returns a Polygon positioned orthogonally adjacent to another Polygon by determining the minimal x or y expansion of the first Polygon with the second Polygon as derived from the bounding boxes of the delivered Polygons. The second Polygon is rotated to achieve a minimal dimensional expansion relative to the bounding box of the first Polygon.
         /// </summary>
         /// <param name="polygon">The static Polygon.</param>
         /// <param name="place">The Polygon to be placed adjacent to the static Polygon.</param>
@@ -446,6 +483,67 @@ namespace GeometryEx
                 throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
             }
             return Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, ratio));
+        }
+
+        /// <summary>
+        /// Reduces points with the Douglases Peucker algorithm.
+        /// </summary>
+        /// <param name="points">The points.</param>
+        /// <param name="firstPoint">The first point.</param>
+        /// <param name="lastPoint">The last point.</param>
+        /// <param name="keepers">The point indices to keep.</param>
+        /// <param name="tolerance">Deviation tolerance.</param>
+        private static void ReducePoints(List<Vector3> points, 
+                                         int firstPoint, 
+                                         int lastPoint, 
+                                         ref List<int> keepers, 
+                                         double tolerance)
+        {
+            double maxDist = 0.0;
+            int iFarthest = 0;
+
+            for (var i = firstPoint; i < lastPoint; i++)
+            {
+                var dist = new Line(points[firstPoint], points[lastPoint]).PerpendicularDistanceTo(points[i]);
+                if (dist > maxDist)
+                {
+                    maxDist = dist;
+                    iFarthest = i;
+                }
+            }
+            if (maxDist > tolerance && iFarthest != 0)
+            {
+                keepers.Add(iFarthest);
+                ReducePoints(points, firstPoint, iFarthest, ref keepers, tolerance);
+            }
+        }
+
+        /// <summary>
+        /// Reduces a quantity of points tested against a deviation tolerance.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static List<Vector3> Simplify(List<Vector3> points, double tolerance)
+        {
+            if (points == null || points.Count < 3)
+            {
+                return points;
+            }
+            //Add the first and last index to the keepers
+            List<int> keepers =
+                new List<int>()
+                {
+                    0,
+                    points.Count - 1
+                };
+            ReducePoints(points, keepers.First(), keepers.Last(), ref keepers, tolerance);
+            var fewerPoints = new List<Vector3>();
+            keepers.Sort();
+            foreach (var i in keepers)
+            {
+                fewerPoints.Add(points[i]);
+            }
+            return fewerPoints;
         }
 
         /// <summary>

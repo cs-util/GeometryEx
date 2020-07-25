@@ -13,7 +13,7 @@
     <releaseNotes>$PackageReleaseNotes$</releaseNotes>
     <copyright>Copyright 2020</copyright>
     <dependencies>
-      <group targetFramework=".NETStandard2.0" />
+      <group targetFramework=".netcoreapp3.1" />
     </dependencies>    
   </metadata>
 </package>

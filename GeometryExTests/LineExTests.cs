@@ -115,6 +115,29 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsEqualTo()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            var thatLine = new Line(new Vector3(6.0, 6.0), new Vector3(1.0, 1.0));
+            Assert.True(line.IsEqualTo(thatLine));
+            thatLine = new Line(new Vector3(7.0, 6.0), new Vector3(1.0, 1.0));
+            Assert.False(line.IsEqualTo(thatLine));
+        }
+
+        [Fact]
+        public void IsListed()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            var lines = new List<Line>
+            {
+                new Line (new Vector3(5.0, 6.0), new Vector3(2.0, 1.0)),
+                new Line (new Vector3(7.0, 6.0), new Vector3(8.0, 1.0)),
+                new Line (new Vector3(6.0, 6.0), new Vector3(1.0, 1.0))
+            };
+            Assert.True(line.IsListed(lines));
+        }
+
+        [Fact]
         public void IsHorizontal()
         {
             var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
@@ -203,6 +226,16 @@ namespace GeometryExTests
             var moved = line.MoveFromTo(Vector3.Origin, new Vector3(0.0, 150.0));
             Assert.Equal(0.0, moved.End.X);
             Assert.Equal(300.0, moved.End.Y);
+        }
+
+        [Fact]
+        public void PerpendicularDistanceTo()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
+            var point = new Vector3(3.0, 4.5);
+            Assert.Equal(4.5, line.PerpendicularDistanceTo(point));
+            point = new Vector3(3.0, -5.5);
+            Assert.Equal(5.5, line.PerpendicularDistanceTo(point));
         }
 
         [Fact]

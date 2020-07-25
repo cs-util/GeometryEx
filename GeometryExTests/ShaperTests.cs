@@ -631,5 +631,22 @@ namespace GeometryExTests
             Assert.Contains(polygon.Vertices, p => p.X == 1.0 && p.Y == 2.0);
             Assert.Contains(polygon.Vertices, p => p.X == 0.0 && p.Y == 2.0);
         }
+
+        [Fact]
+        public void Simplify()
+        {
+            var points = new List<Vector3>()
+            {
+                Vector3.Origin,
+                new Vector3(5.0, 0.0),
+                new Vector3(7.0, 7.0),
+                new Vector3(10.0, 15.0),
+                new Vector3(15.0, 20.0),
+                new Vector3(10.0, 20.0),
+                new Vector3(5.0, 10.0),
+            };
+            points = Shaper.Simplify(points, 0.5);
+            Assert.Equal(3, points.Count);
+        }
     }
 }
