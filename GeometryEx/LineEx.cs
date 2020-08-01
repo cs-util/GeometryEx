@@ -21,7 +21,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon poly in difPolys)
             {
-                polyPaths.Add(Shaper.ToClipperPath(poly));
+                polyPaths.Add(Shaper.ToClipper(poly));
             }
             Clipper clipper = new Clipper();
             clipper.AddPath(thisPath, PolyType.ptSubject, false);
@@ -54,7 +54,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon poly in difPolys)
             {
-                polyPaths.Add(Shaper.ToClipperPath(poly));
+                polyPaths.Add(Shaper.ToClipper(poly));
             }
             Clipper clipper = new Clipper();
             clipper.AddPath(thisPath, PolyType.ptSubject, false);
@@ -213,6 +213,22 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns whether a line is parallel to the x-axis.
+        /// </summary>
+        /// <returns>
+        /// True if the line's slope is zero.
+        /// </returns>
+        public static bool IsHorizontal(this Line line)
+        {
+            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            if (slope.NearEqual(0.0))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Return true if an Equal Line appears in the supplied list.
         /// </summary>
         /// <param name="line"></param>
@@ -226,22 +242,6 @@ namespace GeometryEx
                 {
                     return true;
                 }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Returns whether a line is parallel to the x-axis.
-        /// </summary>
-        /// <returns>
-        /// True if the line's slope is zero.
-        /// </returns>
-        public static bool IsHorizontal(this Line line)
-        {
-            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            if (slope.NearEqual(0.0))
-            {
-                return true;
             }
             return false;
         }

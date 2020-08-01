@@ -27,6 +27,24 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Return true if an NearEqual Vector3 appears in the supplied list.
+        /// </summary>
+        /// <param name="point">Vector3 to compare.</param>
+        /// <param name="points">List of Vector3 to compare to point.</param>
+        /// <returns></returns>
+        public static bool IsListed(this Vector3 point, List<Vector3> points)
+        {
+            foreach (var entry in points)
+            {
+                if (point.IsAlmostEqualTo(entry))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns the Vector3 point moved to a new relative location.
         /// </summary>
         /// <param name="vector">This Vector3.</param>

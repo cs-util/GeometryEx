@@ -11,6 +11,27 @@ namespace GeometryExTests
 {
     public class PolygonExTests
     {
+
+        [Fact]
+        public void AlignedBox()
+        { 
+            var polygon =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(5.0, 1.0),
+                        new Vector3(5.0, 5.0),
+                        new Vector3(2.0, 5.0)
+                    }
+                );
+            var box = polygon.AlignedBox();
+            Assert.Contains(new Vector3(3.92, 6.44, 0.0), box.Vertices);
+            Assert.Contains(new Vector3(6.92, 2.44, 0.0), box.Vertices);
+            Assert.Contains(new Vector3(2.0, 5.0, 0.0), box.Vertices);
+            Assert.Contains(new Vector3(5.0, 1.0, 0.0), box.Vertices);
+        }
+
         [Fact]
         public void AspectRatio()
         {
@@ -80,44 +101,6 @@ namespace GeometryExTests
             Assert.False(p1.Covers(new Vector3(-1.1, -1.1)));
             Assert.True(p1.Covers(new Vector3(2.0, 5.0)));
             Assert.True(p1.Covers(new Vector3(2.0, 0.0)));
-
-            //Assert.True(p1.Covers(p2.Reversed()));
-
-            //Assert.True(p1.Covers(p2.Reversed()));
-        }
-
-        [Fact]
-        public void Difference()
-        {
-            var polygon = 
-                new Polygon
-                (
-                    new[]
-                    {
-                        new Vector3(0.0, 3.0),
-                        new Vector3(11.0, 3.0),
-                        new Vector3(11.0, 12.0),
-                        new Vector3(0.0, 12.0),
-                        new Vector3(0.0, 9.0),
-                        new Vector3(8.0, 9.0),
-                        new Vector3(8.0, 6.0),
-                        new Vector3(0.0, 6.0)
-                    }
-                );
-            var difference = 
-                new Polygon
-                (
-                    new[]
-                    {
-                        new Vector3(2.0, 0.0),
-                        new Vector3(5.0, 0.0),
-                        new Vector3(5.0, 15.0),
-                        new Vector3(2.0, 15.0)
-                    }
-                );
-            var diffList = polygon.Difference(difference);
-            Assert.Equal(3, diffList.Count);
-
         }
 
         [Fact]
@@ -260,7 +243,7 @@ namespace GeometryExTests
                     new Vector3(40.0, 35.0773767097941)
                 }
             );
-            //Assert.True(room.Fits(within, null));
+            Assert.True(room.Fits(within, null));
         }
 
         [Fact]
@@ -317,6 +300,24 @@ namespace GeometryExTests
             Assert.False(p1.Intersects(p3));
             Assert.True(p3.Intersects(p4));
             Assert.True(p1.Intersects(polygons));
+        }
+
+        [Fact]
+        public void Jigsaw()
+        {
+            var jigsaw = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            Assert.Equal(6, jigsaw.Count);
+            jigsaw = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            Assert.Equal(8, jigsaw.Count);
+            jigsaw = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            Assert.Equal(12, jigsaw.Count);
+            var model = new Model();
+            var rooms = new List<Space>();
+            foreach (var polygon in jigsaw)
+            {
+                model.AddElement(new Space(polygon, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "room")));
+            }
+            model.ToGlTF("../../../../jigsaw.glb");
         }
 
         [Fact]

@@ -125,6 +125,16 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsHorizontal()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            Assert.False(line.IsHorizontal());
+
+            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 1.0));
+            Assert.True(line.IsHorizontal());
+        }
+
+        [Fact]
         public void IsListed()
         {
             var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
@@ -135,16 +145,6 @@ namespace GeometryExTests
                 new Line (new Vector3(6.0, 6.0), new Vector3(1.0, 1.0))
             };
             Assert.True(line.IsListed(lines));
-        }
-
-        [Fact]
-        public void IsHorizontal()
-        {
-            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
-            Assert.False(line.IsHorizontal());
-
-            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 1.0));
-            Assert.True(line.IsHorizontal());
         }
 
         [Fact]

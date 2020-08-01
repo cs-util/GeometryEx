@@ -10,6 +10,17 @@ namespace GeometryEx
     public static class PolygonEx
     {
         /// <summary>
+        /// Returns a Polygon bounding box rotated to the same angle as the longest segment of this Polygon.
+        /// </summary>
+        public static Polygon AlignedBox(this Polygon polygon)
+        {
+            var ang = polygon.Segments().OrderByDescending(s => s.Length()).ToList().First();
+            var angle = Math.Atan2(ang.End.Y - ang.Start.Y, ang.End.X - ang.Start.X) * (180 / Math.PI);
+            var perimeterJig = polygon.Rotate(Vector3.Origin, angle * -1);
+            return perimeterJig.Compass().Box.Rotate(Vector3.Origin, angle);
+        }
+
+        /// <summary>
         /// The ratio of the longer side to the shorter side of the Polygon's bounding box.
         /// </summary>
         public static double AspectRatio(this Polygon polygon)
@@ -24,6 +35,7 @@ namespace GeometryEx
         public static CompassBox Compass(this Polygon polygon)
         {
             return new CompassBox(polygon);
+
         }
 
         /// <summary>
@@ -84,7 +96,7 @@ namespace GeometryEx
                 }
                 if (among != null && tryPoly.Intersects(among))
                 {
-                    var tryPolys = tryPoly.Difference(among);
+                    var tryPolys = Shaper.Differences(tryPoly, among);
                     if (tryPolys != null && tryPolys.Count > 0)
                     {
                         tryPoly = tryPolys.First();
@@ -165,7 +177,7 @@ namespace GeometryEx
             {
                 return null;
             }
-            var polygons = Polygon.Difference(new List<Polygon>() { polygon }, among);
+            var polygons = Shaper.Differences(polygon, among);
             if (polygons == null || polygons.Count == 0)
             {
                 return null;
@@ -374,7 +386,33 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a List of Lines forming the Polygon skeleton's connections between Polygon's spine and vertcies.
+        /// Returns a List of Polygons derived from the Polygon's straight skeleton.
+        /// </summary>
+        /// <param name="polygon">This Polygon</param>
+        /// <returns>List(Polygon)</Line></returns>
+        public static List<Polygon> Jigsaw(this Polygon polygon)
+        {
+            var vertices2d = new List<Vector2d>();
+            foreach (var vertex in polygon.Vertices)
+            {
+                vertices2d.Add(new Vector2d(vertex.X, vertex.Y));
+            }
+            var skeleton = SkeletonBuilder.Build(vertices2d);
+            var polygons = new List<Polygon>();
+            foreach (var edgeResult in skeleton.Edges)
+            {
+                var vertices = new List<Vector3>();
+                foreach (var vertex in edgeResult.Polygon)
+                {
+                    vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
+                }
+                polygons.Add(new Polygon(vertices));
+            }
+            return polygons.OrderBy(p => p.Centroid()).ToList();
+        }
+
+        /// <summary>
+        /// Returns a List of Lines forming the Polygon skeleton's connections between Polygon's spine and vertices.
         /// </summary>
         /// <param name="polygon"></param>
         /// <returns>A List of Lines</Line></returns>
@@ -405,16 +443,11 @@ namespace GeometryEx
                 vertices2d.Add(new Vector2d(vertex.X, vertex.Y));
             }
             var skeleton = SkeletonBuilder.Build(vertices2d);
+            var polygons = polygon.Jigsaw();
             var lines = new List<Line>();
-            foreach (var edgeResult in skeleton.Edges)
+            foreach (var poly in polygons)
             {
-                var vertices = new List<Vector3>();
-                foreach (var vertex in edgeResult.Polygon)
-                {
-                    vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
-                }
-                var poly = new Polygon(vertices);
-                var segments = (poly.Segments());
+                var segments = poly.Segments();
                 foreach (var segment in segments)
                 {
                     if ((polygon.Contains(segment.Start) || polygon.Contains(segment.End)) &&

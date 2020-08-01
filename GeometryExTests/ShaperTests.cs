@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Elements;
@@ -75,7 +76,7 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void CombinePolygons()
+        public void Differences()
         {
             var polygon = new Polygon
             (
@@ -145,6 +146,52 @@ namespace GeometryExTests
             };
             var polygons = Polygon.Difference(new List<Polygon> { polygon }, among);
             Assert.Equal(4, polygons.Count);
+            var matl = new Material(Palette.Aqua, 0.0, 0.0, false, null, false, Guid.NewGuid(), "space");
+            var model = new Model();
+            model.AddElement(new Space(polygon, 0.1, BuiltInMaterials.Concrete));
+            foreach (var shape in polygons)
+            {
+                model.AddElement(new Space(shape, 4.0, matl));
+            }
+            model.ToGlTF("../../../../testOutput/Shaper.Differences.glb");
+        }
+
+        [Fact]
+        public void DifferenceTests()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                var ROTATE = Shaper.RandomDouble(0.0, 360.0);
+                var polygon = Polygon.Rectangle(Vector3.Origin, new Vector3(100.0, 50.0)).Rotate(Vector3.Origin, ROTATE);
+                var subtract = Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, 20.0));
+                var subtracts = new List<Polygon>();
+                for (var j = 1; j < 99; j++)
+                {
+                    subtracts.Add(subtract.MoveFromTo(Vector3.Origin, new Vector3(j, 0.0)).Rotate(Vector3.Origin, ROTATE));
+                }
+                subtract = Polygon.Rectangle(new Vector3(0.0, 30.0), new Vector3(1.0, 50.0));
+                for (var j = 1; j < 99; j++)
+                {
+                    subtracts.Add(subtract.MoveFromTo(Vector3.Origin, new Vector3(j, 0.0)).Rotate(Vector3.Origin, ROTATE));
+                }
+                var polygons = Shaper.Differences(polygon, subtracts, 0.01);
+                var matl = new Material(Palette.Aqua, 0.0, 0.0, false, null, false, Guid.NewGuid(), "space");
+                var model = new Model();
+                var count = 0;
+                foreach (var shape in polygons)
+                {
+                    model.AddElement(new Space(shape, 0.1, BuiltInMaterials.Concrete));
+                    count++;
+                }
+                foreach (var shape in subtracts)
+                {
+                    model.AddElement(new Space(shape, 4.0, matl));
+                    count++;
+                }
+                Assert.True(count > 196);
+                var fileName = "../../../../testOutput/Shaper.DifferenceTest" + ROTATE.ToString() + ".glb";
+                model.ToGlTF(fileName);
+            }
         }
 
 
@@ -473,6 +520,30 @@ namespace GeometryExTests
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 10.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
+        }
+
+        [Fact]
+        public void PolylineFromLines()
+        {
+            var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            var pline = Shaper.PolylineFromLines(spine);
+            Assert.Equal(3, pline.Vertices.Count);
+            //spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            //Assert.Equal(3, spine.Count);
+            //spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            //Assert.Equal(4, spine.Count);
+            //var model = new Model();
+            //var corridors = new List<Polygon>();
+            //foreach (var line in spine)
+            //{
+            //    corridors.Add(new Polyline(new[] { line.Start, line.End }).Offset(1.0, EndType.Square).First());
+            //}
+            //corridors = Shaper.Merge(corridors);
+            //foreach (var corridor in corridors)
+            //{
+            //    model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
+            //}
+            //model.ToGlTF("../../../../spine.glb");
         }
 
         [Fact]

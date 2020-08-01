@@ -126,42 +126,52 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs the geometric differences between this Polygon and the supplied Polygons.
+        /// Constructs the geometric differences between a Polygon and the supplied list of Polygons.
         /// </summary>
-        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <param name="difPolys">The list of Polygon differences.</param>
         /// <returns>
-        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon or null if the area of this Polygon is entirely subtracted.
+        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon.
         /// </returns>
-        public static List<Polygon> Differences(Polygon polygon, IList<Polygon> difPolys)
+        public static List<Polygon> Differences(Polygon polygon, List<Polygon> difPolys, double tolerance = 0.01)
         {
             var polygons = new List<Polygon>();
+            var clipper = new Clipper();
+            clipper.AddPath(polygon.ToClipper(), PolyType.ptSubject, true);
+            //difPolys = Merge(difPolys);
             foreach (Polygon differ in difPolys)
             {
-                var thisPath = polygon.ToClipperPath();
-                var clipper = new Clipper();
-                clipper.AddPath(thisPath, PolyType.ptSubject, true);
-                clipper.AddPath(differ.ToClipperPath(), PolyType.ptClip, true);
-                var solution = new List<List<IntPoint>>();
-                clipper.Execute(ClipType.ctDifference, solution);
-                if (solution.Count == 0)
+                clipper.AddPath(differ.ToClipper(), PolyType.ptClip, true);
+            }
+            var solution = new List<List<IntPoint>>();
+            clipper.Execute(ClipType.ctDifference, solution, PolyFillType.pftNonZero);
+            if (solution.Count == 0)
+            {
+                return polygons;
+            }
+            foreach (List<IntPoint> path in solution)
+            {
+                var diff = FromClipper(path);
+                if (diff == null)
                 {
                     continue;
                 }
-                foreach (List<IntPoint> path in solution)
+                if (diff.IsClockWise())
                 {
-                    polygon = ToPolygon(path);
-                    if (polygon == null)
-                    {
-                        continue;
-                    }
-                    if (polygon.IsClockWise())
-                    {
-                        polygon = polygon.Reversed();
-                    }
-                    polygons.Add(polygon);
+                    diff = diff.Reversed();
                 }
+                polygons.Add(diff);
             }
-            return Merge(polygons).OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            var polys = Merge(polygons).OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            polygons.Clear();
+            foreach (var poly in polys)
+            {
+                if (poly.Area() < tolerance)
+                {
+                    break;
+                }
+                polygons.Add(poly);
+            }
+            return polygons;
         }
 
         /// <summary>
@@ -278,7 +288,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon polygon in polygons)
             {
-                polyPaths.Add(polygon.ToClipperPath());
+                polyPaths.Add(polygon.ToClipper());
             }
             Clipper clipper = new Clipper();
             clipper.AddPaths(polyPaths, PolyType.ptClip, true);
@@ -291,7 +301,7 @@ namespace GeometryEx
             }
             foreach (var solved in solution)
             {
-                var polygon = solved.ToList().ToPolygon();
+                var polygon = solved.ToList().FromClipper();
                 if (polygon == null)
                 {
                     continue;
@@ -486,7 +496,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Reduces points with the Douglases Peucker algorithm.
+        /// Reduces points with the Douglas Peucker algorithm.
         /// </summary>
         /// <param name="points">The points.</param>
         /// <param name="firstPoint">The first point.</param>
@@ -854,13 +864,13 @@ namespace GeometryEx
         /// </returns>
         public static double RandomDouble(double minvalue, double maxvalue)
         {
-            var scale = 1000000.0;
+            var scale = 10000.0;
             var rnd = new Random();
             double next = rnd.Next((int)Math.Round(minvalue * scale), (int)Math.Round(maxvalue * scale));
             return next / scale;
         }
 
-        public const double scale = 1024.0;
+        public const double scale = 1000000000000.0;
 
         /// <summary>
         /// Check if any of lines have zero length.
@@ -909,12 +919,14 @@ namespace GeometryEx
             return false;
         }
 
+
+
         /// <summary>
         /// Construct a clipper path from a Polygon.
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        internal static List<IntPoint> ToClipperPath(this Polygon p)
+        internal static List<IntPoint> ToClipper(this Polygon p)
         {
             var path = new List<IntPoint>();
             foreach (var v in p.Vertices)
@@ -929,7 +941,7 @@ namespace GeometryEx
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        internal static Polygon ToPolygon(this List<IntPoint> p)
+        internal static Polygon FromClipper(this List<IntPoint> p)
         {
             var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
             var lines = LinesFromPoints(points);
