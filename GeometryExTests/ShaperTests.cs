@@ -522,29 +522,29 @@ namespace GeometryExTests
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
         }
 
-        [Fact]
-        public void PolylineFromLines()
-        {
-            var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-            var pline = Shaper.PolylineFromLines(spine);
-            Assert.Equal(3, pline.Vertices.Count);
-            //spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-            //Assert.Equal(3, spine.Count);
-            //spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-            //Assert.Equal(4, spine.Count);
-            //var model = new Model();
-            //var corridors = new List<Polygon>();
-            //foreach (var line in spine)
-            //{
-            //    corridors.Add(new Polyline(new[] { line.Start, line.End }).Offset(1.0, EndType.Square).First());
-            //}
-            //corridors = Shaper.Merge(corridors);
-            //foreach (var corridor in corridors)
-            //{
-            //    model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
-            //}
-            //model.ToGlTF("../../../../spine.glb");
-        }
+        //[Fact]
+        //public void PolylineFromLines()
+        //{
+        //    var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+        //    var pline = Shaper.PolylineFromLines(spine);
+        //    Assert.Equal(3, pline.Vertices.Count);
+        //    spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+        //    Assert.Equal(3, spine.Count);
+        //    spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+        //    Assert.Equal(4, spine.Count);
+        //    var model = new Model();
+        //    var corridors = new List<Polygon>();
+        //    foreach (var line in spine)
+        //    {
+        //        corridors.Add(new Polyline(new[] { line.Start, line.End }).Offset(1.0, EndType.Square).First());
+        //    }
+        //    corridors = Shaper.Merge(corridors);
+        //    foreach (var corridor in corridors)
+        //    {
+        //        model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
+        //    }
+        //    model.ToGlTF("../../../../spine.glb");
+        //}
 
         [Fact]
         public void C()

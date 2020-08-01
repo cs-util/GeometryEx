@@ -137,7 +137,7 @@ namespace GeometryEx
             var polygons = new List<Polygon>();
             var clipper = new Clipper();
             clipper.AddPath(polygon.ToClipper(), PolyType.ptSubject, true);
-            //difPolys = Merge(difPolys);
+            difPolys = Merge(difPolys);
             foreach (Polygon differ in difPolys)
             {
                 clipper.AddPath(differ.ToClipper(), PolyType.ptClip, true);
