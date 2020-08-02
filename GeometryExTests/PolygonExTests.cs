@@ -577,7 +577,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
             }
-            model.ToGlTF("../../../../spine.glb");
+            model.ToGlTF("../../../../testOutPut/spine.glb");
         }
     }
 }

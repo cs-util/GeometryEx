@@ -28,7 +28,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Column(point, 4.0, new Profile(Polygon.Rectangle(0.1, 0.1))));
             }
-            model.ToGlTF("../../../../CoordinateGrid.glb");
+            model.ToGlTF("../../../../testOutPut/CoordinateGrid.glb");
             Assert.Equal(600, grid.Available.Count);
         }
 
