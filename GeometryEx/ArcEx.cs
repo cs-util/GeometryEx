@@ -12,12 +12,11 @@ namespace GeometryEx
         /// <summary>
         /// Creates a collection of Vector3 points representing the division of the linear geometry into the supplied number of segments.
         /// </summary>
-        /// <param name="segments">The quantity of desired segments.</param>
+        /// <param name="segments">Quantity of desired segments.</param>
         /// <returns>
         /// A List of Vector3 points.
         /// </returns>
-        /// TODO: Add to ELEMENTS
-        public static IList<Vector3> Divide(this Arc arc, int segments)
+        public static List<Vector3> Divide(this Arc arc, int segments)
         {
             var pointList = new List<Vector3>()
             {
@@ -32,6 +31,30 @@ namespace GeometryEx
                 at = percent * ++factor;
             }
             return pointList;
+        }
+
+        /// <summary>
+        /// Returns a List of Lines representing the Arc divided into the specified quantity of segments.
+        /// </summary>
+        /// <param name="segments">Quantity of desired segments.</param>
+        /// <returns>
+        /// A List of Lines.
+        /// </returns>
+        public static List<Line> ToLines(this Arc arc, int segments)
+        {
+            return Shaper.LinesFromPoints(arc.Divide(segments));
+        }
+
+        /// <summary>
+        /// Returns a Polyline representing the Arc divided into the specified quantity of segments.
+        /// </summary>
+        /// <param name="segments">Quantity of desired segments.</param>
+        /// <returns>
+        /// A new Polyline.
+        /// </returns>
+        public static Polyline ToPolyline(this Arc arc, int segments)
+        {
+            return new Polyline(arc.Divide(segments));
         }
     }
 }

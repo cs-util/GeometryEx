@@ -11,9 +11,8 @@ namespace GeometryEx
         /// <summary>
         /// Reduces Polyline vertices.
         /// </summary>
-        /// <param name="polyline"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <param name="tolerance">The tolerated deviation to include a vertex.</param>
+        /// <returns>A new Polyline.</returns>
         public static Polyline Simplify(this Polyline polyline, double tolerance)
         {
             return new Polyline(Shaper.Simplify(polyline.Vertices.ToList(), tolerance));

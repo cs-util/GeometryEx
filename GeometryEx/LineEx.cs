@@ -9,63 +9,30 @@ namespace GeometryEx
     public static class LineEx
     {
         /// <summary>
-        /// Constructs the geometric difference between this Line and the supplied Polygons.
+        /// Constructs the geometric differences between this Line and the supplied Polygons.
         /// </summary>
-        /// <param name="difPolys">The list of intersecting Polygons.</param>
-        /// <returns>
-        /// Returns the longest Line representing the subtraction of the Line intersecting the supplied list of Polygons.
-        /// </returns>
-        public static Line Difference(this Line line, IList<Polygon> difPolys)
-        {
-            var thisPath = ToClipperPath(line);
-            var polyPaths = new List<List<IntPoint>>();
-            foreach (Polygon poly in difPolys)
-            {
-                polyPaths.Add(Shaper.ToClipper(poly));
-            }
-            Clipper clipper = new Clipper();
-            clipper.AddPath(thisPath, PolyType.ptSubject, false);
-            clipper.AddPaths(polyPaths, PolyType.ptClip, true);
-            var solution = new PolyTree();
-            clipper.Execute(ClipType.ctDifference, solution);
-            var soLines = Clipper.OpenPathsFromPolyTree(solution);
-            if (soLines.Count == 0)
-            {
-                return null;
-            }
-            var lines = new List<Line>();
-            foreach (List<IntPoint> path in soLines)
-            {
-                lines.Add(ToLine(path.Distinct().ToList()));
-            }
-            return lines.OrderByDescending(l => l.Length()).ToList().First();
-        }
-
-        /// <summary>
-        /// Constructs the geometric difference between this Line and the supplied Polygons.
-        /// </summary>
-        /// <param name="difPolys">The list of intersecting Polygons.</param>
+        /// <param name="diffs">The list of intersecting Polygons.</param>
         /// <returns>
         /// Returns a list of Lines representing the subtraction of the Lines intersecting the supplied list of Polygons.
         /// </returns>
-        public static List<Line> Differences(this Line line, IList<Polygon> difPolys)
+        public static List<Line> Differences(this Line line, IList<Polygon> diffs)
         {
-            var thisPath = ToClipperPath(line);
+            var thisPath = LineToClipper(line);
             var polyPaths = new List<List<IntPoint>>();
-            foreach (Polygon poly in difPolys)
+            foreach (Polygon poly in diffs)
             {
-                polyPaths.Add(Shaper.ToClipper(poly));
+                polyPaths.Add(Shaper.PolygonToClipper(poly));
             }
             Clipper clipper = new Clipper();
             clipper.AddPath(thisPath, PolyType.ptSubject, false);
             clipper.AddPaths(polyPaths, PolyType.ptClip, true);
             var solution = new PolyTree();
-            clipper.Execute(ClipType.ctDifference, solution);
+            clipper.Execute(ClipType.ctDifference, solution, PolyFillType.pftEvenOdd);
             var soLines = Clipper.OpenPathsFromPolyTree(solution);
             var lines = new List<Line>();
             foreach (List<IntPoint> path in soLines)
             {
-                lines.Add(ToLine(path.Distinct().ToList()));
+                lines.Add(LineFromClipper(path.ToList()));
             }
             return lines;
         }
@@ -75,7 +42,7 @@ namespace GeometryEx
         /// </summary>
         /// <param name="segments">The quantity of desired segments.</param>
         /// <returns>
-        /// A List of Vector3 points including the start and end points of the series.
+        /// List of Vector3 including the start and end points of the series.
         /// </returns>
         public static List<Vector3> Divide(this Line line, int segments)
         {
@@ -130,8 +97,8 @@ namespace GeometryEx
         /// </returns>
         public static Vector3 Intersection(this Line line, Line intr)
         {
-            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            var intrSlope = (intr.End.Y - intr.Start.Y) / (intr.End.X - intr.Start.X);
+            var lineSlope = line.Slope();
+            var intrSlope = intr.Slope();
             if (lineSlope.NearEqual(intrSlope) || 
                (Math.Abs(lineSlope) == double.PositiveInfinity && Math.Abs(intrSlope) == double.PositiveInfinity))
             {
@@ -165,21 +132,21 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether this line shares a point and a slope with the supplied line.
+        /// Returns whether this Line shares a point and a slope with the supplied Line.
         /// </summary>
-        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <param name="thatLine">Line to compare to this Line.</param>
         /// <returns>
-        /// True if the lines share a point and have the same slope.
+        /// True if the Lines share a point and have the same slope.
         /// </returns>
         public static bool IsContiguousWith(this Line line, Line thatLine)
         {
-            var lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            var thatSlope = (thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X);
-            if (lineSlope == double.NegativeInfinity)
+            var lineSlope = line.Slope();
+            var thatSlope = thatLine.Slope();
+            if (lineSlope.NearEqual(double.NegativeInfinity))
             {
                 lineSlope = double.PositiveInfinity;
             }
-            if (thatSlope == double.NegativeInfinity)
+            if (thatSlope.NearEqual(double.NegativeInfinity))
             {
                 thatSlope = double.PositiveInfinity;
             }
@@ -192,16 +159,16 @@ namespace GeometryEx
             {
                 return true;
             }
-
             return false;
         }
 
         /// <summary>
-        /// Return true if the supplied Line has the sme endpoints as this Line.
+        /// Return true if the supplied Line has the same endpoints as this Line.
         /// </summary>
-        /// <param name="line"></param>
-        /// <param name="thatLine"></param>
-        /// <returns></returns>
+        /// <param name="thatLine">Line to compare to this Line.</param>
+        /// <returns>
+        /// True if the endpoints are near equal to those of the supplied Line.
+        /// </returns>
         public static bool IsEqualTo(this Line line, Line thatLine)
         {
             if ((line.Start.IsAlmostEqualTo(thatLine.Start) || line.Start.IsAlmostEqualTo(thatLine.End)) &&
@@ -213,15 +180,14 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether a line is parallel to the x-axis.
+        /// Returns whether a Line is parallel to the x-axis.
         /// </summary>
         /// <returns>
-        /// True if the line's slope is zero.
+        /// True if the Line's slope is zero.
         /// </returns>
         public static bool IsHorizontal(this Line line)
         {
-            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            if (slope.NearEqual(0.0))
+            if (line.Slope().NearEqual(0.0))
             {
                 return true;
             }
@@ -231,9 +197,9 @@ namespace GeometryEx
         /// <summary>
         /// Return true if an Equal Line appears in the supplied list.
         /// </summary>
-        /// <param name="line"></param>
-        /// <param name="thatLine"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// True if the Line endpoints are NearEqual to those of a Line in the supplied List.
+        /// </returns>
         public static bool IsListed(this Line line, List<Line> lines)
         {
             foreach (var entry in lines)
@@ -247,21 +213,21 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether this line is parallel to the supplied line.
+        /// Returns true if this Line is parallel to the supplied line.
         /// </summary>
         /// <param name="thatLine">Line to compare to this line.</param>
         /// <returns>
-        /// True if the lines have equal slopes.
+        /// True if the Lines have equal slopes.
         /// </returns>
         public static bool IsParallelTo(this Line line, Line thatLine)
         {
-            var lineSlope = Math.Round((line.End.Y - line.Start.Y) / (line.End.X - line.Start.X), 1);
-            var thatSlope = Math.Round((thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X), 1);
-            if (lineSlope == double.NegativeInfinity)
+            var lineSlope = line.Slope();
+            var thatSlope = thatLine.Slope();
+            if (lineSlope.NearEqual(double.NegativeInfinity))
             {
                 lineSlope = double.PositiveInfinity;
             }
-            if (thatSlope == double.NegativeInfinity)
+            if (thatSlope.NearEqual(double.NegativeInfinity))
             {
                 thatSlope = double.PositiveInfinity;
             }
@@ -273,7 +239,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether this line is perpendicular to the supplied line.
+        /// Returns true if this Line is perpendicular to the supplied line.
         /// </summary>
         /// <param name="thatLine">Line to compare to this line.</param>
         /// <returns>
@@ -281,14 +247,14 @@ namespace GeometryEx
         /// </returns>
         public static bool IsPerpendicularTo(this Line line, Line thatLine)
         {
-            var lineSlope = Math.Round((line.End.Y - line.Start.Y) / (line.End.X - line.Start.X), 1);
-            var thatSlope = Math.Round((thatLine.End.Y - thatLine.Start.Y) / (thatLine.End.X - thatLine.Start.X), 1);
-            if (((lineSlope == double.PositiveInfinity || lineSlope == double.NegativeInfinity) && thatSlope == 0.0) ||
-                ((thatSlope == double.PositiveInfinity || thatSlope == double.NegativeInfinity) && lineSlope == 0.0))
+            var lineSlope = line.Slope();
+            var thatSlope = thatLine.Slope();
+            if (((lineSlope.NearEqual(double.PositiveInfinity) || lineSlope.NearEqual(double.NegativeInfinity)) && thatSlope.NearEqual(0.0)) ||
+                ((thatSlope.NearEqual(double.PositiveInfinity) || thatSlope.NearEqual(double.NegativeInfinity)) && lineSlope.NearEqual(0.0)))
             {
                 return true;
             }
-            if (lineSlope * thatSlope == -1)
+            if ((lineSlope * thatSlope).NearEqual(-1))
             {
                 return true;
             }
@@ -296,15 +262,15 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether a line is parallel to the y-axis.
+        /// Returns whether this Line is parallel to the y-axis.
         /// </summary>
         /// <returns>
         /// True if the line's slope resolves to an infinite value.
         /// </returns>
         public static bool IsVertical (this Line line)
         {
-            var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            if (slope == double.PositiveInfinity || slope == double.NegativeInfinity)
+            var slope = line.Slope();
+            if (slope.NearEqual(double.PositiveInfinity) || slope.NearEqual(double.NegativeInfinity))
             {
                 return true;
             }
@@ -312,7 +278,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Calculates a new line from this Line and a supplied line with a single coincident endpoint and identical slope.
+        /// Calculates a new Line from this Line and a supplied Line with a single coincident endpoint and identical slope.
         /// </summary>
         /// <returns>
         /// A new Line.
@@ -348,7 +314,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns the midpoint between the line's start and end.
+        /// Returns the midpoint between the Line's start and end.
         /// </summary>
         /// <returns>
         /// A Vector3 point.
@@ -361,7 +327,6 @@ namespace GeometryEx
         /// <summary>
         /// Returns a new line displaced from the supplied line along a 2D vector calculated between the supplied Vector3 points.
         /// </summary>
-        /// <param name="line">The Line instance to be copied.</param>
         /// <param name="from">The Vector3 base point of the move.</param>
         /// <param name="to">The Vector3 target point of the move.</param>
         /// <returns>
@@ -376,8 +341,7 @@ namespace GeometryEx
         /// <summary>
         /// Returns the perpendicular distance from this Line to the supplied point.
         /// </summary>
-        /// <param name="line"></param>
-        /// <param name="point"></param>
+        /// <param name="point">Vector3 representing a point.</param>
         /// <returns></returns>
         public static double PerpendicularDistanceTo(this Line line, Vector3 point)
         {
@@ -394,10 +358,11 @@ namespace GeometryEx
         /// <summary>
         /// Tests whether a point falls along this line.
         /// </summary>
-        /// <param name="point"></param>
-        /// <param name="line"></param>
-        /// <returns></returns>
-        private static bool PointOnLine(this Line line, Vector3 point)
+        /// <param name="point">Vector3 point to compare to this Line.</param>
+        /// <returns>
+        /// True if the supplied Vector3 is coincident with this Line.
+        /// </returns>
+        public static bool PointOnLine(this Line line, Vector3 point)
         {
             var deltaXp = point.X - line.Start.X;
             var deltaYp = point.Y - line.Start.Y;
@@ -412,12 +377,12 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a point the supplied distance along the line.
+        /// Returns a point the supplied distance along this Line.
         /// </summary>
-        /// <param name="distance">Distance along the line to the desired point.</param>
+        /// <param name="distance">Distance along this Line to the desired point.</param>
         /// <returns>
         /// A Vector3 point on the line.
-        /// If the distance exceed the length of the line, returns the end point of the line.
+        /// If the distance exceeds the length of the line, returns the endpoint of this Line.
         /// </returns>
         public static Vector3 PositionAt(this Line line, double distance)
         {
@@ -429,9 +394,8 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates a new line from the supplied line rotated around the supplied pivot point by the specified angle in degrees.
+        /// Creates a new Line from the supplied Line rotated around the supplied pivot point by the specified angle in degrees.
         /// </summary>
-        /// <param name="line">Line instance to be copied and rotated.</param>
         /// <param name="pivot">Vector3 base point of the rotation.</param>
         /// <param name="angle">Desired rotation angle in degrees.</param>
         /// <returns>
@@ -448,13 +412,13 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a list of lines by dividing the supplied line by the supplied length from the line's start point.
+        /// Returns a list of Lines by dividing the supplied Line by the supplied length from the Line's start point.
         /// </summary>
         /// <param name="length">Longest allowable segment.</param>
         /// <returns>
-        /// A list of lines of the specified length and a shorter line representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
+        /// A list of Lines of the specified length and a shorter line representing any remainder, or a list containing a copy of the supplied Line if the supplied length is greater than the Line.
         /// </returns>
-        public static List<Line> Segment(this Line line, double length, double minimum = 1e-09)
+        public static List<Line> Segment(this Line line, double length, double minimum = 1e-08)
         {
             var lines = new List<Line>();
             var segments = line.Length() / length;
@@ -497,13 +461,13 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a list of lines by dividing the supplied line by the supplied length from the specified start point.
+        /// Returns a list of Lines by dividing the supplied Line by the supplied length from the specified start point.
         /// </summary>
         /// <param name="length">Longest allowable segment.</param>
         /// <returns>
-        /// A list of lines of the specified length and shorter line or lines representing any remainder, or a list containing a copy of the supplied line if the supplied length is greater than the line.
+        /// A list of Lines of the specified length and shorter line or lines representing any remainder, or a List containing a copy of the supplied Line if the supplied length is greater than the Line.
         /// </returns>
-        public static List<Line> SegmentFrom(this Line line, double length, DivideFrom from = DivideFrom.Start, double minimum = 1e-09)
+        public static List<Line> SegmentFrom(this Line line, double length, DivideFrom from = DivideFrom.Start, double minimum = 1e-08)
         {
             var lines = new List<Line>();
             if (length >= line.Length())
@@ -535,7 +499,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns the slope of the line, normalizing a vertical line to a slope of positive infinity.
+        /// Returns the slope of the Line, normalizing a vertical Line to a slope of positive infinity.
         /// </summary>
         /// <returns>
         /// A double representing the slope of the line.
@@ -543,21 +507,23 @@ namespace GeometryEx
         public static double Slope (this Line line)
         {
             var slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            if (slope == double.NegativeInfinity)
+            if (slope.NearEqual(double.NegativeInfinity) || slope.NearEqual(double.PositiveInfinity))
             {
                 slope = double.PositiveInfinity;
             }
             return slope;
         }
 
-        private const double scale = 1024.0;
-
         /// <summary>
-        /// Construct a clipper path from a Polygon.
+        /// Construct a clipper path from this Line.
         /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        internal static List<IntPoint> ToClipperPath(this Line line)
+        /// <param name="scale">
+        /// Scaling factor for translation into Clipper coordinates.
+        /// </param>
+        /// <returns>
+        /// A Clipper path.
+        /// </returns>
+        internal static List<IntPoint> LineToClipper(this Line line, double scale = Shaper.SCALE)
         {
             var path = new List<IntPoint>
             {
@@ -568,11 +534,15 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Construct a Line from a clipper path 
+        /// Construct a Line from a Clipper path 
         /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        internal static Line ToLine(this List<IntPoint> line)
+        /// <param name="scale">
+        /// Scaling factor for translation into Clipper coordinates.
+        /// </param>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        internal static Line LineFromClipper(this List<IntPoint> line, double scale = Shaper.SCALE)
         {
             return new Line(new Vector3(line.First().X / scale, line.First().Y / scale),
                             new Vector3(line.Last().X / scale, line.Last().Y / scale));

@@ -22,6 +22,8 @@ namespace GeometryExTests
                 }
             );
             var box = new CompassBox(polygon);
+            Assert.Equal(2.0, box.C.X);
+            Assert.Equal(2.0, box.C.Y);
             Assert.Equal(0.0, box.SW.X);
             Assert.Equal(0.0, box.SW.Y);
             Assert.Equal(1.0, box.SSW.X);

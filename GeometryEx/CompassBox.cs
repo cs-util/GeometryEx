@@ -184,7 +184,7 @@ namespace GeometryEx
         /// <summary>
         /// Returns the requested bounding box location by orientation.
         /// </summary>
-        /// <param name="orient">The Orient value to index point.</param>
+        /// <param name="orient">Location identifier of the desired point.</param>
         /// <returns>
         /// A Vector3 point.
         /// </returns>

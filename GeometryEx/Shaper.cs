@@ -14,8 +14,8 @@ namespace GeometryEx
         /// <summary>
         /// Creates a rectilinear Polygon in the specified adjacent quadrant to the supplied Polygon's bounding box.
         /// </summary>    
-        /// <param name="area">The area of the new Polygon.</param>
-        /// <param name="orient">The relative cardinal direction in which the new Polygon will be placed.</param>
+        /// <param name="area">Desired area of the new Polygon.</param>
+        /// <param name="orient">Relative cardinal direction in which the new Polygon will be placed.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
@@ -92,29 +92,10 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns the List of Polygons that can merge with the supplied polygon.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="polygons"></param>
-        /// <returns></returns>
-        public static List<Polygon> CanMerge(Polygon polygon, List<Polygon> polygons)
-        {
-            var mrgPolygons = new List<Polygon>();
-            foreach (var poly in polygons)
-            {
-                if (Polygon.Union(new List<Polygon>() { polygon }, new List<Polygon>() { poly }).Count == 1)
-                {
-                    mrgPolygons.Add(poly);
-                }
-            }
-            return mrgPolygons;
-        }
-
-        /// <summary>
         /// Creates a convex hull Polygon from the vertices of all supplied Polygons.
         /// </summary>
         /// <param name="polygons">A list of Polygons from which to extract vertices.</param>
-        /// <returns></returns>
+        /// <returns>A new Polygon.</returns>
         public static Polygon ConvexHullFromPolygons(List<Polygon> polygons)
         {
             var points = new List<Vector3>();
@@ -128,29 +109,33 @@ namespace GeometryEx
         /// <summary>
         /// Constructs the geometric differences between a Polygon and the supplied list of Polygons.
         /// </summary>
-        /// <param name="difPolys">The list of Polygon differences.</param>
+        /// <param name="polygons">List of subject Polygons for the difference calculation.</param>
+        /// <param name="diffs">List of clipping Polygons for the difference calculation.</param>
         /// <returns>
-        /// Returns a list of Polygons representing the subtraction of the supplied Polygons from this Polygon.
+        /// A List of Polygons representing the subtraction of the clipping Polygons from the subject Polygons.
         /// </returns>
-        public static List<Polygon> Differences(Polygon polygon, List<Polygon> difPolys, double tolerance = 0.01)
+        public static List<Polygon> Differences(List<Polygon> polygons, List<Polygon> diffs, double tolerance = 0.01)
         {
-            var polygons = new List<Polygon>();
+            diffs = Merge(diffs);
+            var differs = new List<Polygon>();
             var clipper = new Clipper();
-            clipper.AddPath(polygon.ToClipper(), PolyType.ptSubject, true);
-            difPolys = Merge(difPolys);
-            foreach (Polygon differ in difPolys)
+            foreach (var polygon in polygons)
             {
-                clipper.AddPath(differ.ToClipper(), PolyType.ptClip, true);
+                clipper.AddPath(polygon.PolygonToClipper(), PolyType.ptSubject, true);
+            }
+            foreach (var differ in diffs)
+            {
+                clipper.AddPath(differ.PolygonToClipper(), PolyType.ptClip, true);
             }
             var solution = new List<List<IntPoint>>();
             clipper.Execute(ClipType.ctDifference, solution, PolyFillType.pftNonZero);
             if (solution.Count == 0)
             {
-                return polygons;
+                return differs;
             }
-            foreach (List<IntPoint> path in solution)
+            foreach (var path in solution)
             {
-                var diff = FromClipper(path);
+                var diff = PolygonFromClipper(path);
                 if (diff == null)
                 {
                     continue;
@@ -159,28 +144,28 @@ namespace GeometryEx
                 {
                     diff = diff.Reversed();
                 }
-                polygons.Add(diff);
+                differs.Add(diff);
             }
-            var polys = Merge(polygons).OrderByDescending(p => Math.Abs(p.Area())).ToList();
-            polygons.Clear();
+            var polys = Merge(differs).OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            differs.Clear();
             foreach (var poly in polys)
             {
                 if (poly.Area() < tolerance)
                 {
                     break;
                 }
-                polygons.Add(poly);
+                differs.Add(poly);
             }
-            return polygons;
+            return differs;
         }
 
         /// <summary>
         /// Creates a list of Polygons fitted within a supplied intersecting perimeter.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
+        /// <param name="polygon">A Polygon to intersect with the supplied within perimeter Polygon.</param>
         /// <param name="within">Polygon acting as a constraining outer boundary.</param>
         /// <returns>
-        /// A Polygon.
+        /// A List of Polygons.
         /// </returns>
         public static List<Polygon> FitWithin(Polygon polygon, Polygon within)
         {
@@ -208,11 +193,11 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns the List of Polygons in the specified coordinate system quadrant.
+        /// Returns the List of Polygons wholly contained within the specified coordinate system quadrant.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="polygons"></param>
-        /// <returns></returns>
+        /// <param name="polygons">A List of Polygons to test for positioning.</param>
+        /// <param name="quad">The Quadrant to test the supplied Polygon for inclusion.</param>
+        /// <returns>A List of Polygons.</returns>
         public static List<Polygon> InQuadrant(List<Polygon> polygons, Quadrant quad)
         {
             var quadPolygons = new List<Polygon>();
@@ -251,11 +236,12 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs a list of line segments in order from pairs in a list of vertices.
+        /// Constructs a List of Lines in order from pairs in a List of Vector3 points.
         /// </summary>
-        /// <param name="vertices">List of vertices to convert to line segments.</param>
+        /// <param name="points">List of vertices to convert to Lines.</param>
+        /// <param name="close">If true also creates a Line from the Last to First points of the List.</param>
         /// <returns>List of Lines.</returns>
-        public static List<Line> LinesFromPoints(List<Vector3> points)
+        public static List<Line> LinesFromPoints(List<Vector3> points, bool close = false)
         {
             var lines = new List<Line>();
             if (points.Count == 0)
@@ -266,6 +252,10 @@ namespace GeometryEx
             {
                 lines.Add(new Line(points[i], points[i + 1]));
             }
+            if (close)
+            {
+                lines.Add(new Line(points.Last(), points.First()));
+            }
             return lines;
         }
 
@@ -274,7 +264,7 @@ namespace GeometryEx
         /// </summary>
         /// <param name="polygons">The list of Polygons to be combined.</param>
         /// <returns>
-        /// List of Polygons.
+        /// A List of Polygons.
         /// </returns>
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
         public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
@@ -288,7 +278,7 @@ namespace GeometryEx
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon polygon in polygons)
             {
-                polyPaths.Add(polygon.ToClipper());
+                polyPaths.Add(polygon.PolygonToClipper());
             }
             Clipper clipper = new Clipper();
             clipper.AddPaths(polyPaths, PolyType.ptClip, true);
@@ -301,7 +291,7 @@ namespace GeometryEx
             }
             foreach (var solved in solution)
             {
-                var polygon = solved.ToList().FromClipper();
+                var polygon = solved.ToList().PolygonFromClipper();
                 if (polygon == null)
                 {
                     continue;
@@ -316,10 +306,11 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs the set of nearby Polygons from 8 bounding boxes (as delivered by the nearPolygon and its orthogonal) at each vertex of polygon.
+        /// Constructs the set of nearby Polygons from 8 bounding boxes as delivered by the nearPolygon and its orthogonal at each vertex of the Polygon.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="nearPolygon"></param>
+        /// <param name="polygon">The static Polygon serving as the vertex positioning.</param>
+        /// <param name="nearPolygon">The Polygon to array around each Polygon vertex.</param>
+        /// <param name="rotated">Whether rotated Polygons should be returned.</param>
         /// <returns></returns>
         public static List<Polygon> NearPolygons(Polygon polygon, Polygon nearPolygon, bool rotated = false) 
         {
@@ -351,28 +342,9 @@ namespace GeometryEx
         /// <summary>
         /// Returns the List of Polygons that do not intersect the supplied polygon.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="polygons"></param>
-        /// <returns></returns>
-        public static List<Polygon> NonIntersecting(Polygon polygon, List<Polygon> polygons)
-        {
-            var nonPolygons = new List<Polygon>();
-            foreach (var poly in polygons)
-            {
-                if (!polygon.Intersects(poly))
-                {
-                    nonPolygons.Add(poly);
-                }
-            }
-            return nonPolygons;
-        }
-
-        /// <summary>
-        /// Returns the List of Polygons that do not intersect the supplied polygons.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="polygons"></param>
-        /// <returns></returns>
+        /// <param name="polygons">A List of Polygons to test against.</param>
+        /// <param name="polygons">A List of Polygons to test for intersection.</param>
+        /// <returns>A List of non-intersecting Polygons.</returns>
         public static List<Polygon> NonIntersecting(List<Polygon> placed, List<Polygon> polygons)
         {
             var nonPolygons = new List<Polygon>();
@@ -463,11 +435,10 @@ namespace GeometryEx
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
         /// <param name="ratio">Ratio of width to depth.</param>
-        /// <param name="moveTo">Location of the southwest corner of the new Polygon.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
-        public static Polygon RectangleByArea(double area, double ratio = 1.0)
+        public static Polygon RectangleByArea(double area = 1.0, double ratio = 1.0)
         {
             if (area <= 0.0 || ratio <= 0.0)
             {
@@ -482,7 +453,6 @@ namespace GeometryEx
         /// Creates a rectangular Polygon of the supplied length to width proportion with its southwest corner at the origin.
         /// </summary>
         /// <param name="ratio">Ratio of width to depth.</param>
-        /// <param name="moveTo">Location of the southwest corner of the new Polygon.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
@@ -531,8 +501,11 @@ namespace GeometryEx
         /// <summary>
         /// Reduces a quantity of points tested against a deviation tolerance.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
+        /// <param name="points">A List of Points to test.</param>
+        /// <param name="tolerance">The devisation tolerance for inclusion in the final Vector3 List.</param>
+        /// <returns>
+        /// A List of Vector3 points.
+        /// </returns>
         public static List<Vector3> Simplify(List<Vector3> points, double tolerance)
         {
             if (points == null || points.Count < 3)
@@ -668,7 +641,6 @@ namespace GeometryEx
         /// <param name="origin">The initial enclosing box corner.</param>
         /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
         /// <param name="width">Width of each stroke of the shape.</param>
-        /// <param name="offset">Positive or negative displacement of the H crossbar from the shape meridian.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
@@ -840,8 +812,9 @@ namespace GeometryEx
         /// <summary>
         /// Tests if two doubles are effectively equal within a tolerance.
         /// </summary>
-        /// <param name="thisValue">The lower bound of the random range.</param>
-        /// <param name="thatValue">The upper bound of the random range.</param>
+        /// <param name="thisValue">Lower bound of the random range.</param>
+        /// <param name="thatValue">Upper bound of the random range.</param>
+        /// <param name="tolerace">Tolerance for deviation from mathematical equality.</param>
         /// <returns>
         /// True if the supplied values are equivalent within the default or supplied tolerance.
         /// </returns>
@@ -870,8 +843,6 @@ namespace GeometryEx
             return next / scale;
         }
 
-        public const double scale = 1000000000000.0;
-
         /// <summary>
         /// Check if any of lines have zero length.
         /// </summary>
@@ -883,7 +854,7 @@ namespace GeometryEx
             }
             foreach (var s in lines)
             {
-                if (s.Length() == 0)
+                if (s.Length().NearEqual(0.0))
                 {
                     return true;
                 }
@@ -919,14 +890,14 @@ namespace GeometryEx
             return false;
         }
 
-
+        public const double SCALE = 1000000000000.0;
 
         /// <summary>
         /// Construct a clipper path from a Polygon.
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
         /// <returns></returns>
-        internal static List<IntPoint> ToClipper(this Polygon p)
+        internal static List<IntPoint> PolygonToClipper(this Polygon p, double scale = SCALE)
         {
             var path = new List<IntPoint>();
             foreach (var v in p.Vertices)
@@ -939,9 +910,9 @@ namespace GeometryEx
         /// <summary>
         /// Construct a Polygon from a clipper path 
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
         /// <returns></returns>
-        internal static Polygon FromClipper(this List<IntPoint> p)
+        internal static Polygon PolygonFromClipper(this List<IntPoint> p, double scale = SCALE)
         {
             var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
             var lines = LinesFromPoints(points);

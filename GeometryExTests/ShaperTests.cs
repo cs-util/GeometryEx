@@ -78,12 +78,22 @@ namespace GeometryExTests
         [Fact]
         public void Differences()
         {
-            var polygon = new Polygon
+            var poly1 = new Polygon
             (
                 new[]
                 {
                     new Vector3(0.0, 0.0),
                     new Vector3(12.0, 0.0),
+                    new Vector3(12.0, 5.0),
+                    new Vector3(0.0, 5.0)
+                }
+            );
+            var poly2 = new Polygon
+            (
+                new[]
+                {
+                    new Vector3(0.0, 6.0),
+                    new Vector3(12.0, 6.0),
                     new Vector3(12.0, 12.0),
                     new Vector3(0.0, 12.0)
                 }
@@ -144,11 +154,12 @@ namespace GeometryExTests
                     }
                  ),
             };
-            var polygons = Polygon.Difference(new List<Polygon> { polygon }, among);
+            var polygons = Polygon.Difference(new List<Polygon> { poly1, poly2 }, among);
             Assert.Equal(4, polygons.Count);
             var matl = new Material(Palette.Aqua, 0.0, 0.0, false, null, false, Guid.NewGuid(), "space");
             var model = new Model();
-            model.AddElement(new Space(polygon, 0.1, BuiltInMaterials.Concrete));
+            model.AddElement(new Space(poly1, 0.1, BuiltInMaterials.Concrete));
+            model.AddElement(new Space(poly2, 0.1, BuiltInMaterials.Concrete));
             foreach (var shape in polygons)
             {
                 model.AddElement(new Space(shape, 4.0, matl));
@@ -157,7 +168,7 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void DifferenceTests()
+        public void DifferencesTests()
         {
             for (var i = 0; i < 10; i++)
             {
@@ -174,7 +185,7 @@ namespace GeometryExTests
                 {
                     subtracts.Add(subtract.MoveFromTo(Vector3.Origin, new Vector3(j, 0.0)).Rotate(Vector3.Origin, ROTATE));
                 }
-                var polygons = Shaper.Differences(polygon, subtracts, 0.01);
+                var polygons = Shaper.Differences(polygon.ToList(), subtracts, 0.01);
                 var matl = new Material(Palette.Aqua, 0.0, 0.0, false, null, false, Guid.NewGuid(), "space");
                 var model = new Model();
                 var count = 0;
@@ -192,65 +203,6 @@ namespace GeometryExTests
                 var fileName = "../../../../testOutput/Shaper.DifferenceTest" + ROTATE.ToString() + ".glb";
                 model.ToGlTF(fileName);
             }
-        }
-
-
-        [Fact]
-        public void FitTo()
-        {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0)
-                }
-            );
-            var within = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(1.0, 1.0),
-                    new Vector3(8.0, 1.0),
-                    new Vector3(8.0, 8.0),
-                    new Vector3(1.0, 8.0)
-                }
-            );
-            var among = new List<Polygon>
-            {
-                new Polygon(
-                    new []
-                    {
-                        new Vector3(3.0, 1.0),
-                        new Vector3(7.0, 1.0),
-                        new Vector3(7.0, 5.0),
-                        new Vector3(3.0, 5.0)
-                    }),
-                new Polygon(
-                    new[]
-                    {
-                        new Vector3(1.0, 3.0),
-                        new Vector3(2.0, 3.0),
-                        new Vector3(2.0, 6.0),
-                        new Vector3(1.0, 6.0),
-                    })
-            };
-            polygon = polygon.FitTo(within, among);
-            var spaces = new List<Space>
-            {
-                new Space(polygon, 3.0, new Material("blue", new Color(0.0f, 0.0f, 1.0f, 0.6f))),
-                new Space(within, 0.1, new Material("aqua", new Color(0.3f, 0.7f, 0.7f, 0.6f))),
-                new Space(among[0], 3.0, new Material("yellow", new Color(1.0f, 0.9f, 0.1f, 0.6f))),
-                new Space(among[1], 3.0, new Material("green", new Color(0.0f, 1.0f, 0.0f, 0.6f)))
-            };
-            var model = new Model();
-            foreach (Space space in spaces)
-            {
-                model.AddElement(space);
-            }
-            model.ToGlTF("../../../../FitTo.glb");
         }
 
         [Fact]
@@ -325,6 +277,14 @@ namespace GeometryExTests
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.II));
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.III));
             Assert.Single(Shaper.InQuadrant(polygons, Quadrant.IV));
+        }
+
+        [Fact]
+        public void LinesFromPoints()
+        {
+            var polygon = Shaper.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
+            var points = polygon.Vertices;
+            Assert.Equal(8.0, Shaper.LinesFromPoints(points.ToList(), true).Count);
         }
 
         [Fact]
@@ -422,7 +382,7 @@ namespace GeometryExTests
                     }
                 );
             var polygons = Shaper.NearPolygons(polygon, nearPolygon, true);
-            polygons = Shaper.NonIntersecting(polygon, polygons);
+            polygons = Shaper.NonIntersecting(polygon.ToList(), polygons);
             Assert.Equal(24, polygons.Count);
         }
 
@@ -521,30 +481,6 @@ namespace GeometryExTests
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
         }
-
-        //[Fact]
-        //public void PolylineFromLines()
-        //{
-        //    var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-        //    var pline = Shaper.PolylineFromLines(spine);
-        //    Assert.Equal(3, pline.Vertices.Count);
-        //    spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-        //    Assert.Equal(3, spine.Count);
-        //    spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
-        //    Assert.Equal(4, spine.Count);
-        //    var model = new Model();
-        //    var corridors = new List<Polygon>();
-        //    foreach (var line in spine)
-        //    {
-        //        corridors.Add(new Polyline(new[] { line.Start, line.End }).Offset(1.0, EndType.Square).First());
-        //    }
-        //    corridors = Shaper.Merge(corridors);
-        //    foreach (var corridor in corridors)
-        //    {
-        //        model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
-        //    }
-        //    model.ToGlTF("../../../../spine.glb");
-        //}
 
         [Fact]
         public void C()

@@ -24,6 +24,20 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsListed()
+        {
+            var points = new List<Vector3>
+            {
+                new Vector3(5.0, 5.0),
+                new Vector3(6.0, 6.0),
+                new Vector3(7.0, 7.0),
+                new Vector3(8.0, 8.0)
+            };
+            Assert.True(new Vector3(5.0, 5.0).IsListed(points));
+            Assert.False(Vector3.Origin.IsListed(points));
+        }
+
+        [Fact]
         public void MoveFromTo()
         {
             var point = new Vector3(5.0, 5.0, 5.0);

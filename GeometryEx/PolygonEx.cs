@@ -10,6 +10,15 @@ namespace GeometryEx
     public static class PolygonEx
     {
         /// <summary>
+        /// The ratio of the longer side to the shorter side of the Polygon's bounding box.
+        /// </summary>
+        public static double AlignedAspectRatio(this Polygon polygon)
+        {
+            var segments = polygon.AlignedBox().Segments().OrderBy(s => s.Length());
+            return segments.Last().Length() / segments.First().Length();
+        }
+
+        /// <summary>
         /// Returns a Polygon bounding box rotated to the same angle as the longest segment of this Polygon.
         /// </summary>
         public static Polygon AlignedBox(this Polygon polygon)
@@ -21,25 +30,24 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// The ratio of the longer side to the shorter side of the Polygon's bounding box.
+        /// Returns a list of Vector3 points representing the corners of the Polygon's aligned bounding box.
+        /// </summary>
+        public static List<Vector3> AlignedBoxCorners(this Polygon polygon)
+        {
+            return polygon.AlignedBox().Vertices.ToList();
+        }
+
+        /// <summary>
+        /// The ratio of the longer side to the shorter side of the Polygon's orthogonal bounding box.
         /// </summary>
         public static double AspectRatio(this Polygon polygon)
         {
-            var box = polygon.Compass();
-            return box.SizeX >= box.SizeY ? box.SizeX / box.SizeY : box.SizeY / box.SizeX;
+            var segments = polygon.Compass().Box.Segments().OrderBy(s => s.Length());
+            return segments.Last().Length() / segments.First().Length();
         }
 
         /// <summary>
-        /// Returns a CompassBox representation of the Polygon's bounding box.
-        /// </summary>
-        public static CompassBox Compass(this Polygon polygon)
-        {
-            return new CompassBox(polygon);
-
-        }
-
-        /// <summary>
-        /// Returns a list of Vector3 points representig the corners of the Polygon's orthogonal bounding box.
+        /// Returns a list of Vector3 points representing the corners of the Polygon's orthogonal bounding box.
         /// </summary>
         public static List<Vector3> BoxCorners(this Polygon polygon)
         {
@@ -54,6 +62,34 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the List of Polygons that can merge with this Polygon.
+        /// </summary>
+        /// <param name="polygons">List of Polygons to test.</param>
+        /// <returns>A List of Polygons that can be merged with this Polygon.</returns>
+        public static List<Polygon> CanMerge(this Polygon polygon, List<Polygon> polygons)
+        {
+            var mrgPolygons = new List<Polygon>();
+            foreach (var poly in polygons)
+            {
+                var polys = polygon.ToList();
+                polys.Add(poly);
+                if (Shaper.Merge(polys).Count == 1)
+                {
+                    mrgPolygons.Add(poly);
+                }
+            }
+            return mrgPolygons;
+        }
+
+        /// <summary>
+        /// Returns a CompassBox representation of the Polygon's bounding box.
+        /// </summary>
+        public static CompassBox Compass(this Polygon polygon)
+        {
+            return new CompassBox(polygon);
+        }
+
+        /// <summary>
         /// Attempts to scale up a Polygon until coming within the tolerance percentage of the target area.
         /// </summary>
         /// <param name="polygon">Polygon to scale.</param>
@@ -61,7 +97,7 @@ namespace GeometryEx
         /// <param name="tolerance">Area total tolerance.</param>
         /// <param name="origin">Alignment location for final Polygon.</param>
         /// <param name="within">Polygon acting as a constraining outer boundary.</param>
-        /// <param name="among">Llist of Polygons to avoid intersecting.</param>
+        /// <param name="among">List of Polygons to avoid intersecting.</param>
         /// <returns>
         /// A new Polygon.
         /// </returns>
@@ -85,7 +121,7 @@ namespace GeometryEx
             {
                 var t = new Transform();
                 t.Scale(tryArea / area, tryPoly.Compass().PointBy(origin));
-                tryPoly = t.OfPolygon(tryPoly);
+                tryPoly = tryPoly.TransformedPolygon(t);
                 if (within != null && tryPoly.Intersects(within))
                 {
                     var tryPolys = within.Intersection(tryPoly);
@@ -96,7 +132,7 @@ namespace GeometryEx
                 }
                 if (among != null && tryPoly.Intersects(among))
                 {
-                    var tryPolys = Shaper.Differences(tryPoly, among);
+                    var tryPolys = Shaper.Differences(tryPoly.ToList(), among);
                     if (tryPolys != null && tryPolys.Count > 0)
                     {
                         tryPoly = tryPolys.First();
@@ -110,10 +146,10 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Provides a list of points within a polygon by searching along lines between Polygon vertices and the Polygon's Centroid.
+        /// Provides a list of Vector3 points within a Polygon by searching along Lines between Polygon vertices and the Polygon's Centroid.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
+        /// <param name="interval">Density of Vector points to return along each compass radial.</param>
+        /// <returns>A List of Vector3 points.</returns>
         public static List<Vector3> FindInternalPoints(this Polygon polygon, double interval = 1.0)
         {
             var centroid = polygon.Centroid();
@@ -148,13 +184,12 @@ namespace GeometryEx
         /// <summary>
         /// Tests whether a Polygon is covered by a Polygon perimeter and doesn't intersect with a list of Polygons.
         /// </summary>
-        /// <param name="polygon">The Polygon to test.</param>
-        /// <param name="perimeter">The covering perimeter.</param>
-        /// <param name="among">The list of Polygons to check for intersection.</param>
+        /// <param name="within">Polygon perimeter to test.</param>
+        /// <param name="among">List of Polygons to check for intersection.</param>
         /// <returns>
-        /// True if the Polygon is covered by the perimeter and does not intersect with any Polygon in the supplied list.
+        /// True if the Polygon is covered by the Polygon within and does not intersect with any Polygon in the supplied among list.
         /// </returns>
-        public static bool Fits(this Polygon polygon, Polygon within = null, IList<Polygon> among = null)
+        public static bool Fits(this Polygon polygon, Polygon within = null, List<Polygon> among = null)
         {
             if (within != null && !within.Covers(polygon))
             {
@@ -166,10 +201,9 @@ namespace GeometryEx
         /// <summary>
         /// Creates the largest Polygon fitted to supplied intersecting Polygons.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
         /// <param name="among">List of Polygons against which this Polygon must conform.</param>
         /// <returns>
-        /// A Polygons.
+        /// A new Polygon.
         /// </returns>
         public static Polygon FitAmong(this Polygon polygon, List<Polygon> among)
         {
@@ -177,7 +211,7 @@ namespace GeometryEx
             {
                 return null;
             }
-            var polygons = Shaper.Differences(polygon, among);
+            var polygons = Shaper.Differences(polygon.ToList(), among);
             if (polygons == null || polygons.Count == 0)
             {
                 return null;
@@ -193,10 +227,9 @@ namespace GeometryEx
         /// <summary>
         /// Creates the largest Polygon fitted within a supplied intersecting perimeter.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
         /// <param name="within">Polygon acting as a constraining outer boundary.</param>
         /// <returns>
-        /// A Polygon.
+        /// A new Polygon.
         /// </returns>
         public static Polygon FitMost(this Polygon polygon, Polygon within)
         {
@@ -220,11 +253,10 @@ namespace GeometryEx
         /// <summary>
         /// Creates the largest Polygon fitted within a supplied perimeter and conforming to supplied intersecting Polygons.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
         /// <param name="within">Polygon acting as a constraining outer boundary.</param>
         /// <param name="among">List of Polygons against which this Polygon must conform.</param>
         /// <returns>
-        /// A list of Polygons.
+        /// A List of Polygons.
         /// </returns>
         public static Polygon FitTo(this Polygon polygon, Polygon within, List<Polygon> among)
         {
@@ -239,12 +271,11 @@ namespace GeometryEx
         /// <summary>
         /// Tests if any of the supplied Polygons share one or more areas with this Polygon when compared on a shared plane.
         /// </summary>
-        /// <param name="polygons">The Polygon to compare with this Polygon.</param>
+        /// <param name="polygons">List of Polygons to compare with this Polygon.</param>
         /// <returns>
         /// Returns true if any of the supplied Polygons share one or more areas with this Polygon when compared on a shared plane or if the list of supplied Polygons is null. Returns false if the none of the supplied Polygons share an area with this Polygon or if the supplied list of Polygons is null.
         /// </returns>
-        /// TODO: Move to ELEMENTS
-        public static bool Intersects(this Polygon polygon, IList<Polygon> polygons)
+        public static bool Intersects(this Polygon polygon, List<Polygon> polygons)
         {
             if (polygons == null)
             {
@@ -261,9 +292,33 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a List of Polygons derived from the Polygon's straight skeleton.
+        /// </summary>
+        /// <returns>A List of Polygons.</Line></returns>
+        public static List<Polygon> Jigsaw(this Polygon polygon)
+        {
+            var vertices2d = new List<Vector2d>();
+            foreach (var vertex in polygon.Vertices)
+            {
+                vertices2d.Add(new Vector2d(vertex.X, vertex.Y));
+            }
+            var skeleton = SkeletonBuilder.Build(vertices2d);
+            var polygons = new List<Polygon>();
+            foreach (var edgeResult in skeleton.Edges)
+            {
+                var vertices = new List<Vector3>();
+                foreach (var vertex in edgeResult.Polygon)
+                {
+                    vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
+                }
+                polygons.Add(new Polygon(vertices));
+            }
+            return polygons.OrderBy(p => p.Centroid()).ToList();
+        }
+
+        /// <summary>
         /// Returns a new Polygon displaced along a 2D vector calculated between the supplied Vector3 points.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
         /// <param name="from">Vector3 base point of the move.</param>
         /// <param name="to">Vector3 target point of the move.</param>
         /// <returns>
@@ -272,13 +327,12 @@ namespace GeometryEx
         public static Polygon MoveFromTo(this Polygon polygon, Vector3 from, Vector3 to)
         {
             var t = new Transform(new Vector3(to.X - from.X, to.Y - from.Y, to.Z - from.Z));
-            return t.OfPolygon(polygon);
+            return polygon.TransformedPolygon(t);
         }
 
         /// <summary>
         /// Returns a new Polygon placed in a spatial relationship with a supplied polygon by using supplied Orient points derived from Polygon.Compass bounding box points on each Polygon.
         /// </summary>
-        /// <param name="polygon">This Polygon.</param>
         /// <param name="adjTo">Reference Polygon in relation to which to place This Polygon.</param>
         /// <param name="from">Orient value indicating the point on This Polygon to use a MoveFromTo 'from' value.</param>
         /// <param name="to">Orient value indicating the point on the reference Polygon as a MoveFromTo 'to' value.</param>
@@ -291,33 +345,10 @@ namespace GeometryEx
         }
         
         /// <summary>
-        /// Returns a new Polygon rotated around a supplied Vector3 by the specified angle in degrees.
-        /// </summary>
-        /// <param name="pivot">The Vector3 base point of the rotation.</param>
-        /// <param name="angle">The desired rotation angle in degrees.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon Rotate(this Polygon polygon, Vector3 pivot, double angle)
-        {
-            var theta = angle * (Math.PI / 180);
-            var vertices = new List<Vector3>();
-            foreach(Vector3 vertex in polygon.Vertices)
-            {
-                var rX = (Math.Cos(theta) * (vertex.X - pivot.X)) - (Math.Sin(theta) * (vertex.Y - pivot.Y)) + pivot.X;
-                var rY = (Math.Sin(theta) * (vertex.X - pivot.X)) + (Math.Cos(theta) * (vertex.Y - pivot.Y)) + pivot.Y;
-                var rZ = vertex.Z;
-                vertices.Add(new Vector3(rX, rY, rZ));
-            }
-            return new Polygon(vertices.ToArray());
-        }
-
-        /// <summary>
         /// Creates a new CCW Polygon of the same vertices with the start point now at the specified Polygon vertex.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="startFrom">The point from which to start the new Polygon.</param>
-        /// <returns>A Polygon.</returns>
+        /// <param name="startFrom">The Vector3 point from which to start the new Polygon.</param>
+        /// <returns>A new Polygon.</returns>
         public static Polygon RewindFrom(this Polygon polygon, Vector3 startFrom)
         {
             var vertices = polygon.Vertices;
@@ -346,9 +377,8 @@ namespace GeometryEx
         /// <summary>
         /// Creates a new CCW Polygon of the same vertices with the start point now at the indexed Polygon vertex.
         /// </summary>
-        /// <param name="polygon"></param>
         /// <param name="start">The index of the point from which to start the new Polygon.</param>
-        /// <returns>A Polygon.</returns>
+        /// <returns>A new Polygon.</returns>
         public static Polygon RewindFrom(this Polygon polygon, int start)
         {
             var vertices = polygon.Vertices;
@@ -370,52 +400,9 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Reduces Polygon vertices.
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        public static Polygon Simplify(this Polygon polygon, double tolerance)
-        {
-            var points = Shaper.Simplify(polygon.Vertices.ToList(), tolerance);
-            if (points.Count < 3)
-            {
-                return polygon;
-            }
-            return new Polygon(points);
-        }
-
-        /// <summary>
-        /// Returns a List of Polygons derived from the Polygon's straight skeleton.
-        /// </summary>
-        /// <param name="polygon">This Polygon</param>
-        /// <returns>List(Polygon)</Line></returns>
-        public static List<Polygon> Jigsaw(this Polygon polygon)
-        {
-            var vertices2d = new List<Vector2d>();
-            foreach (var vertex in polygon.Vertices)
-            {
-                vertices2d.Add(new Vector2d(vertex.X, vertex.Y));
-            }
-            var skeleton = SkeletonBuilder.Build(vertices2d);
-            var polygons = new List<Polygon>();
-            foreach (var edgeResult in skeleton.Edges)
-            {
-                var vertices = new List<Vector3>();
-                foreach (var vertex in edgeResult.Polygon)
-                {
-                    vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
-                }
-                polygons.Add(new Polygon(vertices));
-            }
-            return polygons.OrderBy(p => p.Centroid()).ToList();
-        }
-
-        /// <summary>
         /// Returns a List of Lines forming the Polygon skeleton's connections between Polygon's spine and vertices.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns>A List of Lines</Line></returns>
+        /// <returns>A List of Lines.</Line></returns>
         public static List<Line> Ribs(this Polygon polygon)
         {
             var skeleton = polygon.Skeleton();
@@ -431,10 +418,46 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a new Polygon rotated around a supplied Vector3 by the specified angle in degrees.
+        /// </summary>
+        /// <param name="pivot">The Vector3 base point of the rotation.</param>
+        /// <param name="angle">The desired rotation angle in degrees.</param>
+        /// <returns>
+        /// A new Polygon.
+        /// </returns>
+        public static Polygon Rotate(this Polygon polygon, Vector3 pivot, double angle)
+        {
+            var theta = angle * (Math.PI / 180);
+            var vertices = new List<Vector3>();
+            foreach (Vector3 vertex in polygon.Vertices)
+            {
+                var rX = (Math.Cos(theta) * (vertex.X - pivot.X)) - (Math.Sin(theta) * (vertex.Y - pivot.Y)) + pivot.X;
+                var rY = (Math.Sin(theta) * (vertex.X - pivot.X)) + (Math.Cos(theta) * (vertex.Y - pivot.Y)) + pivot.Y;
+                var rZ = vertex.Z;
+                vertices.Add(new Vector3(rX, rY, rZ));
+            }
+            return new Polygon(vertices.ToArray());
+        }
+
+        /// <summary>
+        /// Reduces Polygon vertices.
+        /// </summary>
+        /// <param name="tolerance">Tolerated deviation to retain a vertex.</param>
+        /// <returns>A new Polygon.</returns>
+        public static Polygon Simplify(this Polygon polygon, double tolerance)
+        {
+            var points = Shaper.Simplify(polygon.Vertices.ToList(), tolerance);
+            if (points.Count < 3)
+            {
+                return polygon;
+            }
+            return new Polygon(points);
+        }
+
+        /// <summary>
         /// Returns a List of Lines forming the Polygon's skeleton sorted by the ascending midpoint of each Line.
         /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns>A List of Lines</Line></returns>
+        /// <returns>A List of Lines.</Line></returns>
         public static List<Line> Skeleton(this Polygon polygon)
         {
             var vertices2d = new List<Vector2d>();
@@ -460,11 +483,9 @@ namespace GeometryEx
             return lines.OrderBy(l => l.Midpoint()).ToList();
         }
 
-
         /// <summary>
         /// Returns a List of Lines forming the Polygon's centerline sorted by the ascending midpoint of each Line.
         /// </summary>
-        /// <param name="polygon"></param>
         /// <returns>A List of Lines</Line></returns>
         public static List<Line> Spine(this Polygon polygon)
         {
@@ -479,5 +500,18 @@ namespace GeometryEx
             }
             return lines.OrderBy(l => l.Midpoint()).ToList();
         }
+
+        /// <summary>
+        /// Inserts this Polygon into a new List.
+        /// </summary>
+        /// <returns>A List containing this Polygon.</returns>
+        public static List<Polygon> ToList(this Polygon polygon)
+        {
+            return new List<Polygon>
+            {
+                polygon
+            };
+        }
+
     }
 }

@@ -168,7 +168,7 @@ namespace GeometryEx
         /// <returns>
         /// None.
         /// </returns>
-        public void Allocate(IList<Polygon> polygons)
+        public void Allocate(List<Polygon> polygons)
         {
             if (polygons.Count == 0)
             {
@@ -244,7 +244,6 @@ namespace GeometryEx
         /// <returns>
         /// A Vector3 point.
         /// </returns>
-
         public Vector3 AvailableMax()
         {
             if (Available.Count == 0)

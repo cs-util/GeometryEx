@@ -15,9 +15,9 @@ namespace GeometryEx
         /// </summary>
         /// <param name="points">List of Vector3 points to compare.</param>
         /// <returns>
-        /// A Vector3.
+        /// A Vector3 point.
         /// </returns>
-        public static Vector3 FarthestFrom (this Vector3 point, IList<Vector3> points)
+        public static Vector3 FarthestFrom (this Vector3 point, List<Vector3> points)
         {
             if (points.Count == 0)
             {
@@ -29,9 +29,10 @@ namespace GeometryEx
         /// <summary>
         /// Return true if an NearEqual Vector3 appears in the supplied list.
         /// </summary>
-        /// <param name="point">Vector3 to compare.</param>
         /// <param name="points">List of Vector3 to compare to point.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// True if this Vectors 3 appears in the supplied List of Vector3 points.
+        /// </returns>
         public static bool IsListed(this Vector3 point, List<Vector3> points)
         {
             foreach (var entry in points)
@@ -47,11 +48,10 @@ namespace GeometryEx
         /// <summary>
         /// Returns the Vector3 point moved to a new relative location.
         /// </summary>
-        /// <param name="vector">This Vector3.</param>
         /// <param name="from">Vector3 base point of the move.</param>
         /// <param name="to">Vector3 target point of the move.</param>
         /// <returns>
-        /// A Vector3.
+        /// A new Vector3 points.
         /// </returns>
         public static Vector3 MoveFromTo(this Vector3 vector, Vector3 from, Vector3 to)
         {
@@ -65,7 +65,7 @@ namespace GeometryEx
         /// </summary>
         /// <param name="points">List of Vector3 points to compare.</param>
         /// <returns>
-        /// A Vector3.
+        /// A Vector3 point.
         /// </returns>
         public static Vector3 NearestTo(this Vector3 point, IList<Vector3> points)
         {
@@ -79,7 +79,6 @@ namespace GeometryEx
         /// <summary>
         /// Returns a new Vector3 rotated around a supplied Vector3 by the specified angle in degrees.
         /// </summary>
-        /// <param name="point">The Vector3 instance to be rotated.</param>
         /// <param name="pivot">The Vector3 base point of the rotation.</param>
         /// <param name="angle">The desired rotation angle in degrees.</param>
         /// <returns>

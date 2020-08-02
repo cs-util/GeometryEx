@@ -10,27 +10,6 @@ namespace GeometryExTests
     public class LineExTests
     {
         [Fact]
-        public void Difference()
-        {
-            var line = new Line(new Vector3(-5.0, 5.0), new Vector3(16.0, 5.0));
-            var polygons = new List<Polygon>
-            {
-                new Polygon
-                (
-                    new[]
-                    {
-                        new Vector3(0.0, 0.0),
-                        new Vector3(10.0, 0.0),
-                        new Vector3(10.0, 10.0),
-                        new Vector3(0.0, 10.0)
-                    }
-                )
-            };
-            line = line.Difference(polygons);
-            Assert.Equal(6.0, line.Length());
-        }
-
-        [Fact]
         public void Differences()
         {
             var line = new Line(new Vector3(-5.0, 5.0), new Vector3(15.0, 5.0));
@@ -220,6 +199,13 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Midpoint()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
+            Assert.True(new Vector3(3.0, 0.0).IsAlmostEqualTo(line.Midpoint()));
+        }
+
+        [Fact]
         public void MoveFromTo()
         {
             var line = new Line(Vector3.Origin, new Vector3(0.0, 150));
@@ -239,6 +225,23 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void PointOnLine()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
+            Assert.True(line.PointOnLine(new Vector3(3.0, 0.0)));
+            Assert.False(line.PointOnLine(new Vector3(3.0, 1.0)));
+        }
+
+        [Fact]
+        public void PositionAt()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
+            var position = line.PositionAt(3.0);
+            Assert.Equal(3.0, position.X);
+            Assert.Equal(0.0, position.Y);
+        }
+
+        [Fact]
         public void Rotate()
         {
             var line = new Line(Vector3.Origin, new Vector3(5.0, 0.0));
@@ -253,6 +256,21 @@ namespace GeometryExTests
             var line = new Line(Vector3.Origin, new Vector3(20.0, 0.0));
             var segments = line.Segment(9.0, 4.0);
             Assert.Equal(2, segments.Count);
+        }
+
+        [Fact]
+        public void SegmentFrom()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(20.0, 0.0));
+            var segments = line.SegmentFrom(9.0, DivideFrom.Start);
+            Assert.Equal(3, segments.Count);
+        }
+
+        [Fact]
+        public void Slope()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(20.0, 20.0));
+            Assert.Equal(1.0, line.Slope());
         }
     }
 }
