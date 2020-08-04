@@ -107,7 +107,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs the geometric differences between a Polygon and the supplied list of Polygons.
+        /// Constructs the geometric differences between two supplied Lists of Polygons.
         /// </summary>
         /// <param name="polygons">List of subject Polygons for the difference calculation.</param>
         /// <param name="diffs">List of clipping Polygons for the difference calculation.</param>
@@ -233,6 +233,59 @@ namespace GeometryEx
                 }
             }
             return quadPolygons;
+        }
+
+        /// <summary>
+        /// Constructs the geometric intersections between two supplied Lists of Polygons.
+        /// </summary>
+        /// <param name="polygons">List of subject Polygons for the difference calculation.</param>
+        /// <param name="inters">List of clipping Polygons for the difference calculation.</param>
+        /// <returns>
+        /// A List of Polygons representing the subtraction of the clipping Polygons from the subject Polygons.
+        /// </returns>
+        public static List<Polygon> Intersections(List<Polygon> polygons, List<Polygon> inters, double tolerance = 0.01)
+        {
+            inters = Merge(inters);
+            var differs = new List<Polygon>();
+            var clipper = new Clipper();
+            foreach (var polygon in polygons)
+            {
+                clipper.AddPath(polygon.PolygonToClipper(), PolyType.ptSubject, true);
+            }
+            foreach (var differ in inters)
+            {
+                clipper.AddPath(differ.PolygonToClipper(), PolyType.ptClip, true);
+            }
+            var solution = new List<List<IntPoint>>();
+            clipper.Execute(ClipType.ctIntersection, solution, PolyFillType.pftNonZero);
+            if (solution.Count == 0)
+            {
+                return differs;
+            }
+            foreach (var path in solution)
+            {
+                var diff = PolygonFromClipper(path);
+                if (diff == null)
+                {
+                    continue;
+                }
+                if (diff.IsClockWise())
+                {
+                    diff = diff.Reversed();
+                }
+                differs.Add(diff);
+            }
+            var polys = Merge(differs).OrderByDescending(p => Math.Abs(p.Area())).ToList();
+            differs.Clear();
+            foreach (var poly in polys)
+            {
+                if (poly.Area() < tolerance)
+                {
+                    break;
+                }
+                differs.Add(poly);
+            }
+            return differs;
         }
 
         /// <summary>
