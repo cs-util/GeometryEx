@@ -258,31 +258,19 @@ namespace GeometryEx
             }
             var solution = new List<List<IntPoint>>();
             clipper.Execute(ClipType.ctIntersection, solution, PolyFillType.pftNonZero);
-            if (solution.Count == 0)
-            {
-                return differs;
-            }
+            if (solution.Count == 0) return differs;
             foreach (var path in solution)
             {
                 var diff = PolygonFromClipper(path);
-                if (diff == null)
-                {
-                    continue;
-                }
-                if (diff.IsClockWise())
-                {
-                    diff = diff.Reversed();
-                }
+                if (diff == null) continue;
+                if (diff.IsClockWise()) diff = diff.Reversed();
                 differs.Add(diff);
             }
             var polys = Merge(differs).OrderByDescending(p => Math.Abs(p.Area())).ToList();
             differs.Clear();
             foreach (var poly in polys)
             {
-                if (poly.Area() < tolerance)
-                {
-                    break;
-                }
+                if (poly.Area() < tolerance) break;
                 differs.Add(poly);
             }
             return differs;
