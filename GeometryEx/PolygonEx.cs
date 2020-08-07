@@ -452,6 +452,22 @@ namespace GeometryEx
             }
             tolerance = Math.Abs(tolerance);
             var segs = polygon.Segments();
+            var longSegs = 0;
+            foreach (var line in segs)
+            {
+                if (line.Length() >= tolerance)
+                {
+                    longSegs++;
+                }
+                if (longSegs == 3)
+                {
+                    break;
+                }
+            }
+            if (longSegs < 3)
+            {
+                return polygon;
+            }
             var vLines = new List<GxLine>();
             foreach (var line in segs)
             {
