@@ -308,12 +308,14 @@ namespace GeometryEx
         /// A List of Polygons.
         /// </returns>
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
-        public static List<Polygon> Merge(List<Polygon> polygons, FillType fillType = FillType.NonZero)
+        public static List<Polygon> Merge(List<Polygon> polygons,                                           
+                                          FillType fillType = FillType.NonZero, 
+                                          double tolerance = 0.0)
         {
-            var mergePolygons = new List<Polygon>();
+            var resultPolygons = new List<Polygon>();
             if (polygons == null || polygons.Count == 0)
             {
-                return mergePolygons;
+                return resultPolygons;
             }
             var filtyp = (PolyFillType)fillType;
             var polyPaths = new List<List<IntPoint>>();
@@ -328,7 +330,7 @@ namespace GeometryEx
             clipper.Execute(ClipType.ctUnion, solution, filtyp);
             if (solution.Count == 0)
             {
-                return mergePolygons;
+                return resultPolygons;
             }
             foreach (var solved in solution)
             {
@@ -341,7 +343,17 @@ namespace GeometryEx
                 {
                     polygon = polygon.Reversed();
                 }
-                mergePolygons.Add(polygon);
+                resultPolygons.Add(polygon);
+            }
+            tolerance = Math.Abs(tolerance);
+            if (tolerance.NearEqual(0.0))
+            {
+                return resultPolygons;
+            }
+            var mergePolygons = new List<Polygon>();
+            foreach(var polygon in resultPolygons)
+            {
+                mergePolygons.Add(polygon.Simplify(tolerance));
             }
             return mergePolygons;
         }
@@ -481,9 +493,11 @@ namespace GeometryEx
         /// </returns>
         public static Polygon RectangleByArea(double area = 1.0, double ratio = 1.0)
         {
-            if (area <= 0.0 || ratio <= 0.0)
+            area = Math.Abs(area);
+            ratio = Math.Abs(ratio);
+            if (area.NearEqual(0.0) || ratio.NearEqual(0.0))
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var x = Math.Sqrt(area * ratio);
             var y = area / Math.Sqrt(area * ratio);
@@ -499,75 +513,29 @@ namespace GeometryEx
         /// </returns>
         public static Polygon RectangleByRatio(double ratio = 1.0)
         {
-            if (ratio <= 0.0)
+            ratio = Math.Abs(ratio);
+            if (ratio.NearEqual(0.0))
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             return Polygon.Rectangle(Vector3.Origin, new Vector3(1.0, ratio));
-        }
-
-        /// <summary>
-        /// Reduces points with the Douglas Peucker algorithm.
-        /// </summary>
-        /// <param name="points">The points.</param>
-        /// <param name="firstPoint">The first point.</param>
-        /// <param name="lastPoint">The last point.</param>
-        /// <param name="keepers">The point indices to keep.</param>
-        /// <param name="tolerance">Deviation tolerance.</param>
-        private static void ReducePoints(List<Vector3> points, 
-                                         int firstPoint, 
-                                         int lastPoint, 
-                                         ref List<int> keepers, 
-                                         double tolerance)
-        {
-            double maxDist = 0.0;
-            int iFarthest = 0;
-
-            for (var i = firstPoint; i < lastPoint; i++)
-            {
-                var dist = new Line(points[firstPoint], points[lastPoint]).PerpendicularDistanceTo(points[i]);
-                if (dist > maxDist)
-                {
-                    maxDist = dist;
-                    iFarthest = i;
-                }
-            }
-            if (maxDist > tolerance && iFarthest != 0)
-            {
-                keepers.Add(iFarthest);
-                ReducePoints(points, firstPoint, iFarthest, ref keepers, tolerance);
-            }
         }
 
         /// <summary>
         /// Reduces a quantity of points tested against a deviation tolerance.
         /// </summary>
         /// <param name="points">A List of Points to test.</param>
-        /// <param name="tolerance">The devisation tolerance for inclusion in the final Vector3 List.</param>
+        /// <param name="tolerance">The deviation tolerance for inclusion in the final Vector3 List.</param>
         /// <returns>
         /// A List of Vector3 points.
         /// </returns>
         public static List<Vector3> Simplify(List<Vector3> points, double tolerance)
         {
-            if (points == null || points.Count < 3)
+            if (points.Count == 3)
             {
                 return points;
             }
-            //Add the first and last index to the keepers
-            List<int> keepers =
-                new List<int>()
-                {
-                    0,
-                    points.Count - 1
-                };
-            ReducePoints(points, keepers.First(), keepers.Last(), ref keepers, tolerance);
-            var fewerPoints = new List<Vector3>();
-            keepers.Sort();
-            foreach (var i in keepers)
-            {
-                fewerPoints.Add(points[i]);
-            }
-            return fewerPoints;
+            return SimplifyNet.Simplify(points, tolerance);
         }
 
         /// <summary>
@@ -583,7 +551,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 3 >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             return
                 new Polygon
@@ -615,7 +583,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 3 >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
@@ -653,7 +621,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 2 >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
@@ -689,7 +657,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width * 2 >= size.X || width >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var halfWidth = width * 0.5;
             var xAxis = size.Y * 0.5;
@@ -728,7 +696,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width >= size.X || width >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             return
                 new Polygon
@@ -758,7 +726,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width >= size.X || width >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var halfWidth = width * 0.5;
             var yAxis = origin.X + (size.X * 0.5);
@@ -792,7 +760,7 @@ namespace GeometryEx
         {
             if (size.X <= 0 || size.Y <= 0 || width * 2 >= size.X || width >= size.Y)
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             return
                 new Polygon
@@ -824,7 +792,7 @@ namespace GeometryEx
         {
             if (width >= Math.Abs(size.X - origin.X) || width >= Math.Abs(size.Y - origin.Y))
             {
-                throw new ArgumentOutOfRangeException(Messages.POLYGON_SHAPE_EXCEPTION);
+                return null;
             }
             var halfWidth = width * 0.5;
             var xAxis = origin.Y + (size.Y * 0.5);

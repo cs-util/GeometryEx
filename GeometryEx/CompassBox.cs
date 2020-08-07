@@ -147,7 +147,7 @@ namespace GeometryEx
         {
             if (polygon == null)
             {
-                throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
+                return;
             }
             var vertices = new List<Vector3>(polygon.Vertices);
             vertices.Sort((a, b) => a.X.CompareTo(b.X));

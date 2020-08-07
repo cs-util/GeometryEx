@@ -345,14 +345,12 @@ namespace GeometryEx
         /// <returns></returns>
         public static double PerpendicularDistanceTo(this Line line, Vector3 point)
         {
-            var area = Math.Abs(
-                0.5 * 
-                (line.Start.X * line.End.Y + line.End.X *
-                 point.Y + point.X * line.Start.Y - line.End.X * 
-                 line.Start.Y - point.X * line.End.Y - line.Start.X * point.Y));
-            double bottom = Math.Sqrt(Math.Pow(line.Start.X - line.End.X, 2) +
-            Math.Pow(line.Start.Y - line.End.Y, 2));
-            return area / bottom * 2.0;
+            if (PointOnLine(line, point))
+            {
+                return 0.0;
+            }
+            var area = Math.Abs(new Polygon(new[] { line.Start, line.End, point }).Area());
+            return area / (line.Length() * 0.5);
         }
 
         /// <summary>
@@ -362,8 +360,12 @@ namespace GeometryEx
         /// <returns>
         /// True if the supplied Vector3 is coincident with this Line.
         /// </returns>
-        public static bool PointOnLine(this Line line, Vector3 point)
+        public static bool PointOnLine(Line line, Vector3 point)
         {
+            if (line.Start.IsAlmostEqualTo(point) || line.End.IsAlmostEqualTo(point))
+            {
+                return true;
+            }
             var deltaXp = point.X - line.Start.X;
             var deltaYp = point.Y - line.Start.Y;
             var deltaXl = line.End.X - line.Start.X;
@@ -374,6 +376,16 @@ namespace GeometryEx
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Returns a Vector3 List of this Line's Start and End points.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>A List of Vector3s.</returns>
+        public static List<Vector3> Points(this Line line)
+        {
+            return new List<Vector3> { line.Start, line.End };
         }
 
         /// <summary>
@@ -512,6 +524,16 @@ namespace GeometryEx
                 slope = double.PositiveInfinity;
             }
             return slope;
+        }
+
+        /// <summary>
+        /// Returns this Line as a Polyline.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>A new Polyline</returns>
+        public static Polyline ToPolyline(this Line line)
+        {
+            return new Polyline(line.Points());
         }
 
         /// <summary>

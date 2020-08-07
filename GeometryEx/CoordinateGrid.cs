@@ -55,7 +55,7 @@ namespace GeometryEx
         {
             if (polygon == null)
             {
-                throw new ArgumentNullException(Messages.POLYGON_NULL_EXCEPTION);
+                return;
             }
             random = new Random();
             Allocated = new List<Vector3>();

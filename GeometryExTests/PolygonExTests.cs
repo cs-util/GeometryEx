@@ -542,8 +542,8 @@ namespace GeometryExTests
                 new Vector3(10.0, 20.0),
                 new Vector3(5.0, 10.0),
             };
-            var polygon = new Polygon(points).Simplify(0.5);
-            Assert.Equal(3, polygon.Vertices.Count);
+            var polygon = new Polygon(points).Simplify(3.0);
+            Assert.Equal(5, polygon.Vertices.Count);
         }
 
         [Fact]

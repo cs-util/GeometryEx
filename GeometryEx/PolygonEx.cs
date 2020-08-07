@@ -446,7 +446,7 @@ namespace GeometryEx
         /// <returns>A new Polygon.</returns>
         public static Polygon Simplify(this Polygon polygon, double tolerance)
         {
-            var points = Shaper.Simplify(polygon.Vertices.ToList(), tolerance);
+            var points = SimplifyNet.Simplify(polygon.Vertices.ToList(), tolerance);
             if (points.Count < 3)
             {
                 return polygon;

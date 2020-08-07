@@ -645,15 +645,15 @@ namespace GeometryExTests
             var points = new List<Vector3>()
             {
                 Vector3.Origin,
-                new Vector3(5.0, 0.0),
-                new Vector3(7.0, 7.0),
-                new Vector3(10.0, 15.0),
-                new Vector3(15.0, 20.0),
-                new Vector3(10.0, 20.0),
-                new Vector3(5.0, 10.0),
+                new Vector3(5.0, 1.0),
+                new Vector3(7.0, 0.0),
+                new Vector3(10.0, 2.0),
+                new Vector3(15.0, 0.0),
+                new Vector3(20.0, 2.0),
+                new Vector3(25.0, 0.0),
             };
-            points = Shaper.Simplify(points, 0.5);
-            Assert.Equal(3, points.Count);
+            points = Shaper.Simplify(points, 1.1);
+            Assert.Equal(6, points.Count);
         }
     }
 }
