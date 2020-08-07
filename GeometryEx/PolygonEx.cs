@@ -80,7 +80,7 @@ namespace GeometryEx
             }
             return mrgPolygons;
         }
-
+        
         /// <summary>
         /// Returns a CompassBox representation of the Polygon's bounding box.
         /// </summary>
@@ -440,18 +440,60 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Reduces Polygon vertices.
+        /// Returns a new Polygon with all segments shorter than tolerance removed and newly adjacent segments joined at their implied intersection.
         /// </summary>
-        /// <param name="tolerance">Tolerated deviation to retain a vertex.</param>
-        /// <returns>A new Polygon.</returns>
+        /// <param name="tolerance">Tolerable segment length.</param>
+        /// <returns></returns>
         public static Polygon Simplify(this Polygon polygon, double tolerance)
         {
-            var points = SimplifyNet.Simplify(polygon.Vertices.ToList(), tolerance);
-            if (points.Count < 3)
+            if (polygon.Vertices.Count == 3)
             {
                 return polygon;
             }
-            return new Polygon(points);
+            tolerance = Math.Abs(tolerance);
+            var segs = polygon.Segments();
+            var vLines = new List<GxLine>();
+            foreach (var line in segs)
+            {
+                vLines.Add(new GxLine(line));
+            }
+            for (var i = 0; i < vLines.Count; i++)
+            {
+                if (vLines[i].Length < tolerance)
+                {
+                    Line thisLine;
+                    if (i == 0)
+                    {
+                        thisLine = vLines.Last().ToLine();
+                    }
+                    else
+                    {
+                        thisLine = vLines[(i - 1) % vLines.Count].ToLine();
+                    }
+                    var thatLine = vLines[(i + 1) % vLines.Count].ToLine();
+                    var inters = thisLine.Intersection(thatLine);
+                    GxLine thisVLine;
+                    if (i == 0)
+                    {
+                        thisVLine = vLines.Last();
+                    }
+                    else
+                    {
+                        thisVLine = vLines[(i - 1) % vLines.Count];
+                    }
+                    thisVLine.End = inters;
+                    vLines[(i + 1) % vLines.Count].Start = inters;
+                }
+            }
+            var vertices = new List<Vector3>();
+            foreach (var line in vLines)
+            {
+                if (line.Length >= tolerance)
+                {
+                    vertices.Add(line.Start);
+                }
+            }
+            return new Polygon(vertices);
         }
 
         /// <summary>

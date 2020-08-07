@@ -532,18 +532,19 @@ namespace GeometryExTests
         [Fact]
         public void Simplify()
         {
-            var points = new List<Vector3>()
-            {
-                Vector3.Origin,
-                new Vector3(5.0, 0.0),
-                new Vector3(7.0, 7.0),
-                new Vector3(10.0, 15.0),
-                new Vector3(15.0, 20.0),
-                new Vector3(10.0, 20.0),
-                new Vector3(5.0, 10.0),
-            };
-            var polygon = new Polygon(points).Simplify(3.0);
-            Assert.Equal(5, polygon.Vertices.Count);
+            var polygon = new Polygon
+            (
+                new[]
+                {
+                    Vector3.Origin,
+                    new Vector3(4.0, 0.0),
+                    new Vector3(4.0, 4.0),
+                    new Vector3(3.0, 5.0),
+                    new Vector3(0.0, 4.0),
+                }
+            );
+            polygon = polygon.Simplify(2.0);
+            Assert.Equal(4, polygon.Vertices.Count);
         }
 
         [Fact]
