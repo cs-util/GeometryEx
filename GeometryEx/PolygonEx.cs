@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elements.Geometry;
-using StraightSkeletonNet;
-using StraightSkeletonNet.Primitives;
+using SkeletonNet;
+using SkeletonNet.Primitives;
 
 namespace GeometryEx
 {
@@ -487,18 +487,21 @@ namespace GeometryEx
                         thisLine = vLines[(i - 1) % vLines.Count].ToLine();
                     }
                     var thatLine = vLines[(i + 1) % vLines.Count].ToLine();
-                    var inters = thisLine.Intersection(thatLine);
-                    GxLine thisVLine;
-                    if (i == 0)
+                    if (!thisLine.IsParallelTo(thatLine))
                     {
-                        thisVLine = vLines.Last();
+                        var inters = thisLine.Intersection(thatLine);
+                        GxLine thisVLine;
+                        if (i == 0)
+                        {
+                            thisVLine = vLines.Last();
+                        }
+                        else
+                        {
+                            thisVLine = vLines[(i - 1) % vLines.Count];
+                        }
+                        thisVLine.End = inters;
+                        vLines[(i + 1) % vLines.Count].Start = inters;
                     }
-                    else
-                    {
-                        thisVLine = vLines[(i - 1) % vLines.Count];
-                    }
-                    thisVLine.End = inters;
-                    vLines[(i + 1) % vLines.Count].Start = inters;
                 }
             }
             var vertices = new List<Vector3>();

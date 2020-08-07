@@ -164,7 +164,23 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(shape, 4.0, matl));
             }
-            model.ToGlTF("../../../../testOutput/Shaper.Differences.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/Shaper.Differences.glb");
+        }
+
+        [Fact]
+        public void CornerLines()
+        {
+            var thisLine = new Line(Vector3.Origin, new Vector3(4.0, 4.0));
+            var thatLine = new Line(new Vector3(6.0, 0.0), new Vector3(6.0, 1.0));
+            var lines = Shaper.CornerLines(thisLine, thatLine);
+            Assert.True(lines.First().End.X.NearEqual(6.0));
+            Assert.True(lines.Last().End.Y.NearEqual(6.0));
+
+            thisLine = new Line(new Vector3(4.0, 4.0), Vector3.Origin);
+            thatLine = new Line(new Vector3(6.0, 0.0), new Vector3(6.0, 1.0));
+            lines = Shaper.CornerLines(thisLine, thatLine);
+            Assert.True(lines.First().Start.X.NearEqual(6.0));
+            Assert.True(lines.Last().End.Y.NearEqual(6.0));
         }
 
         [Fact]
@@ -200,7 +216,7 @@ namespace GeometryExTests
                     count++;
                 }
                 Assert.True(count > 196);
-                var fileName = "../../../../testOutput/Shaper.DifferenceTest" + ROTATE.ToString() + ".glb";
+                var fileName = "../../../../GeometryExTests/output/Shaper.DifferenceTest" + ROTATE.ToString() + ".glb";
                 model.ToGlTF(fileName);
             }
         }

@@ -99,8 +99,7 @@ namespace GeometryEx
         {
             var lineSlope = line.Slope();
             var intrSlope = intr.Slope();
-            if (lineSlope.NearEqual(intrSlope) || 
-               (lineSlope == intrSlope))
+            if (lineSlope.NearEqual(intrSlope))
             {
                 return new Vector3(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
             }

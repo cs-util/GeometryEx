@@ -107,6 +107,50 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Creates two Lines intersecting at their implied intersection, or the original Lines if the Lines are parallel
+        /// </summary>
+        /// <param name="thisLine"></param>
+        /// <param name="thatLine"></param>
+        /// <returns></returns>
+        public static List<Line> CornerLines (Line thisLine, Line thatLine)
+        {
+            if (thisLine.IsParallelTo(thatLine))
+            {
+                return 
+                    new List<Line>
+                    {
+                        thisLine,
+                        thatLine
+                    };
+            }
+            var inters = thisLine.Intersection(thatLine);
+            var thisGxLine = new GxLine(thisLine);
+            var thatGxLine = new GxLine(thatLine);
+            if (inters.DistanceTo(thisGxLine.Start) <= inters.DistanceTo(thisGxLine.End))
+            {
+                thisGxLine.Start = inters;
+            }
+            else
+            {
+                thisGxLine.End = inters;
+            }
+            if (inters.DistanceTo(thatGxLine.Start) <= inters.DistanceTo(thatGxLine.End))
+            {
+                thatGxLine.Start = inters;
+            }
+            else
+            {
+                thatGxLine.End = inters;
+            }
+            return
+                new List<Line>
+                {
+                    thisGxLine.ToLine(),
+                    thatGxLine.ToLine()
+                };
+        }
+
+        /// <summary>
         /// Constructs the geometric differences between two supplied Lists of Polygons.
         /// </summary>
         /// <param name="polygons">List of subject Polygons for the difference calculation.</param>

@@ -178,7 +178,7 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../testOutput/expandToArea.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/expandToArea.glb");
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../testOutput/FitAmong.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/FitAmong.glb");
         }
 
         [Fact]
@@ -359,7 +359,7 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../testOutput/FitTo.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/FitTo.glb");
         }
 
         [Fact]
@@ -427,12 +427,11 @@ namespace GeometryExTests
             jigsaw = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
             Assert.Equal(12, jigsaw.Count);
             var model = new Model();
-            var rooms = new List<Space>();
             foreach (var polygon in jigsaw)
             {
                 model.AddElement(new Space(polygon, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "room")));
             }
-            model.ToGlTF("../../../../testOutput/jigsaw.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/jigsaw.glb");
         }
 
         [Fact]
@@ -532,19 +531,46 @@ namespace GeometryExTests
         [Fact]
         public void Simplify()
         {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    Vector3.Origin,
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(3.0, 5.0),
-                    new Vector3(0.0, 4.0),
-                }
-            );
-            polygon = polygon.Simplify(2.0);
-            Assert.Equal(4, polygon.Vertices.Count);
+            var p1 = 
+                new Polygon
+                (
+                    new[]
+                    {
+                        Vector3.Origin,
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 4.0),
+                        new Vector3(3.0, 5.0),
+                        new Vector3(0.0, 4.0),
+                    }
+                );
+            p1 = p1.Simplify(2.0);
+            Assert.Equal(4, p1.Vertices.Count);
+            var p2 = 
+                new Polygon
+                (
+                    new[]
+                    {
+                        Vector3.Origin,
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 4.0),
+                        new Vector3(0.0, 4.0),
+                    }
+                );
+            p2 = p2.Simplify(5.0);
+            Assert.Equal(4, p2.Vertices.Count);
+            var p3 =
+                new Polygon
+                (
+                    new[]
+                    {
+                        Vector3.Origin,
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 1.0),
+                        new Vector3(0.0, 1.0),
+                    }
+                );
+            p3 = p3.Simplify(3.0);
+            Assert.Equal(4, p3.Vertices.Count);
         }
 
         [Fact]
@@ -578,7 +604,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
             }
-            model.ToGlTF("../../../../testOutPut/spine.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/spine.glb");
         }
     }
 }
