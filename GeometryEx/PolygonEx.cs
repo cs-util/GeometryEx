@@ -446,73 +446,36 @@ namespace GeometryEx
         /// <returns></returns>
         public static Polygon Simplify(this Polygon polygon, double tolerance)
         {
-            if (polygon.Vertices.Count == 3)
-            {
-                return polygon;
-            }
             tolerance = Math.Abs(tolerance);
-            var segs = polygon.Segments();
-            var longSegs = 0;
-            foreach (var line in segs)
-            {
-                if (line.Length() >= tolerance)
-                {
-                    longSegs++;
-                }
-                if (longSegs == 3)
-                {
-                    break;
-                }
-            }
-            if (longSegs < 3)
+            var segs = polygon.Segments().Where(s => s.Length() >= tolerance).ToList();
+            if (segs.Count() < 3)
             {
                 return polygon;
             }
-            var vLines = new List<GxLine>();
-            foreach (var line in segs)
-            {
-                vLines.Add(new GxLine(line));
-            }
+            var vLines = segs.Select(s => new GxLine(s)).ToList();
+            var bndLines = new List<GxLine>();
             for (var i = 0; i < vLines.Count; i++)
             {
-                if (vLines[i].Length < tolerance)
+                var thisLine = vLines[i];
+                var thatLine = vLines[(i + 1) % vLines.Count];
+                if (thisLine.End.IsAlmostEqualTo(thatLine.Start))
                 {
-                    Line thisLine;
-                    if (i == 0)
-                    {
-                        thisLine = vLines.Last().ToLine();
-                    }
-                    else
-                    {
-                        thisLine = vLines[(i - 1) % vLines.Count].ToLine();
-                    }
-                    var thatLine = vLines[(i + 1) % vLines.Count].ToLine();
-                    if (!thisLine.IsParallelTo(thatLine))
-                    {
-                        var inters = thisLine.Intersection(thatLine);
-                        GxLine thisVLine;
-                        if (i == 0)
-                        {
-                            thisVLine = vLines.Last();
-                        }
-                        else
-                        {
-                            thisVLine = vLines[(i - 1) % vLines.Count];
-                        }
-                        thisVLine.End = inters;
-                        vLines[(i + 1) % vLines.Count].Start = inters;
-                    }
+                    bndLines.Add(thisLine);
+                    continue;
                 }
-            }
-            var vertices = new List<Vector3>();
-            foreach (var line in vLines)
-            {
-                if (line.Length >= tolerance)
+                if (thisLine.IsParallelTo(thatLine))
                 {
-                    vertices.Add(line.Start);
+                    bndLines.Add(thisLine);
+                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
+                    continue;
                 }
+                var inters = thisLine.Intersection(thatLine);
+                thisLine.End = inters;
+                thatLine.Start = inters;
+                bndLines.Add(thisLine);
             }
-            return new Polygon(vertices);
+            var points = bndLines.Select(l => l.Start).Distinct().ToArray();
+            return new Polygon(points);
         }
 
         /// <summary>

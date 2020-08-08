@@ -70,13 +70,47 @@ namespace GeometryEx
                 e = !value.IsAlmostEqualTo(s) ? value : e;
             }
         }
-
+        
         public double Length
         {
             get
             {
                 return s.DistanceTo(e);
             }
+        }
+
+        /// <summary>
+        /// Finds the implied intersection of this GxLine with a supplied GxLine.
+        /// </summary>
+        /// <param name="intr">GxLine to find intersection with this GxLine.</param>
+        /// <returns>
+        /// A Vector3 point or null if the lines are parallel.
+        /// </returns>
+        public Vector3 Intersection(GxLine line)
+        {
+            return ToLine().Intersection(line.ToLine());
+        }
+
+        /// <summary>
+        /// Returns true if this GxLine is parallel to the supplied GxLine.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <returns>
+        /// True if the Lines have equal slopes.
+        /// </returns>
+        public bool IsParallelTo(GxLine line)
+        {
+            return ToLine().IsParallelTo(line.ToLine());
+        }
+
+        /// <summary>
+        /// Returns the perpendicular distance from this GxLine to the supplied Vector3 point.
+        /// </summary>
+        /// <param name="point">Vector3 representing a point.</param>
+        /// <returns>A double.</returns>
+        public double PerpendicularDistanceTo(Vector3 point)
+        {
+            return ToLine().PerpendicularDistanceTo(point);
         }
     }
 }

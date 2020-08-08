@@ -89,7 +89,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Finds the implied intersection of this line with a supplied line.
+        /// Finds the implied intersection of this Line with a supplied Line.
         /// </summary>
         /// <param name="intr">Line to find intersection with this Line.</param>
         /// <returns>
@@ -214,7 +214,7 @@ namespace GeometryEx
         /// <summary>
         /// Returns true if this Line is parallel to the supplied line.
         /// </summary>
-        /// <param name="thatLine">Line to compare to this line.</param>
+        /// <param name="thatLine">Line to compare to this Line.</param>
         /// <returns>
         /// True if the Lines have equal slopes.
         /// </returns>
@@ -338,10 +338,10 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns the perpendicular distance from this Line to the supplied point.
+        /// Returns the perpendicular distance from this Line to the supplied Vector3 point.
         /// </summary>
         /// <param name="point">Vector3 representing a point.</param>
-        /// <returns></returns>
+        /// <returns>A double.</returns>
         public static double PerpendicularDistanceTo(this Line line, Vector3 point)
         {
             if (PointOnLine(line, point))

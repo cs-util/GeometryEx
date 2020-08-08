@@ -539,38 +539,17 @@ namespace GeometryExTests
                         Vector3.Origin,
                         new Vector3(4.0, 0.0),
                         new Vector3(4.0, 4.0),
+                        new Vector3(2.0, 3.0),
                         new Vector3(3.0, 5.0),
                         new Vector3(0.0, 4.0),
                     }
                 );
-            p1 = p1.Simplify(2.0);
-            Assert.Equal(4, p1.Vertices.Count);
-            var p2 = 
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(4.0, 0.0),
-                        new Vector3(4.0, 4.0),
-                        new Vector3(0.0, 4.0),
-                    }
-                );
+            var p2 = new Polygon(p1.Vertices);
+            var p3 = new Polygon(p1.Vertices);
+            p1 = p1.Simplify(3.0);
             p2 = p2.Simplify(5.0);
-            Assert.Equal(4, p2.Vertices.Count);
-            var p3 =
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(4.0, 0.0),
-                        new Vector3(4.0, 1.0),
-                        new Vector3(0.0, 1.0),
-                    }
-                );
-            p3 = p3.Simplify(3.0);
-            Assert.Equal(4, p3.Vertices.Count);
+            Assert.Equal(4, p1.Vertices.Count);          
+            Assert.Equal(6, p2.Vertices.Count);
         }
 
         [Fact]
