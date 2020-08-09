@@ -469,14 +469,63 @@ namespace GeometryEx
                     bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
                     continue;
                 }
-                var inters = thisLine.Intersection(thatLine);
-                thisLine.End = inters;
-                thatLine.Start = inters;
-                bndLines.Add(thisLine);
+                if (thisLine.End.DistanceTo(thatLine.Start) > tolerance)
+                {
+                    bndLines.Add(thisLine);
+                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
+                    continue;
+                }
+                if (thisLine.End.DistanceTo(thatLine.Start) < tolerance)
+                {
+                    var inters = thisLine.Intersection(thatLine);
+                    thisLine.End = inters;
+                    thatLine.Start = inters;
+                    bndLines.Add(thisLine);
+                    continue;
+                }
             }
             var points = bndLines.Select(l => l.Start).Distinct().ToArray();
             return new Polygon(points);
         }
+
+        ///// <summary>
+        ///// Returns a new Polygon with all segments shorter than tolerance removed and newly adjacent segments joined at their implied intersection.
+        ///// </summary>
+        ///// <param name="tolerance">Tolerable segment length.</param>
+        ///// <returns></returns>
+        //public static Polygon Simplify(this Polygon polygon, double tolerance)
+        //{
+        //    tolerance = Math.Abs(tolerance);
+        //    var segs = polygon.Segments().Where(s => s.Length() >= tolerance).ToList();
+        //    if (segs.Count() < 3)
+        //    {
+        //        return polygon;
+        //    }
+        //    var vLines = segs.Select(s => new GxLine(s)).ToList();
+        //    var bndLines = new List<GxLine>();
+        //    for (var i = 0; i < vLines.Count; i++)
+        //    {
+        //        var thisLine = vLines[i];
+        //        var thatLine = vLines[(i + 1) % vLines.Count];
+        //        if (thisLine.End.IsAlmostEqualTo(thatLine.Start))
+        //        {
+        //            bndLines.Add(thisLine);
+        //            continue;
+        //        }
+        //        if (thisLine.IsParallelTo(thatLine))
+        //        {
+        //            bndLines.Add(thisLine);
+        //            bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
+        //            continue;
+        //        }
+        //        var inters = thisLine.Intersection(thatLine);
+        //        thisLine.End = inters;
+        //        thatLine.Start = inters;
+        //        bndLines.Add(thisLine);
+        //    }
+        //    var points = bndLines.Select(l => l.Start).Distinct().ToArray();
+        //    return new Polygon(points);
+        //}
 
         /// <summary>
         /// Returns a List of Lines forming the Polygon's skeleton sorted by the ascending midpoint of each Line.

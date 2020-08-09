@@ -531,7 +531,7 @@ namespace GeometryExTests
         [Fact]
         public void Simplify()
         {
-            var p1 = 
+            var p1 =
                 new Polygon
                 (
                     new[]
@@ -545,11 +545,33 @@ namespace GeometryExTests
                     }
                 );
             var p2 = new Polygon(p1.Vertices);
-            var p3 = new Polygon(p1.Vertices);
             p1 = p1.Simplify(3.0);
+            Assert.Equal(4, p1.Vertices.Count);
             p2 = p2.Simplify(5.0);
-            Assert.Equal(4, p1.Vertices.Count);          
             Assert.Equal(6, p2.Vertices.Count);
+            var p3 =
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(3.0, 0.0),
+                        new Vector3(6.0, 3.0),
+                        new Vector3(7.0, 2.0),
+                        new Vector3(6.0, 1.0),
+                        new Vector3(7.0, 0.0),
+                        new Vector3(8.0, 1.0),
+                        new Vector3(8.0, 6.0),
+                        new Vector3(6.0, 8.0),
+                        new Vector3(7.0, 9.0),
+                        new Vector3(6.0, 10.0),
+                        new Vector3(1.0, 5.0),
+                        new Vector3(1.0, 4.0),
+                        new Vector3(2.0, 3.0),
+                        new Vector3(1.0, 2.0)
+                    }
+                );
+            var p4 = p3.Simplify(1.5);
+            Assert.Equal(8, p4.Vertices.Count);
         }
 
         [Fact]
