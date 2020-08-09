@@ -354,7 +354,8 @@ namespace GeometryEx
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
         public static List<Polygon> Merge(List<Polygon> polygons,                                           
                                           FillType fillType = FillType.NonZero, 
-                                          double tolerance = 0.0)
+                                          double tolerance = 0.0,
+                                          double minLength = 0.0)
         {
             var resultPolygons = new List<Polygon>();
             if (polygons == null || polygons.Count == 0)
@@ -397,7 +398,7 @@ namespace GeometryEx
             var mergePolygons = new List<Polygon>();
             foreach(var polygon in resultPolygons)
             {
-                mergePolygons.Add(polygon.Simplify(tolerance));
+                mergePolygons.Add(polygon.Simplify(tolerance, minLength));
             }
             return mergePolygons;
         }
