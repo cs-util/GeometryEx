@@ -440,14 +440,27 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a new Polygon with all segments shorter than tolerance removed and newly adjacent segments joined at their implied intersection.
+        /// Simplifies a Polygon with three successive algorirthms.
+        /// If |tolerance| > 0.0, Ramer–Douglas–Peucker is used in conjuction with a radial distance algorithm to remove Polygon vertices.
+        /// If |minLength| > 0.0 Polygon segments shorter than minLength are removed. Remaining segments are rejoined at their implied intersections adjacent endpoints are separated by minLength or less, or by a new segment joining their adjacent endpoints.
         /// </summary>
-        /// <param name="tolerance">Tolerable segment length.</param>
-        /// <returns></returns>
-        public static Polygon Simplify(this Polygon polygon, double tolerance)
+        /// <param name="tolerance">Points deviating beyond the tolerance distance are retained..</param>
+        /// <param name="MinLength">Minimum length for any Polygon segment.</param>
+        /// <returns>A new Polygon</returns>
+        public static Polygon Simplify(this Polygon polygon, double tolerance = 0.0, double minLength = 0.0)
         {
+            var vertices = polygon.Vertices.ToList();
             tolerance = Math.Abs(tolerance);
-            var segs = polygon.Segments().Where(s => s.Length() >= tolerance).ToList();
+            minLength = Math.Abs(minLength);
+            if (!tolerance.NearEqual(0.0))
+            {
+                polygon = new Polygon(Shaper.Simplify(vertices, tolerance));
+            }
+            if (polygon.Vertices.Count() == 3 || minLength.NearEqual(0.0))
+            {
+                return polygon;
+            }
+            var segs = polygon.Segments().Where(s => s.Length() >= minLength).ToList();
             if (segs.Count() < 3)
             {
                 return polygon;
@@ -469,13 +482,13 @@ namespace GeometryEx
                     bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
                     continue;
                 }
-                if (thisLine.End.DistanceTo(thatLine.Start) > tolerance)
+                if (thisLine.End.DistanceTo(thatLine.Start) >= minLength)
                 {
                     bndLines.Add(thisLine);
                     bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
                     continue;
                 }
-                if (thisLine.End.DistanceTo(thatLine.Start) < tolerance)
+                if (thisLine.End.DistanceTo(thatLine.Start) < minLength)
                 {
                     var inters = thisLine.Intersection(thatLine);
                     thisLine.End = inters;
