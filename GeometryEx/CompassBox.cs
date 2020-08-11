@@ -127,7 +127,7 @@ namespace GeometryEx
         {
             get
             {
-                return new Polygon(new List<Vector3>() { SW, SE, NE, NW });
+                return Shaper.MakePolygon(new List<Vector3>() { SW, SE, NE, NW });
             }
         }
 

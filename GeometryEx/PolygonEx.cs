@@ -311,7 +311,7 @@ namespace GeometryEx
                 {
                     vertices.Add(new Vector3(vertex.X, vertex.Y, 0.0));
                 }
-                polygons.Add(new Polygon(vertices));
+                polygons.Add(Shaper.MakePolygon(vertices));
             }
             return polygons.OrderBy(p => p.Centroid()).ToList();
         }
@@ -371,7 +371,7 @@ namespace GeometryEx
                 points.Add(vertices[i]);
                 i++;
             }
-            return new Polygon(points);
+            return Shaper.MakePolygon(points);
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace GeometryEx
                 points.Add(vertices[i % vertices.Count]);
                 i++;
             }
-            return new Polygon(points);
+            return Shaper.MakePolygon(points);
         }
 
         /// <summary>
@@ -436,69 +436,17 @@ namespace GeometryEx
                 var rZ = vertex.Z;
                 vertices.Add(new Vector3(rX, rY, rZ));
             }
-            return new Polygon(vertices.ToArray());
+            return Shaper.MakePolygon(vertices);
         }
 
         /// <summary>
-        /// Simplifies a Polygon with three successive algorirthms.
-        /// If |tolerance| > 0.0, Ramer–Douglas–Peucker is used in conjuction with a radial distance algorithm to remove Polygon vertices.
-        /// If |minLength| > 0.0 Polygon segments shorter than minLength are removed. Remaining segments are rejoined at their implied intersections adjacent endpoints are separated by minLength or less, or by a new segment joining their adjacent endpoints.
+        /// Reduces Polygon vertices.
         /// </summary>
-        /// <param name="tolerance">Points deviating beyond the tolerance distance are retained..</param>
-        /// <param name="MinLength">Minimum length for any Polygon segment.</param>
-        /// <returns>A new Polygon</returns>
-        public static Polygon Simplify(this Polygon polygon, double tolerance = 0.0, double minLength = 0.0)
+        /// <param name="tolerance">The tolerated deviation to include a vertex.</param>
+        /// <returns>A new Polyline.</returns>
+        public static Polygon Simplify(this Polygon polygon, double minLength)
         {
-            var vertices = polygon.Vertices.ToList();
-            tolerance = Math.Abs(tolerance);
-            minLength = Math.Abs(minLength);
-            if (!tolerance.NearEqual(0.0))
-            {
-                polygon = new Polygon(Shaper.Simplify(vertices, tolerance));
-            }
-            if (polygon.Vertices.Count() == 3 || minLength.NearEqual(0.0))
-            {
-                return polygon;
-            }
-            var segs = polygon.Segments().Where(s => s.Length() >= minLength).ToList();
-            if (segs.Count() < 3)
-            {
-                return polygon;
-            }
-            var vLines = segs.Select(s => new GxLine(s)).ToList();
-            var bndLines = new List<GxLine>();
-            for (var i = 0; i < vLines.Count; i++)
-            {
-                var thisLine = vLines[i];
-                var thatLine = vLines[(i + 1) % vLines.Count];
-                if (thisLine.End.IsAlmostEqualTo(thatLine.Start))
-                {
-                    bndLines.Add(thisLine);
-                    continue;
-                }
-                if (thisLine.IsParallelTo(thatLine))
-                {
-                    bndLines.Add(thisLine);
-                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
-                    continue;
-                }
-                if (thisLine.End.DistanceTo(thatLine.Start) >= minLength)
-                {
-                    bndLines.Add(thisLine);
-                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
-                    continue;
-                }
-                if (thisLine.End.DistanceTo(thatLine.Start) < minLength)
-                {
-                    var inters = thisLine.Intersection(thatLine);
-                    thisLine.End = inters;
-                    thatLine.Start = inters;
-                    bndLines.Add(thisLine);
-                    continue;
-                }
-            }
-            var points = bndLines.Select(l => l.Start).Distinct().ToArray();
-            return new Polygon(points);
+            return Shaper.MakePolygon(Shaper.Simplify(polygon.Vertices.ToList(), minLength));
         }
 
         /// <summary>
@@ -546,6 +494,18 @@ namespace GeometryEx
                 }
             }
             return lines.OrderBy(l => l.Midpoint()).ToList();
+        }
+
+        /// <summary>
+        /// Creates a Polygon with a reduced quantity of points tested against a deviation tolerance.
+        /// </summary>
+        /// <param name="tolerance">The deviation tolerance for inclusion in the final Vector3 List.</param>
+        /// <returns>
+        /// A new Polygon.
+        /// </returns>
+        public static Polygon Straighten(this Polygon polygon, double tolerance)
+        {
+            return Shaper.MakePolygon(SimplifyNet.Straighten(polygon.Vertices.ToList(), tolerance));
         }
 
         /// <summary>

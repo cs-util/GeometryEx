@@ -669,12 +669,12 @@ namespace GeometryExTests
                 new Vector3(20.0, 2.0),
                 new Vector3(25.0, 0.0),
             };
-            points = Shaper.Simplify(points, 1.1);
+            points = Shaper.Simplify(points, 5.0);
             Assert.Equal(6, points.Count);
         }
 
         [Fact]
-        public void SortByClock()
+        public void SortRadial()
         {
             var points =
                 new List<Vector3>
@@ -694,7 +694,7 @@ namespace GeometryExTests
                     new Vector3(6.0, 4.0),
                     new Vector3(6.0, 0.0),
                 };
-            var sorted = Shaper.SortByClock(points);
+            var sorted = Shaper.SortRadial(points);
             Assert.Equal(12, sorted.Count());
             Assert.Equal(9.0, sorted.First().X);
             Assert.Equal(0.0, sorted.First().Y);

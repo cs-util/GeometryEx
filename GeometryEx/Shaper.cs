@@ -103,7 +103,7 @@ namespace GeometryEx
             {
                 points.AddRange(polygon.Vertices);
             }
-            return new Polygon(ConvexHull.MakeHull(points));
+            return MakePolygon(ConvexHull.MakeHull(points));
         }
 
         /// <summary>
@@ -349,11 +349,23 @@ namespace GeometryEx
         /// </summary>
         /// <param name="points"></param>
         /// <returns></returns>
-        public static Polygon MakePolygon(List<Vector3> points, bool clockwise = false)
+        public static Polygon MakePolygon(List<Vector3> vertices, bool clockwise = false)
         {
-            return new Polygon(SortByClock(points, clockwise).Distinct().ToList());
+            Polygon polygon = null;
+            try
+            {
+                polygon = new Polygon(vertices);
+            }
+            catch(Exception)
+            {
+                var points = SortRadial(vertices, clockwise);
+                if (points.Count > 2)
+                {
+                    return new Polygon(points);
+                }
+            }
+            return polygon;
         }
-
 
         /// <summary>
         /// Constructs the geometric union of the supplied list of Polygons.
@@ -364,9 +376,9 @@ namespace GeometryEx
         /// </returns>
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
         public static List<Polygon> Merge(List<Polygon> polygons,                                           
-                                          FillType fillType = FillType.NonZero, 
                                           double tolerance = 0.0,
-                                          double minLength = 0.0)
+                                          double minLength = 0.0,
+                                          FillType fillType = FillType.NonZero)
         {
             var resultPolygons = new List<Polygon>();
             if (polygons == null || polygons.Count == 0)
@@ -401,12 +413,10 @@ namespace GeometryEx
                 }
                 resultPolygons.Add(polygon);
             }
-            tolerance = Math.Abs(tolerance);
-            minLength = Math.Abs(minLength);
             var mergePolygons = new List<Polygon>();
             foreach(var polygon in resultPolygons)
             {
-                mergePolygons.Add(polygon.Simplify(tolerance, minLength));
+                mergePolygons.Add(polygon);//.Simplify(tolerance, minLength));
             }
             return mergePolygons;
         }
@@ -575,31 +585,72 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Reduces a quantity of points tested against a deviation tolerance.
+        /// Treats an ordered List of Vector3 points as a series of line segments and removes points representing distances shorter than a minimum length. Adjusts remaining points to preerve straight segments greater or equal to the supplied minimum length.
         /// </summary>
-        /// <param name="points">A List of Points to test.</param>
-        /// <param name="tolerance">The deviation tolerance for inclusion in the final Vector3 List.</param>
-        /// <returns>
-        /// A List of Vector3 points.
-        /// </returns>
-        public static List<Vector3> Simplify(List<Vector3> points, double tolerance)
+        /// <param name="minLength">Minimum length for any segment represented by two points.</param>
+        /// <returns>A new Polygon</returns>
+        public static List<Vector3> Simplify(List<Vector3> vertices, double minLength = 0.0)
         {
-            if (points.Count == 3)
+            minLength = Math.Abs(minLength);
+            if (minLength.NearEqual(0.0))
             {
-                return points;
+                return vertices;
             }
-            return SimplifyNet.Simplify(points, tolerance);
+            var segs = LinesFromPoints(vertices).Where(s => s.Length() >= minLength).ToList();
+            if (segs.Count() < 3)
+            {
+                return vertices;
+            }
+            var vLines = segs.Select(s => new GxLine(s)).ToList();
+            var bndLines = new List<GxLine>();
+            for (var i = 0; i < vLines.Count; i++)
+            {
+                var thisLine = vLines[i];
+                var thatLine = vLines[(i + 1) % vLines.Count];
+                if (thisLine.End.IsAlmostEqualTo(thatLine.Start))
+                {
+                    bndLines.Add(thisLine);
+                    continue;
+                }
+                if (thisLine.IsParallelTo(thatLine))
+                {
+                    bndLines.Add(thisLine);
+                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
+                    continue;
+                }
+                if (thisLine.End.DistanceTo(thatLine.Start) >= minLength)
+                {
+                    bndLines.Add(thisLine);
+                    bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
+                    continue;
+                }
+                if (thisLine.End.DistanceTo(thatLine.Start) < minLength)
+                {
+                    var inters = thisLine.Intersection(thatLine);
+                    thisLine.End = inters;
+                    thatLine.Start = inters;
+                    bndLines.Add(thisLine);
+                    continue;
+                }
+            }
+            return bndLines.Select(l => l.Start).ToList();
         }
 
         /// <summary>
         /// Sorts Vector3 points in a clockwise or anti-clockwise direction relative to the centroid of the points.
         /// </summary>
-        /// <param name="points">A List of Vector3 points to sort clockwise or anti-clockwise</param>
-        /// <param name="clockwise">If true, sorts points clockwise.</param>
+        /// <param name="points">A List of Vector3 points to sort clockwise or anti-clockwise (default).</param>
+        /// <param name="clockwise">If true, sorts points clockwise (defaults to false).</param>
         /// <returns>A List of distinct sorted Vector3 points.</returns>
-        public static List<Vector3> SortByClock(List<Vector3> points, bool clockwise = false)
+        public static List<Vector3> SortRadial(List<Vector3> points, bool clockwise = false)
         {
-            var c = new Polygon(ConvexHull.MakeHull(points)).Centroid();
+            var sorted = new List<Vector3>();
+            var cvxPoints = ConvexHull.MakeHull(points);
+            if (cvxPoints.Count < 2)
+            {
+                return sorted;
+            }
+            var c = MakePolygon(cvxPoints).Centroid();
             points = points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).Distinct().ToList();
             if (clockwise)
             {
@@ -607,6 +658,115 @@ namespace GeometryEx
             }
             points.Reverse();
             return points;
+        }
+         
+        /// <summary>
+        /// Tests if two doubles are effectively equal within a tolerance.
+        /// </summary>
+        /// <param name="thisValue">Lower bound of the random range.</param>
+        /// <param name="thatValue">Upper bound of the random range.</param>
+        /// <param name="tolerace">Tolerance for deviation from mathematical equality.</param>
+        /// <returns>
+        /// True if the supplied values are equivalent within the default or supplied tolerance.
+        /// </returns>
+        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
+        {
+            if (Math.Abs(thisValue - thatValue) > tolerance)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a random double within the supplied range.
+        /// </summary>
+        /// <param name="minValue">The lower bound of the random range.</param>
+        /// <param name="minValue">The upper bound of the random range.</param>
+        /// <returns>
+        /// A random double within the range.
+        /// </returns>
+        public static double RandomDouble(double minvalue, double maxvalue)
+        {
+            var scale = 10000.0;
+            var rnd = new Random();
+            double next = rnd.Next((int)Math.Round(minvalue * scale), (int)Math.Round(maxvalue * scale));
+            return next / scale;
+        }
+
+        /// <summary>
+        /// Check if any of lines have zero length.
+        /// </summary>
+        public static bool ZeroLength(List<Line> lines)
+        {
+            if (lines.Count == 0)
+            {
+                return false;
+            }
+            foreach (var s in lines)
+            {
+                if (s.Length().NearEqual(0.0))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check for self-intersection in the supplied lines.
+        /// </summary>
+        /// <param name="lines">List of lines to check.</param>
+        public static bool SelfIntersects(List<Line> lines)
+        {
+            if (lines.Count == 0)
+            {
+                return true;
+            }
+            for (var i = 0; i < lines.Count; i++)
+            {
+                for (var j = 0; j < lines.Count; j++)
+                {
+                    if (i == j)
+                    {
+                        // Don't check against itself.
+                        continue;
+                    }
+                    if (lines[i].Intersects2D(lines[j]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public const double SCALE = 1000000000000.0;
+
+        /// <summary>
+        /// Construct a clipper path from a Polygon.
+        /// </summary>
+        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
+        /// <returns></returns>
+        internal static List<IntPoint> PolygonToClipper(this Polygon p, double scale = SCALE)
+        {
+            return p.Vertices.Select(v => new IntPoint(v.X * scale, v.Y * scale)).Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Construct a Polygon from a clipper path 
+        /// </summary>
+        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
+        /// <returns></returns>
+        internal static Polygon PolygonFromClipper(this List<IntPoint> p, double scale = SCALE)
+        {
+            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
+            var lines = LinesFromPoints(points);
+            if (ZeroLength(lines) || SelfIntersects(lines))
+            {
+                return null;
+            }
+            return MakePolygon(points);
         }
 
         /// <summary>
@@ -889,107 +1049,5 @@ namespace GeometryEx
                 ).MoveFromTo(Vector3.Origin, origin);
         }
 
-        /// <summary>
-        /// Tests if two doubles are effectively equal within a tolerance.
-        /// </summary>
-        /// <param name="thisValue">Lower bound of the random range.</param>
-        /// <param name="thatValue">Upper bound of the random range.</param>
-        /// <param name="tolerace">Tolerance for deviation from mathematical equality.</param>
-        /// <returns>
-        /// True if the supplied values are equivalent within the default or supplied tolerance.
-        /// </returns>
-        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
-        {
-            if (Math.Abs(thisValue - thatValue) > tolerance)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Returns a random double within the supplied range.
-        /// </summary>
-        /// <param name="minValue">The lower bound of the random range.</param>
-        /// <param name="minValue">The upper bound of the random range.</param>
-        /// <returns>
-        /// A random double within the range.
-        /// </returns>
-        public static double RandomDouble(double minvalue, double maxvalue)
-        {
-            var scale = 10000.0;
-            var rnd = new Random();
-            double next = rnd.Next((int)Math.Round(minvalue * scale), (int)Math.Round(maxvalue * scale));
-            return next / scale;
-        }
-
-        /// <summary>
-        /// Check if any of lines have zero length.
-        /// </summary>
-        public static bool ZeroLength(List<Line> lines)
-        {
-            if (lines.Count == 0)
-            {
-                return false;
-            }
-            foreach (var s in lines)
-            {
-                if (s.Length().NearEqual(0.0))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Check for self-intersection in the supplied lines.
-        /// </summary>
-        /// <param name="lines">List of lines to check.</param>
-        public static bool SelfIntersects(List<Line> lines)
-        {
-            if (lines.Count == 0)
-            {
-                return true;
-            }
-            for (var i = 0; i < lines.Count; i++)
-            {
-                for (var j = 0; j < lines.Count; j++)
-                {
-                    if (i == j)
-                    {
-                        // Don't check against itself.
-                        continue;
-                    }
-                    if (lines[i].Intersects2D(lines[j]))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public const double SCALE = 1000000000000.0;
-
-        /// <summary>
-        /// Construct a clipper path from a Polygon.
-        /// </summary>
-        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
-        /// <returns></returns>
-        internal static List<IntPoint> PolygonToClipper(this Polygon p, double scale = SCALE)
-        {
-            return p.Vertices.Select(v => new IntPoint(v.X * scale, v.Y * scale)).ToList();
-        }
-
-        /// <summary>
-        /// Construct a Polygon from a clipper path 
-        /// </summary>
-        /// <param name="scale">Scaling factor for Clipper coordinate translation.</param>
-        /// <returns></returns>
-        internal static Polygon PolygonFromClipper(this List<IntPoint> p, double scale = SCALE)
-        {
-            return MakePolygon(p.Select(v => new Vector3(v.X / scale, v.Y / scale)).ToList());
-        }
     }
 }

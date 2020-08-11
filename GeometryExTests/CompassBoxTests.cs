@@ -11,16 +11,17 @@ namespace GeometryExTests
         [Fact]
         public void CompassBoxCreate()
         {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(0.0, 0.0),
-                    new Vector3(4.0, 0.0),
-                    new Vector3(4.0, 4.0),
-                    new Vector3(0.0, 4.0)
-                }
-            );
+            var polygon = 
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(0.0, 0.0),
+                        new Vector3(4.0, 0.0),
+                        new Vector3(4.0, 4.0),
+                        new Vector3(0.0, 4.0)
+                    }
+                );
             var box = new CompassBox(polygon);
             Assert.Equal(2.0, box.C.X);
             Assert.Equal(2.0, box.C.Y);

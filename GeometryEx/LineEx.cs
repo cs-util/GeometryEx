@@ -348,7 +348,7 @@ namespace GeometryEx
             {
                 return 0.0;
             }
-            var area = Math.Abs(new Polygon(new[] { line.Start, line.End, point }).Area());
+            var area = Math.Abs(Shaper.MakePolygon(new[] { line.Start, line.End, point }.ToList()).Area());
             return area / (line.Length() * 0.5);
         }
 

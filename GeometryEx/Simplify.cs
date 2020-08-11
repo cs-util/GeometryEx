@@ -144,13 +144,12 @@ namespace GeometryEx
 
 
         // both algorithms combined for awesome performance
-        public static List<Vector3> Simplify(List<Vector3> points, double tolerance = 1, bool highestQuality = false)
+        public static List<Vector3> Straighten(List<Vector3> points, double tolerance = 1, bool highestQuality = false)
         {
             if (points.Count <= 2)
             {
                 return points;
             }
-
             double sqTolerance = tolerance * tolerance;
 
             points = highestQuality ? points : SimplifyRadialDist(points, sqTolerance);

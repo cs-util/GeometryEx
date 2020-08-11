@@ -60,7 +60,7 @@ namespace GeometryEx
             random = new Random();
             Allocated = new List<Vector3>();
             Available = new List<Vector3>();
-            Perimeter = new Polygon(polygon.Vertices);
+            Perimeter = Shaper.MakePolygon(polygon.Vertices.ToList());
             var centroid = polygon.Centroid();
             var box = new CompassBox(polygon);
             var points = new List<Vector3>();

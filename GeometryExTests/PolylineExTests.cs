@@ -22,7 +22,7 @@ namespace GeometryExTests
                 new Vector3(10.0, 20.0),
                 new Vector3(5.0, 10.0),
             };
-            var polyline = new Polyline(points).Simplify(3.0);
+            var polyline = new Polyline(points).Simplify(6.0);
             Assert.Equal(5, polyline.Vertices.Count);
         }
     }
