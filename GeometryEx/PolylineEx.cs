@@ -21,7 +21,7 @@ namespace GeometryEx
         /// <summary>
         /// Reduces Polyline vertices.
         /// </summary>
-        /// <param name="tolerance">The tolerated deviation to include a vertex.</param>
+        /// <param name="minLength">The tolerated deviation to include a vertex.</param>
         /// <returns>A new Polyline.</returns>
         public static Polyline Simplify(this Polyline polyline, double minLength)
         {

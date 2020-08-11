@@ -314,7 +314,10 @@ namespace GeometryEx
             differs.Clear();
             foreach (var poly in polys)
             {
-                if (poly.Area() < tolerance) break;
+                if (poly.Area() < tolerance)
+                {
+                    break;
+                }
                 differs.Add(poly);
             }
             return differs;
@@ -375,17 +378,13 @@ namespace GeometryEx
         /// A List of Polygons.
         /// </returns>
         public enum FillType { EvenOdd, NonZero, Positive, Negative };
-        public static List<Polygon> Merge(List<Polygon> polygons,                                           
-                                          double tolerance = 0.0,
-                                          double minLength = 0.0,
-                                          FillType fillType = FillType.NonZero)
+        public static List<Polygon> Merge(List<Polygon> polygons)
         {
             var resultPolygons = new List<Polygon>();
             if (polygons == null || polygons.Count == 0)
             {
                 return resultPolygons;
             }
-            var filtyp = (PolyFillType)fillType;
             var polyPaths = new List<List<IntPoint>>();
             foreach (Polygon polygon in polygons)
             {
@@ -395,7 +394,7 @@ namespace GeometryEx
             clipper.AddPaths(polyPaths, PolyType.ptClip, true);
             clipper.AddPaths(polyPaths, PolyType.ptSubject, true);
             var solution = new List<List<IntPoint>>();
-            clipper.Execute(ClipType.ctUnion, solution, filtyp);
+            clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftNonZero);
             if (solution.Count == 0)
             {
                 return resultPolygons;
@@ -416,7 +415,7 @@ namespace GeometryEx
             var mergePolygons = new List<Polygon>();
             foreach(var polygon in resultPolygons)
             {
-                mergePolygons.Add(polygon);//.Simplify(tolerance, minLength));
+                mergePolygons.Add(polygon);
             }
             return mergePolygons;
         }
