@@ -55,16 +55,17 @@ namespace GeometryExTests
         [Fact]
         public void AxisQuad()
         {
-            var polygon = new Polygon
-            (
-                new[]
-                {
-                    new Vector3(3.0, 1.0),
-                    new Vector3(6.0, 1.0),
-                    new Vector3(1.0, 6.0),
-                    new Vector3(1.0, 3.0)
-                }
-            );
+            var polygon = 
+                new Polygon
+                (
+                    new[]
+                    {
+                        new Vector3(3.0, 1.0),
+                        new Vector3(6.0, 1.0),
+                        new Vector3(1.0, 6.0),
+                        new Vector3(1.0, 3.0)
+                    }
+                );
             var axis = Shaper.AxisQuad(polygon);
             var start = new Vector3(2.0, 2.0);
             var end = new Vector3(3.5, 3.5);
@@ -670,6 +671,35 @@ namespace GeometryExTests
             };
             points = Shaper.Simplify(points, 1.1);
             Assert.Equal(6, points.Count);
+        }
+
+        [Fact]
+        public void SortByClock()
+        {
+            var points =
+                new List<Vector3>
+                {
+                    new Vector3(13.0, 4.0),
+                    new Vector3(13.0, 4.0),
+                    new Vector3(13.0, 4.0),
+                    new Vector3(6.0, 11.0),
+                    new Vector3(6.0, 7.0),
+                    new Vector3(2.0, 7.0),
+                    new Vector3(2.0, 4.0),
+                    new Vector3(9.0, 0.0),
+                    new Vector3(9.0, 4.0),
+                    new Vector3(13.0, 7.0),
+                    new Vector3(9.0, 7.0),
+                    new Vector3(9.0, 11.0),
+                    new Vector3(6.0, 4.0),
+                    new Vector3(6.0, 0.0),
+                };
+            var sorted = Shaper.SortByClock(points);
+            Assert.Equal(12, sorted.Count());
+            Assert.Equal(9.0, sorted.First().X);
+            Assert.Equal(0.0, sorted.First().Y);
+            Assert.Equal(6.0, sorted.Last().X);
+            Assert.Equal(0.0, sorted.Last().Y);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace GeometryEx
                 return null;
             }
             var box = new CompassBox(polygon);
-            double sizeX = 0.0;
+            double sizeX;
             double sizeY = 0.0;
             if (orient == Orient.N || orient == Orient.S)
             {
@@ -345,6 +345,17 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Sorts and removes duplicate Vector3 
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public static Polygon MakePolygon(List<Vector3> points, bool clockwise = false)
+        {
+            return new Polygon(SortByClock(points, clockwise).Distinct().ToList());
+        }
+
+
+        /// <summary>
         /// Constructs the geometric union of the supplied list of Polygons.
         /// </summary>
         /// <param name="polygons">The list of Polygons to be combined.</param>
@@ -391,10 +402,7 @@ namespace GeometryEx
                 resultPolygons.Add(polygon);
             }
             tolerance = Math.Abs(tolerance);
-            if (tolerance.NearEqual(0.0))
-            {
-                return resultPolygons;
-            }
+            minLength = Math.Abs(minLength);
             var mergePolygons = new List<Polygon>();
             foreach(var polygon in resultPolygons)
             {
@@ -581,6 +589,24 @@ namespace GeometryEx
                 return points;
             }
             return SimplifyNet.Simplify(points, tolerance);
+        }
+
+        /// <summary>
+        /// Sorts Vector3 points in a clockwise or anti-clockwise direction relative to the centroid of the points.
+        /// </summary>
+        /// <param name="points">A List of Vector3 points to sort clockwise or anti-clockwise</param>
+        /// <param name="clockwise">If true, sorts points clockwise.</param>
+        /// <returns>A List of distinct sorted Vector3 points.</returns>
+        public static List<Vector3> SortByClock(List<Vector3> points, bool clockwise = false)
+        {
+            var c = new Polygon(ConvexHull.MakeHull(points)).Centroid();
+            points = points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).Distinct().ToList();
+            if (clockwise)
+            {
+                return points;
+            }
+            points.Reverse();
+            return points;
         }
 
         /// <summary>
@@ -953,12 +979,7 @@ namespace GeometryEx
         /// <returns></returns>
         internal static List<IntPoint> PolygonToClipper(this Polygon p, double scale = SCALE)
         {
-            var path = new List<IntPoint>();
-            foreach (var v in p.Vertices)
-            {
-                path.Add(new IntPoint(v.X * scale, v.Y * scale));
-            }
-            return path.Distinct().ToList();
+            return p.Vertices.Select(v => new IntPoint(v.X * scale, v.Y * scale)).ToList();
         }
 
         /// <summary>
@@ -968,20 +989,7 @@ namespace GeometryEx
         /// <returns></returns>
         internal static Polygon PolygonFromClipper(this List<IntPoint> p, double scale = SCALE)
         {
-            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
-            var lines = LinesFromPoints(points);
-            if (ZeroLength(lines) || SelfIntersects(lines))
-            {
-                return null;
-            }
-            try
-            {
-                return new Polygon(points);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return MakePolygon(p.Select(v => new Vector3(v.X / scale, v.Y / scale)).ToList());
         }
     }
 }
