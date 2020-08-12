@@ -225,7 +225,7 @@ namespace GeometryExTests
         [Fact]
         public void FitWithin()
         {
-            var within = Shaper.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
+            var within = ShapeMaker.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
             var fit = Polygon.Rectangle(new Vector3(-10.0, 20.0), new Vector3(50.0, 30.0));
             var polygons = Shaper.FitWithin(fit, within);
 
@@ -299,9 +299,36 @@ namespace GeometryExTests
         [Fact]
         public void LinesFromPoints()
         {
-            var polygon = Shaper.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
+            var polygon = ShapeMaker.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
             var points = polygon.Vertices;
             Assert.Equal(8.0, Shaper.LinesFromPoints(points.ToList(), true).Count);
+        }
+
+        [Fact]
+        public void MakePolygon()
+        {
+            var points =
+                new List<Vector3>
+                {
+                    new Vector3(13.0, 4.0),
+                    new Vector3(13.0, 4.0),
+                    new Vector3(13.0, 4.0),
+                    new Vector3(6.0, 11.0),
+                    new Vector3(6.0, 7.0),
+                    new Vector3(2.0, 7.0),
+                    new Vector3(2.0, 4.0),
+                    new Vector3(9.0, 0.0),
+                    new Vector3(9.0, 4.0),
+                    new Vector3(13.0, 7.0),
+                    new Vector3(9.0, 7.0),
+                    new Vector3(9.0, 11.0),
+                    new Vector3(6.0, 4.0),
+                    new Vector3(6.0, 0.0),
+                };
+            Polygon polygon = null;
+            Assert.ThrowsAny<Exception>(() => polygon = new Polygon(points));
+            polygon = Shaper.MakePolygon(points);
+            Assert.Equal(12, polygon.Vertices.Count);
         }
 
         [Fact]
@@ -497,138 +524,6 @@ namespace GeometryExTests
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 10.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
-        }
-
-        [Fact]
-        public void C()
-        {
-            var polygon = Shaper.C(new Vector3(2.0, 2.0), new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 6.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 6.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 7.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 7.0);
-        }
-
-        [Fact]
-        public void E()
-        {
-            var polygon = Shaper.E(new Vector3(2.0, 2.0), new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 6.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 6.0);
-            Assert.Contains(vertices, p => p.X == 5.0 && p.Y == 7.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 7.0);
-        }
-
-        [Fact]
-        public void F()
-        {
-            var polygon = Shaper.F(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 5.0);
-        }
-
-        [Fact]
-        public void H()
-        {
-            var polygon = Shaper.H(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 5.0);
-        }
-
-        [Fact]
-        public void L()
-        {
-            var polygon = Shaper.L(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 5.0);
-        }
-
-        [Fact]
-        public void PolygonT()
-        {
-            var polygon = Shaper.T(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 4.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 4.0);
-        }
-
-        [Fact]
-        public void U()
-        {
-            var polygon = Shaper.U(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 1.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 5.0);
-        }
-
-        [Fact]
-        public void X()
-        {
-            var polygon = Shaper.X(Vector3.Origin, new Vector3(3.0, 5.0), 1.0);
-            var vertices = polygon.Vertices;
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 0.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 3.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 2.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 5.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 3.0);
-            Assert.Contains(vertices, p => p.X == 0.0 && p.Y == 2.0);
-            Assert.Contains(vertices, p => p.X == 1.0 && p.Y == 2.0);
         }
 
         [Fact]

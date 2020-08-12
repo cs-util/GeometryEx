@@ -92,6 +92,23 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Calculate the centroid of the set of points.
+        /// </summary>
+        public static Vector3 Centroid(List<Vector3> points)
+        {
+            var x = 0.0;
+            var y = 0.0;
+            var z = 0.0;
+            foreach (var pnt in points)
+            {
+                x += pnt.X;
+                y += pnt.Y;
+                z += pnt.Z;
+            }
+            return new Vector3(x / points.Count, y / points.Count, z / points.Count);
+        }
+
+        /// <summary>
         /// Creates a convex hull Polygon from the vertices of all supplied Polygons.
         /// </summary>
         /// <param name="polygons">A list of Polygons from which to extract vertices.</param>
@@ -348,23 +365,24 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Sorts and removes duplicate Vector3 
+        /// Uses SortRadial to reorder points in clockwise or anticlockise direction and eliminate duplicates before attempting to create a Polygon. If Polygon creation fails begins removing the trailing point until arriving at a viable Polygon.
         /// </summary>
-        /// <param name="points"></param>
-        /// <returns></returns>
+        /// <param name="vertices">List of Vector3 points to convert to Polygon.</param>
+        /// <param name="clockwise">Direction to sort the supplied Vector3 points. Defaults to anticlockwise.</param>
+        /// <returns>A new Polygon.</returns>
         public static Polygon MakePolygon(List<Vector3> vertices, bool clockwise = false)
         {
             Polygon polygon = null;
-            try
+            var points = SortRadial(vertices, clockwise);
+            while (polygon == null && points.Count > 2)
             {
-                polygon = new Polygon(vertices);
-            }
-            catch(Exception)
-            {
-                var points = SortRadial(vertices, clockwise);
-                if (points.Count > 2)
+                try
                 {
-                    return new Polygon(points);
+                    polygon = new Polygon(points);
+                }
+                catch (Exception)
+                {
+                    points = points.Skip(1).ToList();
                 }
             }
             return polygon;
@@ -418,6 +436,24 @@ namespace GeometryEx
                 mergePolygons.Add(polygon);
             }
             return mergePolygons;
+        }
+
+        /// <summary>
+        /// Tests if two doubles are effectively equal within a tolerance.
+        /// </summary>
+        /// <param name="thisValue">Lower bound of the random range.</param>
+        /// <param name="thatValue">Upper bound of the random range.</param>
+        /// <param name="tolerace">Tolerance for deviation from mathematical equality.</param>
+        /// <returns>
+        /// True if the supplied values are equivalent within the default or supplied tolerance.
+        /// </returns>
+        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
+        {
+            if (Math.Abs(thisValue - thatValue) > tolerance)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -641,42 +677,27 @@ namespace GeometryEx
         /// <param name="points">A List of Vector3 points to sort clockwise or anti-clockwise (default).</param>
         /// <param name="clockwise">If true, sorts points clockwise (defaults to false).</param>
         /// <returns>A List of distinct sorted Vector3 points.</returns>
-        public static List<Vector3> SortRadial(List<Vector3> points, bool clockwise = false)
+        public static List<Vector3> SortRadial(List<Vector3> points, 
+                                               bool clockwise = false, 
+                                               bool distinct = true)
         {
-            var sorted = new List<Vector3>();
             var cvxPoints = ConvexHull.MakeHull(points);
             if (cvxPoints.Count < 2)
             {
-                return sorted;
+                return cvxPoints;
             }
-            var c = MakePolygon(cvxPoints).Centroid();
-            points = points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).Distinct().ToList();
+            var c = Centroid(cvxPoints);
+            var sorted = distinct ?
+                points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).Distinct().ToList() :
+                points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).ToList();
             if (clockwise)
             {
-                return points;
+                return sorted;
             }
-            points.Reverse();
-            return points;
+            sorted.Reverse();
+            return sorted;
         }
-         
-        /// <summary>
-        /// Tests if two doubles are effectively equal within a tolerance.
-        /// </summary>
-        /// <param name="thisValue">Lower bound of the random range.</param>
-        /// <param name="thatValue">Upper bound of the random range.</param>
-        /// <param name="tolerace">Tolerance for deviation from mathematical equality.</param>
-        /// <returns>
-        /// True if the supplied values are equivalent within the default or supplied tolerance.
-        /// </returns>
-        public static bool NearEqual(this double thisValue, double thatValue, double tolerance = 1e-9)
-        {
-            if (Math.Abs(thisValue - thatValue) > tolerance)
-            {
-                return false;
-            }
-            return true;
-        }
-
+ 
         /// <summary>
         /// Returns a random double within the supplied range.
         /// </summary>
@@ -759,294 +780,7 @@ namespace GeometryEx
         /// <returns></returns>
         internal static Polygon PolygonFromClipper(this List<IntPoint> p, double scale = SCALE)
         {
-            var points = p.Select(v => new Vector3(v.X / scale, v.Y / scale)).Distinct().ToList();
-            var lines = LinesFromPoints(points);
-            if (ZeroLength(lines) || SelfIntersects(lines))
-            {
-                return null;
-            }
-            return MakePolygon(points);
+            return MakePolygon(p.Select(v => new Vector3(v.X / scale, v.Y / scale)).ToList());
         }
-
-        /// <summary>
-        /// Creates an C-shaped Polygon within a specified rectangle with its southwest corner at the origin.
-        /// </summary>
-        /// <param name="origin">The southwest enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon C(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 3 >= size.Y)
-            {
-                return null;
-            }
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(size.X, Vector3.Origin.Y),
-                        new Vector3(size.X, width),
-                        new Vector3(width, width),
-                        new Vector3(width, size.Y - width),
-                        new Vector3(size.X, size.Y - width),
-                        new Vector3(size.X, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y),
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates an E-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The southwest enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon E(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 3 >= size.Y)
-            {
-                return null;
-            }
-            var halfWidth = width * 0.5;
-            var xAxis = size.Y * 0.5;
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(size.X, Vector3.Origin.Y),
-                        new Vector3(size.X, width),
-                        new Vector3(width, width),
-                        new Vector3(width, xAxis - halfWidth),//
-                        new Vector3(size.X, xAxis - halfWidth),
-                        new Vector3(size.X, xAxis + halfWidth),
-                        new Vector3(width, xAxis + halfWidth),
-                        new Vector3(width, size.Y - width),//
-                        new Vector3(size.X, size.Y - width),
-                        new Vector3(size.X, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y),
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates an F-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon F(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width >= size.X || width * 2 >= size.Y)
-            {
-                return null;
-            }
-            var halfWidth = width * 0.5;
-            var xAxis = size.Y * 0.5;
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(width, Vector3.Origin.Y),
-                        new Vector3(width, xAxis - halfWidth),
-                        new Vector3(size.X, xAxis - halfWidth),
-                        new Vector3(size.X, xAxis + halfWidth),
-                        new Vector3(width, xAxis + halfWidth),
-                        new Vector3(width, size.Y - width),
-                        new Vector3(size.X, size.Y - width),
-                        new Vector3(size.X, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y),
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates an H-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon H(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width * 2 >= size.X || width >= size.Y)
-            {
-                return null;
-            }
-            var halfWidth = width * 0.5;
-            var xAxis = size.Y * 0.5;
-            var rightWest = size.X - width;
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(width, Vector3.Origin.Y),
-                        new Vector3(width, xAxis - halfWidth),
-                        new Vector3(rightWest, xAxis - halfWidth),
-                        new Vector3(rightWest, Vector3.Origin.Y),
-                        new Vector3(size.X, Vector3.Origin.Y),
-                        new Vector3(size.X, size.Y),
-                        new Vector3(rightWest, size.Y),
-                        new Vector3(rightWest, xAxis + halfWidth),
-                        new Vector3(width, xAxis + halfWidth),
-                        new Vector3(width, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y),
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates an L-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon L(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width >= size.X || width >= size.Y)
-            {
-                return null;
-            }
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(size.X, Vector3.Origin.Y),
-                        new Vector3(size.X, width),
-                        new Vector3(width, width),
-                        new Vector3(width, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y)
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates a T-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon T(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width >= size.X || width >= size.Y)
-            {
-                return null;
-            }
-            var halfWidth = width * 0.5;
-            var yAxis = origin.X + (size.X * 0.5);
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        new Vector3(yAxis - halfWidth, 0),
-                        new Vector3(yAxis + halfWidth, 0),
-                        new Vector3(yAxis + halfWidth, size.Y - width),
-                        new Vector3(size.X, size.Y - width),
-                        new Vector3(size.X, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y),
-                        new Vector3(Vector3.Origin.X, size.Y - width),
-                        new Vector3(yAxis - halfWidth, size.Y - width)
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates U-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon U(Vector3 origin, Vector3 size, double width)
-        {
-            if (size.X <= 0 || size.Y <= 0 || width * 2 >= size.X || width >= size.Y)
-            {
-                return null;
-            }
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        Vector3.Origin,
-                        new Vector3(size.X, Vector3.Origin.Y),
-                        new Vector3(size.X, Vector3.Origin.Y + size.Y),
-                        new Vector3(size.X - width, Vector3.Origin.Y + size.Y),
-                        new Vector3(size.X - width, Vector3.Origin.Y + width),
-                        new Vector3(width, Vector3.Origin.Y + width),
-                        new Vector3(width, Vector3.Origin.Y + size.Y),
-                        new Vector3(Vector3.Origin.X, Vector3.Origin.Y + size.Y)
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
-        /// <summary>
-        /// Creates an X-shaped Polygon within a specified rectangle.
-        /// </summary>
-        /// <param name="origin">The initial enclosing box corner.</param>
-        /// <param name="size">The positive x and y delta defining the size of the enclosing box.</param>
-        /// <param name="width">Width of each stroke of the shape.</param>
-        /// <returns>
-        /// A new Polygon.
-        /// </returns>
-        public static Polygon X(Vector3 origin, Vector3 size, double width)
-        {
-            if (width >= Math.Abs(size.X - origin.X) || width >= Math.Abs(size.Y - origin.Y))
-            {
-                return null;
-            }
-            var halfWidth = width * 0.5;
-            var xAxis = origin.Y + (size.Y * 0.5);
-            var yAxis = origin.X + (size.X * 0.5);
-            return
-                new Polygon
-                (
-                    new[]
-                    {
-                        new Vector3(yAxis - halfWidth, Vector3.Origin.Y),
-                        new Vector3(yAxis + halfWidth, Vector3.Origin.Y),
-                        new Vector3(yAxis + halfWidth, xAxis - halfWidth),
-                        new Vector3(size.X, xAxis - halfWidth),
-                        new Vector3(size.X, xAxis + halfWidth),
-                        new Vector3(yAxis + halfWidth, xAxis + halfWidth),
-                        new Vector3(yAxis + halfWidth, size.Y),
-                        new Vector3(yAxis - halfWidth, size.Y),
-                        new Vector3(yAxis - halfWidth, xAxis + halfWidth),
-                        new Vector3(Vector3.Origin.X, xAxis + halfWidth),
-                        new Vector3(Vector3.Origin.X, xAxis - halfWidth),
-                        new Vector3(yAxis - halfWidth, xAxis - halfWidth)
-                    }
-                ).MoveFromTo(Vector3.Origin, origin);
-        }
-
     }
 }

@@ -420,11 +420,11 @@ namespace GeometryExTests
         [Fact]
         public void Jigsaw()
         {
-            var jigsaw = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            var jigsaw = ShapeMaker.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
             Assert.Equal(6, jigsaw.Count);
-            jigsaw = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            jigsaw = ShapeMaker.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
             Assert.Equal(8, jigsaw.Count);
-            jigsaw = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
+            jigsaw = ShapeMaker.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Jigsaw();
             Assert.Equal(12, jigsaw.Count);
             var model = new Model();
             foreach (var polygon in jigsaw)
@@ -501,11 +501,11 @@ namespace GeometryExTests
         [Fact]
         public void Ribs()
         {
-            var ribs = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            var ribs = ShapeMaker.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
             Assert.Equal(6, ribs.Count);
-            ribs = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            ribs = ShapeMaker.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
             Assert.Equal(8, ribs.Count);
-            ribs = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
+            ribs = ShapeMaker.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Ribs();
             Assert.Equal(12, ribs.Count);
         }
 
@@ -579,22 +579,22 @@ namespace GeometryExTests
         [Fact]
         public void Skeleton()
         {
-            var skeleton = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            var skeleton = ShapeMaker.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
             Assert.Equal(8, skeleton.Count);
-            skeleton = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            skeleton = ShapeMaker.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
             Assert.Equal(11, skeleton.Count);
-            skeleton = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
+            skeleton = ShapeMaker.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Skeleton();
             Assert.Equal(16, skeleton.Count);
         }
 
         [Fact]
         public void Spine()
         {
-            var spine = Shaper.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            var spine = ShapeMaker.L(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
             Assert.Equal(2, spine.Count);
-            spine = Shaper.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            spine = ShapeMaker.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
             Assert.Equal(3, spine.Count);
-            spine = Shaper.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
+            spine = ShapeMaker.X(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).Spine();
             Assert.Equal(4, spine.Count);
             var model = new Model();
             var corridors = new List<Polygon>();

@@ -371,7 +371,7 @@ namespace GeometryEx
                 points.Add(vertices[i]);
                 i++;
             }
-            return Shaper.MakePolygon(points);
+            return new Polygon(points);
         }
 
         /// <summary>
