@@ -9,7 +9,7 @@ using GeometryEx;
 
 namespace GeometryExTests
 {
-    public class ShapeTests
+    public class ShapeMakerTests
     {
 
         [Fact]

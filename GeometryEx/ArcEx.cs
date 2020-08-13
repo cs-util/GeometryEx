@@ -42,7 +42,7 @@ namespace GeometryEx
         /// </returns>
         public static List<Line> ToLines(this Arc arc, int segments)
         {
-            return Shaper.LinesFromPoints(arc.Divide(segments));
+            return Shaper.PointsToLines(arc.Divide(segments));
         }
 
         /// <summary>

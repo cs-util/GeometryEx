@@ -207,17 +207,7 @@ namespace GeometryEx
                 }
                 differs.Add(diff);
             }
-            var polys = Merge(differs).OrderByDescending(p => Math.Abs(p.Area())).ToList();
-            differs.Clear();
-            foreach (var poly in polys)
-            {
-                if (poly.Area() < tolerance)
-                {
-                    break;
-                }
-                differs.Add(poly);
-            }
-            return differs;
+            return differs.Where(p => p.Area() > tolerance).OrderByDescending(p => p.Area()).ToList();
         }
 
         /// <summary>
@@ -341,30 +331,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Constructs a List of Lines in order from pairs in a List of Vector3 points.
-        /// </summary>
-        /// <param name="points">List of vertices to convert to Lines.</param>
-        /// <param name="close">If true also creates a Line from the Last to First points of the List.</param>
-        /// <returns>List of Lines.</returns>
-        public static List<Line> LinesFromPoints(List<Vector3> points, bool close = false)
-        {
-            var lines = new List<Line>();
-            if (points.Count == 0)
-            {
-                return lines;
-            }
-            for (var i = 0; i < points.Count - 1; i++)
-            {
-                lines.Add(new Line(points[i], points[i + 1]));
-            }
-            if (close)
-            {
-                lines.Add(new Line(points.Last(), points.First()));
-            }
-            return lines;
-        }
-
-        /// <summary>
         /// Uses SortRadial to reorder points in clockwise or anticlockise direction and eliminate duplicates before attempting to create a Polygon. If Polygon creation fails begins removing the trailing point until arriving at a viable Polygon.
         /// </summary>
         /// <param name="vertices">List of Vector3 points to convert to Polygon.</param>
@@ -373,17 +339,14 @@ namespace GeometryEx
         public static Polygon MakePolygon(List<Vector3> vertices, bool clockwise = false)
         {
             Polygon polygon = null;
-            var points = SortRadial(vertices, clockwise);
-            while (polygon == null && points.Count > 2)
+            var points = vertices.Distinct().ToList();
+            try
             {
-                try
-                {
-                    polygon = new Polygon(points);
-                }
-                catch (Exception)
-                {
-                    points = points.Skip(1).ToList();
-                }
+                polygon = new Polygon(points);
+            }
+            catch (Exception)
+            {
+                polygon = new Polygon(ConvexHull.MakeHull(points));
             }
             return polygon;
         }
@@ -582,6 +545,30 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Constructs a List of Lines in order from pairs in a List of Vector3 points.
+        /// </summary>
+        /// <param name="points">List of vertices to convert to Lines.</param>
+        /// <param name="close">If true also creates a Line from the Last to First points of the List.</param>
+        /// <returns>List of Lines.</returns>
+        public static List<Line> PointsToLines(List<Vector3> points, bool close = false)
+        {
+            var lines = new List<Line>();
+            if (points.Count == 0)
+            {
+                return lines;
+            }
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                lines.Add(new Line(points[i], points[i + 1]));
+            }
+            if (close)
+            {
+                lines.Add(new Line(points.Last(), points.First()));
+            }
+            return lines;
+        }
+
+        /// <summary>
         /// Creates a rectangular Polygon of the supplied length to width proportion at the supplied area with its southwest corner at the origin.
         /// </summary>
         /// <param name="area">Required area of the Polygon.</param>
@@ -631,7 +618,7 @@ namespace GeometryEx
             {
                 return vertices;
             }
-            var segs = LinesFromPoints(vertices).Where(s => s.Length() >= minLength).ToList();
+            var segs = PointsToLines(vertices).Where(s => s.Length() >= minLength).ToList();
             if (segs.Count() < 3)
             {
                 return vertices;
@@ -728,34 +715,6 @@ namespace GeometryEx
                 if (s.Length().NearEqual(0.0))
                 {
                     return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Check for self-intersection in the supplied lines.
-        /// </summary>
-        /// <param name="lines">List of lines to check.</param>
-        public static bool SelfIntersects(List<Line> lines)
-        {
-            if (lines.Count == 0)
-            {
-                return true;
-            }
-            for (var i = 0; i < lines.Count; i++)
-            {
-                for (var j = 0; j < lines.Count; j++)
-                {
-                    if (i == j)
-                    {
-                        // Don't check against itself.
-                        continue;
-                    }
-                    if (lines[i].Intersects2D(lines[j]))
-                    {
-                        return true;
-                    }
                 }
             }
             return false;

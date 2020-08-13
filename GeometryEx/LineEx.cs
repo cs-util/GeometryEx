@@ -89,6 +89,28 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Checks for intersection with the supplied Lines.
+        /// </summary>
+        /// <param name="lines">List of lines to check.</param>
+        public static bool IntersectsMiddle(this Line line, List<Line> lines)
+        {
+            if (line == null || lines == null || lines.Count == 0)
+            {
+                return false;
+            }
+            for (var i = 0; i < lines.Count; i++)
+            {
+                if (line.Intersects2D(lines[i]) &&
+                   !line.Start.IsAlmostEqualTo(lines[i].Start) && !line.Start.IsAlmostEqualTo(lines[i].End) &&
+                   !line.End.IsAlmostEqualTo(lines[i].Start) && !line.End.IsAlmostEqualTo(lines[i].End))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Finds the implied intersection of this Line with a supplied Line.
         /// </summary>
         /// <param name="intr">Line to find intersection with this Line.</param>

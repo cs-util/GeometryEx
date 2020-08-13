@@ -207,12 +207,12 @@ namespace GeometryEx
         /// </returns>
         public static Polygon FitAmong(this Polygon polygon, List<Polygon> among)
         {
-            if (among == null)
+            if (among == null || among.Count == 0)
             {
                 return null;
             }
             var polygons = Shaper.Differences(polygon.ToList(), among);
-            if (polygons == null || polygons.Count == 0)
+            if (polygons.Count == 0)
             {
                 return null;
             }

@@ -297,14 +297,6 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void LinesFromPoints()
-        {
-            var polygon = ShapeMaker.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
-            var points = polygon.Vertices;
-            Assert.Equal(8.0, Shaper.LinesFromPoints(points.ToList(), true).Count);
-        }
-
-        [Fact]
         public void MakePolygon()
         {
             var points =
@@ -328,7 +320,7 @@ namespace GeometryExTests
             Polygon polygon = null;
             Assert.ThrowsAny<Exception>(() => polygon = new Polygon(points));
             polygon = Shaper.MakePolygon(points);
-            Assert.Equal(12, polygon.Vertices.Count);
+            Assert.Equal(8, polygon.Vertices.Count);
         }
 
         [Fact]
@@ -524,6 +516,14 @@ namespace GeometryExTests
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 10.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -6.0) && Shaper.NearEqual(p.Y, 4.0));
             Assert.Contains(points, p => Shaper.NearEqual(p.X, -9.0) && Shaper.NearEqual(p.Y, 4.0));
+        }
+
+        [Fact]
+        public void PointsToLines()
+        {
+            var polygon = ShapeMaker.U(Vector3.Origin, new Vector3(40.0, 40.0), 10.0);
+            var points = polygon.Vertices;
+            Assert.Equal(8.0, Shaper.PointsToLines(points.ToList(), true).Count);
         }
 
         [Fact]
