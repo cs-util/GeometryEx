@@ -209,7 +209,7 @@ namespace GeometryEx
         {
             if (among == null || among.Count == 0)
             {
-                return null;
+                return polygon;
             }
             var polygons = Shaper.Differences(polygon.ToList(), among);
             if (polygons.Count == 0)

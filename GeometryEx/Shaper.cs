@@ -296,38 +296,45 @@ namespace GeometryEx
         /// </returns>
         public static List<Polygon> Intersections(List<Polygon> polygons, List<Polygon> inters, double tolerance = 0.01)
         {
-            inters = Merge(inters);
-            var differs = new List<Polygon>();
-            var clipper = new Clipper();
-            foreach (var polygon in polygons)
+            var resultPolygons = new List<Polygon>();
+            if (polygons == null || polygons.Count == 0 || 
+                inters == null || inters.Count == 0)
             {
-                clipper.AddPath(polygon.PolygonToClipper(), PolyType.ptSubject, true);
+                return resultPolygons;
             }
-            foreach (var differ in inters)
+            var polyPaths = new List<List<IntPoint>>();
+            var intrPaths = new List<List<IntPoint>>();
+            foreach (Polygon polygon in polygons)
             {
-                clipper.AddPath(differ.PolygonToClipper(), PolyType.ptClip, true);
+                polyPaths.Add(polygon.PolygonToClipper());
             }
+            foreach (Polygon polygon in inters)
+            {
+                intrPaths.Add(polygon.PolygonToClipper());
+            }
+            Clipper clipper = new Clipper();
+            clipper.AddPaths(polyPaths, PolyType.ptSubject, true);
+            clipper.AddPaths(intrPaths, PolyType.ptClip, true);
             var solution = new List<List<IntPoint>>();
             clipper.Execute(ClipType.ctIntersection, solution, PolyFillType.pftNonZero);
-            if (solution.Count == 0) return differs;
-            foreach (var path in solution)
+            if (solution.Count == 0)
             {
-                var diff = PolygonFromClipper(path);
-                if (diff == null) continue;
-                if (diff.IsClockWise()) diff = diff.Reversed();
-                differs.Add(diff);
+                return resultPolygons;
             }
-            var polys = Merge(differs).OrderByDescending(p => Math.Abs(p.Area())).ToList();
-            differs.Clear();
-            foreach (var poly in polys)
+            foreach (var solved in solution)
             {
-                if (poly.Area() < tolerance)
+                var polygon = solved.ToList().PolygonFromClipper();
+                if (polygon == null)
                 {
-                    break;
+                    continue;
                 }
-                differs.Add(poly);
+                if (polygon.IsClockWise())
+                {
+                    polygon = polygon.Reversed();
+                }
+                resultPolygons.Add(polygon);
             }
-            return differs;
+            return resultPolygons.Where(p => p.Area() >= tolerance).OrderByDescending(p => p.Area()).ToList();
         }
 
         /// <summary>
@@ -336,17 +343,20 @@ namespace GeometryEx
         /// <param name="vertices">List of Vector3 points to convert to Polygon.</param>
         /// <param name="clockwise">Direction to sort the supplied Vector3 points. Defaults to anticlockwise.</param>
         /// <returns>A new Polygon.</returns>
-        public static Polygon MakePolygon(List<Vector3> vertices, bool clockwise = false)
+        public static Polygon MakePolygon(List<Vector3> vertices)
         {
             Polygon polygon = null;
             var points = vertices.Distinct().ToList();
-            try
+            while (polygon == null && points.Count > 2)
             {
-                polygon = new Polygon(points);
-            }
-            catch (Exception)
-            {
-                polygon = new Polygon(ConvexHull.MakeHull(points));
+                try
+                {
+                    polygon = new Polygon(points);
+                }
+                catch (Exception)
+                {
+                    points = points.Skip(1).ToList();
+                }
             }
             return polygon;
         }
@@ -393,12 +403,7 @@ namespace GeometryEx
                 }
                 resultPolygons.Add(polygon);
             }
-            var mergePolygons = new List<Polygon>();
-            foreach(var polygon in resultPolygons)
-            {
-                mergePolygons.Add(polygon);
-            }
-            return mergePolygons;
+            return resultPolygons.OrderByDescending(p => p.Area()).ToList();
         }
 
         /// <summary>

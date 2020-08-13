@@ -297,6 +297,51 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Intersections()
+        {
+            var polygons = 
+                new List<Polygon>
+                {
+                    new Polygon
+                    (
+                        new []
+                        {
+                            new Vector3(3.0, 1.0),
+                            new Vector3(10.0, 1.0),
+                            new Vector3(10.0, 5.0),
+                            new Vector3(3.0, 5.0)
+                        }
+                    )
+                };
+            var inters =
+                new List<Polygon>
+                {
+                    new Polygon
+                    (
+                        new []
+                        {
+                            new Vector3(7.0, 0.0),
+                            new Vector3(8.0, 0.0),
+                            new Vector3(8.0, 7.0),
+                            new Vector3(7.0, 7.0)
+                        }
+                    ),
+                    new Polygon
+                    (
+                        new []
+                        {
+                            new Vector3(1.0, 3.0),
+                            new Vector3(5.0, 3.0),
+                            new Vector3(5.0, 7.0),
+                            new Vector3(1.0, 7.0)
+                        }
+                    )
+                };
+            var intersects = Shaper.Intersections(polygons, inters);
+            Assert.Equal(2, intersects.Count);
+        }
+
+        [Fact]
         public void MakePolygon()
         {
             var points =
@@ -317,10 +362,8 @@ namespace GeometryExTests
                     new Vector3(6.0, 4.0),
                     new Vector3(6.0, 0.0),
                 };
-            Polygon polygon = null;
-            Assert.ThrowsAny<Exception>(() => polygon = new Polygon(points));
-            polygon = Shaper.MakePolygon(points);
-            Assert.Equal(8, polygon.Vertices.Count);
+            var polygon = Shaper.MakePolygon(points);
+            Assert.Equal(7, polygon.Vertices.Count);
         }
 
         [Fact]
