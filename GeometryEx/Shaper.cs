@@ -614,9 +614,13 @@ namespace GeometryEx
         /// <summary>
         /// Treats an ordered List of Vector3 points as a series of line segments and removes points representing distances shorter than a minimum length. Adjusts remaining points to preerve straight segments greater or equal to the supplied minimum length.
         /// </summary>
+        /// <param name="vertices">A List of Vertex3 to evaluate for simplification.</param>
         /// <param name="minLength">Minimum length for any segment represented by two points.</param>
+        /// <param name="minLength">Factor by which to multiply minLength to determine if two adjacent segments should intersect.</param>
         /// <returns>A new Polygon</returns>
-        public static List<Vector3> Simplify(List<Vector3> vertices, double minLength = 0.0)
+        public static List<Vector3> Simplify(List<Vector3> vertices, 
+                                            double minLength = 0.0, 
+                                            double filletFactor = 1.0)
         {
             minLength = Math.Abs(minLength);
             var segs = PointsToLines(vertices).Where(s => s.Length() >= minLength).ToList();
@@ -647,7 +651,7 @@ namespace GeometryEx
                     bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
                     continue;
                 }
-                if (thisLine.End.DistanceTo(thatLine.Start) < minLength * 2.0)
+                if (thisLine.End.DistanceTo(thatLine.Start) < minLength * filletFactor)
                 {
                     var inters = thisLine.Intersection(thatLine);
                     thisLine.End = inters;

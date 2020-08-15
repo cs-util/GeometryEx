@@ -545,9 +545,9 @@ namespace GeometryExTests
                     }
                 );
             var p2 = new Polygon(p1.Vertices);
-            p1 = p1.Simplify(3.0);
+            p1 = p1.Simplify(3.0, 2.0);
             Assert.Equal(4, p1.Vertices.Count);
-            p2 = p2.Simplify(5.0);
+            p2 = p2.Simplify(5.0, 2.0);
             Assert.Equal(6, p2.Vertices.Count);
             var p3 =
                 new Polygon
@@ -570,9 +570,9 @@ namespace GeometryExTests
                         new Vector3(1.0, 2.0)
                     }
                 );
-            var p4 = p3.Simplify(1.5);
+            var p4 = p3.Simplify(1.5, 2.0);
             Assert.Equal(7, p4.Vertices.Count);
-            var p5 = p3.Simplify(3.0);
+            var p5 = p3.Simplify(3.0, 2.0);
             Assert.Equal(5, p5.Vertices.Count);
         }
 

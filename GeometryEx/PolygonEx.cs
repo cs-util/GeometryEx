@@ -444,9 +444,9 @@ namespace GeometryEx
         /// </summary>
         /// <param name="tolerance">The tolerated deviation to include a vertex.</param>
         /// <returns>A new Polyline.</returns>
-        public static Polygon Simplify(this Polygon polygon, double minLength)
+        public static Polygon Simplify(this Polygon polygon, double minLength, double filletFactor = 1.0)
         {
-            return Shaper.MakePolygon(Shaper.Simplify(polygon.Vertices.ToList(), minLength));
+            return Shaper.MakePolygon(Shaper.Simplify(polygon.Vertices.ToList(), minLength, filletFactor));
         }
 
         /// <summary>

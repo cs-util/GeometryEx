@@ -23,9 +23,9 @@ namespace GeometryEx
         /// </summary>
         /// <param name="minLength">The tolerated deviation to include a vertex.</param>
         /// <returns>A new Polyline.</returns>
-        public static Polyline Simplify(this Polyline polyline, double minLength)
+        public static Polyline Simplify(this Polyline polyline, double minLength, double filletFactor = 1.0)
         {
-            return new Polyline(Shaper.Simplify(polyline.Vertices.ToList(), minLength));
+            return new Polyline(Shaper.Simplify(polyline.Vertices.ToList(), minLength, filletFactor));
         }
     }
 }
