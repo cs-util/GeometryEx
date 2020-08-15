@@ -619,12 +619,8 @@ namespace GeometryEx
         public static List<Vector3> Simplify(List<Vector3> vertices, double minLength = 0.0)
         {
             minLength = Math.Abs(minLength);
-            if (minLength.NearEqual(0.0))
-            {
-                return vertices;
-            }
             var segs = PointsToLines(vertices).Where(s => s.Length() >= minLength).ToList();
-            if (segs.Count() < 3)
+            if (minLength.NearEqual(0.0) || segs.Count() < 3)
             {
                 return vertices;
             }
@@ -651,7 +647,7 @@ namespace GeometryEx
                     bndLines.Add(new GxLine(thisLine.End, thatLine.Start));
                     continue;
                 }
-                if (thisLine.End.DistanceTo(thatLine.Start) < minLength)
+                if (thisLine.End.DistanceTo(thatLine.Start) < minLength * 2.0)
                 {
                     var inters = thisLine.Intersection(thatLine);
                     thisLine.End = inters;
