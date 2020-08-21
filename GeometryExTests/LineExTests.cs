@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using Elements.Geometry;
@@ -38,6 +39,39 @@ namespace GeometryExTests
             Assert.Contains(new Vector3(0.0, 5.0), points);
             Assert.Contains(new Vector3(10.0, 5.0), points);
             Assert.Contains(line.End, points);
+        }
+
+        [Fact]
+        public void DistanceTo()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edges = mesh.Edges();
+            var plane = new Plane(Vector3.Origin, Vector3.ZAxis);
+            var sort = edges.OrderBy(e => e.DistanceTo(new Plane(Vector3.Origin, Vector3.ZAxis))).ToList();
+            Assert.Contains(new Vector3(5.0, 4.0, 10.0), sort.First().Points());
+            Assert.Contains(new Vector3(5.0, 11.0, 10.0), sort.First().Points());
         }
 
         [Fact]
@@ -201,8 +235,8 @@ namespace GeometryExTests
         [Fact]
         public void Midpoint()
         {
-            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
-            Assert.True(new Vector3(3.0, 0.0).IsAlmostEqualTo(line.Midpoint()));
+            var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0, 4.0));
+            Assert.True(new Vector3(3.0, 0.0, 2.0).IsAlmostEqualTo(line.Midpoint()));
         }
 
         [Fact]
@@ -264,6 +298,18 @@ namespace GeometryExTests
             var line = new Line(Vector3.Origin, new Vector3(20.0, 0.0));
             var segments = line.SegmentFrom(9.0, DivideFrom.Start);
             Assert.Equal(3, segments.Count);
+        }
+
+        [Fact]
+        public void SharesEndPointWith()
+        {
+            var line1 = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 1.0));
+            var line2 = new Line(new Vector3(6.0, 1.0), new Vector3(10.0, 15.0));
+            var line3 = new Line(new Vector3(6.0, 2.0), new Vector3(5.0, 1.0));
+
+            Assert.True(line1.SharesEndpointWith(line2));
+            Assert.False(line1.SharesEndpointWith(line3));
+            Assert.False(line1.SharesEndpointWith(line1));
         }
 
         [Fact]

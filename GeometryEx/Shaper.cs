@@ -667,26 +667,15 @@ namespace GeometryEx
         /// Sorts Vector3 points in a clockwise or anti-clockwise direction relative to the centroid of the points.
         /// </summary>
         /// <param name="points">A List of Vector3 points to sort clockwise or anti-clockwise (default).</param>
-        /// <param name="clockwise">If true, sorts points clockwise (defaults to false).</param>
+        /// <param name="relativeTo">The reference point against which the supplied point list will be sorted.</param>
         /// <returns>A List of distinct sorted Vector3 points.</returns>
-        public static List<Vector3> SortRadial(List<Vector3> points, 
-                                               bool clockwise = false, 
+        public static List<Vector3> SortRadial(List<Vector3> points,
+                                               Vector3 relativeTo,
                                                bool distinct = true)
         {
-            var cvxPoints = ConvexHull.MakeHull(points);
-            if (cvxPoints.Count < 2)
-            {
-                return cvxPoints;
-            }
-            var c = Centroid(cvxPoints);
             var sorted = distinct ?
-                points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).Distinct().ToList() :
-                points.OrderBy(p => Math.Atan2(p.X - c.X, p.Y - c.Y)).ToList();
-            if (clockwise)
-            {
-                return sorted;
-            }
-            sorted.Reverse();
+                points.OrderBy(p => Math.Atan2(p.X - relativeTo.X, p.Y - relativeTo.Y)).Distinct().ToList() :
+                points.OrderBy(p => Math.Atan2(p.X - relativeTo.X, p.Y - relativeTo.Y)).ToList();
             return sorted;
         }
  

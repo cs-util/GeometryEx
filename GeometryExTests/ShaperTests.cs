@@ -632,11 +632,11 @@ namespace GeometryExTests
                     new Vector3(6.0, 4.0),
                     new Vector3(6.0, 0.0),
                 };
-            var sorted = Shaper.SortRadial(points);
+            var sorted = Shaper.SortRadial(points, new Vector3(7.5, 5.5));
             Assert.Equal(12, sorted.Count());
-            Assert.Equal(9.0, sorted.First().X);
+            Assert.Equal(6.0, sorted.First().X);
             Assert.Equal(0.0, sorted.First().Y);
-            Assert.Equal(6.0, sorted.Last().X);
+            Assert.Equal(9.0, sorted.Last().X);
             Assert.Equal(0.0, sorted.Last().Y);
         }
     }

@@ -38,6 +38,18 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Measures the distance from this Line's midpoint to the supplied plane.
+        /// </summary>
+        /// <param name="plane">The Plane to measure to.</param>
+        /// <returns>
+        /// A double.
+        /// </returns>
+        public static double DistanceTo(this Line line, Plane plane)
+        {
+           return line.Midpoint().DistanceTo(plane);
+        }
+
+        /// <summary>
         /// Creates a collection of Vector3 points representing the division of the linear geometry into the supplied number of segments.
         /// </summary>
         /// <param name="segments">The quantity of desired segments.</param>
@@ -342,7 +354,9 @@ namespace GeometryEx
         /// </returns>
         public static Vector3 Midpoint(this Line line)
         {
-            return new Vector3((line.Start.X + line.End.X) * 0.5, (line.Start.Y + line.End.Y) * 0.5);
+            return new Vector3((line.Start.X + line.End.X) * 0.5, 
+                               (line.Start.Y + line.End.Y) * 0.5, 
+                               (line.Start.Z + line.End.Z) * 0.5);
         }
 
         /// <summary>
@@ -529,6 +543,24 @@ namespace GeometryEx
                     break;
             }
             return lines;
+        }
+
+        /// <summary>
+        /// Returns whether this Line shares an endpoint with the supplied Line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this Line.</param>
+        /// <returns>
+        /// True if the Lines share an endpoint.
+        /// </returns>
+        public static bool SharesEndpointWith(this Line line, Line thatLine)
+        {
+            if (!line.IsEqualTo(thatLine) &&
+                (line.End.IsAlmostEqualTo(thatLine.End) || line.Start.IsAlmostEqualTo(thatLine.Start) ||
+                line.Start.IsAlmostEqualTo(thatLine.End) || line.End.IsAlmostEqualTo(thatLine.Start)))
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
