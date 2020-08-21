@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using Elements;
@@ -66,10 +67,16 @@ namespace GeometryExTests
             triangles.ForEach(t => mesh.AddTriangle(t));
             var planes = mesh.Planes(MeshEx.Normal.X);
             Assert.Equal(3, planes.Count);
+            Assert.Equal(2.0, planes.First().Origin.X);
+            Assert.Equal(9.0, planes.Last().Origin.X);
             planes = mesh.Planes(MeshEx.Normal.Y);
             Assert.Equal(4, planes.Count);
+            Assert.Equal(2.0, planes.First().Origin.Y);
+            Assert.Equal(13.0, planes.Last().Origin.Y);
             planes = mesh.Planes(MeshEx.Normal.Z);
             Assert.Equal(2, planes.Count);
+            Assert.Equal(10.0, planes.First().Origin.Z);
+            Assert.Equal(12.0, planes.Last().Origin.Z);
         }
     }
 }

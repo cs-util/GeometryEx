@@ -39,17 +39,20 @@ namespace GeometryEx
                 case Normal.X:
                     points.ForEach(v => slices.Add(v.X));
                     slices.Distinct().ToList().ForEach(s => planes.Add(new Plane(new Vector3(s, 0.0, 0.0), Vector3.XAxis)));
+                    planes = planes.OrderBy(p => p.Origin.X).ToList();
                     break;
                 case Normal.Y:
                     points.ForEach(v => slices.Add(v.Y));
                     slices.Distinct().ToList().ForEach(s => planes.Add(new Plane(new Vector3(0.0, s, 0.0), Vector3.YAxis)));
+                    planes = planes.OrderBy(p => p.Origin.Y).ToList();
                     break;
                 case Normal.Z:
                     points.ForEach(v => slices.Add(v.Z));
                     slices.Distinct().ToList().ForEach(s => planes.Add(new Plane(new Vector3(0.0, 0.0, s), Vector3.ZAxis)));
+                    planes = planes.OrderBy(p => p.Origin.Z).ToList();
                     break;
             }
-            return planes.OrderBy(p => p.Origin).ToList();
+            return planes; ;
         }
     }
 }
