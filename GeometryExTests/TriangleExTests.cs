@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Xunit;
 using Elements;
@@ -8,6 +9,16 @@ namespace GeometryExTests
 {
     public class TriangleExTests
     {
+        [Fact]
+        public void Area()
+        {
+            var t =
+                new Triangle(new Vertex(Vector3.Origin),
+                             new Vertex(Vector3.XAxis),
+                             new Vertex(Vector3.YAxis));
+            Assert.True(t.Area().NearEqual(0.5));
+        }
+
         [Fact]
         public void Edges()
         {
