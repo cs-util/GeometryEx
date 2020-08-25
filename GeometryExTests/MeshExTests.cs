@@ -10,6 +10,42 @@ namespace GeometryExTests
     public class MeshExTests
     {
         [Fact]
+        public void AverageAt()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var average = mesh.AverageAt(new Vector3(2.0, 2.0, 12.0));
+            Assert.True(average.Z > 0.0);
+            average = mesh.AverageAt(new Vector3(9.0, 13.0, 12.0));
+            Assert.True(average.Z > 0.0);
+            average = mesh.AverageAt(new Vector3(5.0, 4.0, 10.0));
+            Assert.True(average.Z < 0.0);
+            average = mesh.AverageAt(new Vector3(5.0, 11.0, 10.0));
+            Assert.True(average.Z < 0.0);
+        }
+
+        [Fact]
         public void Edges()
         {
             var triangles = new List<Triangle>
@@ -37,6 +73,94 @@ namespace GeometryExTests
             triangles.ForEach(t => mesh.AddTriangle(t));
             var edges = mesh.Edges();
             Assert.Equal(11, edges.Count);
+        }
+
+        [Fact]
+        public void EdgesAt()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var point = new Vector3(2.0, 2.0, 12.0);
+            var edges = mesh.EdgesAt(point);
+            Assert.Equal(3, edges.Count);
+            Assert.True(edges[0].End.IsAlmostEqualTo(point));
+            Assert.True(edges[1].End.IsAlmostEqualTo(point));
+            Assert.True(edges[2].End.IsAlmostEqualTo(point));
+        }
+
+        [Fact]
+        public void IsFlat()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            Assert.False(mesh.IsFlat());
+
+            triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            Assert.True(mesh.IsFlat());
         }
 
         [Fact]
@@ -77,6 +201,36 @@ namespace GeometryExTests
             Assert.Equal(2, planes.Count);
             Assert.Equal(10.0, planes.First().Origin.Z);
             Assert.Equal(12.0, planes.Last().Origin.Z);
+        }
+
+        [Fact]
+        public void Points()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var points = mesh.Points();
+            Assert.Equal(6, points.Count);
         }
     }
 }
