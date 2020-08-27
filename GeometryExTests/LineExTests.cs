@@ -276,6 +276,15 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Reverse()
+        {
+            var line = new Line(Vector3.Origin, new Vector3(5.0, 1.0));
+            var revLine = line.Reverse();
+            Assert.Equal(5.0, revLine.Start.X);
+            Assert.Equal(1.0, revLine.Start.Y);
+        }
+
+        [Fact]
         public void Rotate()
         {
             var line = new Line(Vector3.Origin, new Vector3(5.0, 0.0));
