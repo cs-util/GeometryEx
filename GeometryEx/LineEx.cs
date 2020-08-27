@@ -441,6 +441,17 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a Line with reversed endpoints in comparison to this Line.
+        /// </summary>
+        /// <returns>
+        /// A new Line.
+        /// </returns>
+        public static Line Reverse(this Line line)
+        {
+            return new Line(line.End, line.Start);
+        }
+
+        /// <summary>
         /// Creates a new Line from the supplied Line rotated around the supplied pivot point by the specified angle in degrees.
         /// </summary>
         /// <param name="pivot">Vector3 base point of the rotation.</param>
