@@ -575,6 +575,18 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns a list of Lines shares an endpoint with the supplied Line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this Line.</param>
+        /// <returns>
+        /// A List of Lines.
+        /// </returns>
+        public static List<Line> SharesEndpointWith(this Line line, List<Line> lines)
+        {
+            return lines.Where(l => l.SharesEndpointWith(line)).ToList();
+        }
+
+        /// <summary>
         /// Returns the slope of the Line, normalizing a vertical Line to a slope of positive infinity.
         /// </summary>
         /// <returns>

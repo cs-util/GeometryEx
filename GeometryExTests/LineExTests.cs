@@ -315,10 +315,15 @@ namespace GeometryExTests
             var line1 = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 1.0));
             var line2 = new Line(new Vector3(6.0, 1.0), new Vector3(10.0, 15.0));
             var line3 = new Line(new Vector3(6.0, 2.0), new Vector3(5.0, 1.0));
-
             Assert.True(line1.SharesEndpointWith(line2));
             Assert.False(line1.SharesEndpointWith(line3));
             Assert.False(line1.SharesEndpointWith(line1));
+
+            var lines = line1.SharesEndpointWith(new List<Line> { line1, line2, line3 });
+            Assert.Single(lines);
+
+            lines = line1.SharesEndpointWith(new List<Line> { line3 });
+            Assert.Empty(lines);
         }
 
         [Fact]
