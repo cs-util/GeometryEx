@@ -514,10 +514,7 @@ namespace GeometryEx
         /// <returns>A List containing this Polygon.</returns>
         public static List<Polygon> ToList(this Polygon polygon)
         {
-            return new List<Polygon>
-            {
-                polygon
-            };
+            return new List<Polygon> { polygon };
         }
 
     }

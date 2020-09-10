@@ -20,6 +20,16 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Centroid()
+        {
+            var t =
+                new Triangle(new Vertex(Vector3.Origin),
+                             new Vertex(new Vector3(1.0, 0.0, 1.0)),
+                             new Vertex(new Vector3(0.0, 1.0, 1.0)));
+            Assert.True(t.Centroid().IsAlmostEqualTo(new Vector3(0.333333, 0.333333, 0.66666667)));
+        }
+
+        [Fact]
         public void Edges()
         {
             var t1 = 
@@ -38,6 +48,17 @@ namespace GeometryExTests
             Assert.True(new Line(new Vector3(2.0, 2.0, 12.0), new Vector3(5.0, 4.0, 10.0)).IsListed(edges1));
             Assert.True(new Line(new Vector3(9.0, 2.0, 12.0), new Vector3(5.0, 4.0, 10.0)).IsListed(edges2));
             Assert.True(new Line(new Vector3(9.0, 2.0, 12.0), new Vector3(5.0, 11.0, 10.0)).IsListed(edges2));
+        }
+
+        [Fact]
+        public void Points()
+        {
+            var t1 =
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)));
+            var points = t1.Points();
+            Assert.Equal(3, points.Count);
         }
     }
 }

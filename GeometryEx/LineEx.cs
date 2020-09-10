@@ -603,6 +603,15 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Inserts this Line into a new List.
+        /// </summary>
+        /// <returns>A List containing this Line.</returns>
+        public static List<Line> ToList(this Line line)
+        {
+            return new List<Line> { line };
+        }
+
+        /// <summary>
         /// Returns this Line as a Polyline.
         /// </summary>
         /// <param name="line"></param>

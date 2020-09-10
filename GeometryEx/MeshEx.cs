@@ -11,11 +11,35 @@ namespace GeometryEx
     public static class MeshEx
     {
         /// <summary>
-        /// Returns the average calculated from the edges terminating at a Mesh Vertex..
+        /// Returns the Mesh Triangle(s) that border the supplied Line edge.
+        /// </summary>
+        /// <param name="edge">A Line representing a Mesh edge.</param>
+        /// <returns>
+        /// A List of Triangles.
+        /// </returns>
+        public static List<Triangle> AdjacentTriangles(this Mesh mesh, Line edge)
+        {
+            var triangles = new List<Triangle>();
+            foreach (var triangle in mesh.Triangles)
+            {
+                var points = new List<Vector3>();
+                triangle.Vertices.ToList().ForEach(v => points.Add(v.Position));
+                if (points.Contains(edge.Start) && points.Contains(edge.End))
+                {
+                    triangles.Add(triangle);
+                }
+            }
+            return triangles;
+        }
+
+        /// <summary>
+        /// Averages the vectors terminating at a Mesh Vertex..
         /// </summary>
         /// <param name="point">A Vector3 at the same position as a Vertex on the Mesh.</param>
         /// <param name="orient">If true, returns lines whose end point is at the supplied point.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// A Vector3 average.
+        /// </returns>
         public static Vector3 AverageAt(this Mesh mesh, Vector3 point)
         {
             var average = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
@@ -105,21 +129,58 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a
+        /// Calculates whether a supplied edge of the Mesh is a valley relative to its adjacent triangles and a supplied comparison vector.
+        /// </summary>
+        /// <param name="edge">A Line representing an edge of this Mesh.</param>
+        /// <param name="compareTo">A vector to compare adjacent triangle normals.</param>
+        /// <returns></returns>
+        public static bool IsValley(this Mesh mesh, Line edge, Vector3 compareTo)
+        {
+            compareTo = compareTo.Unitized();
+            var triangles = mesh.AdjacentTriangles(edge);
+            if (triangles.Count == 0) //Line is not a Mesh edge.
+            {
+                return false;
+            }
+            var origin = triangles[0].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
+                                                          !p.IsAlmostEqualTo(edge.End)).First();
+
+            var nrmPlane = new Plane(origin, compareTo);
+            var distS0 = nrmPlane.SignedDistanceTo(edge.Start);
+            var distE0 = nrmPlane.SignedDistanceTo(edge.End);
+            if (triangles.Count == 1)
+            {
+                if (distS0 < 0.0 && distE0 < 0.0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            origin = triangles[1].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
+                                                      !p.IsAlmostEqualTo(edge.End)).First();
+            nrmPlane = new Plane(origin, compareTo);
+            var distS1 = nrmPlane.SignedDistanceTo(edge.Start);
+            var distE1 = nrmPlane.SignedDistanceTo(edge.End);
+            if (distS0 < 0.0 && distE0 < 0.0 &&
+                distS1 < 0.0 && distE1 < 0.0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a list of distict points in the Mesh.
         /// </summary>
         /// <param name="mesh"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// A Vector3 List.
+        /// </returns>
         public static List<Vector3> Points(this Mesh mesh)
         {
             var triangles = mesh.Triangles;
             var points = new List<Vector3>();
-            foreach (var triangle in triangles)
-            {
-                var vertices = triangle.Vertices;
-                points.Add(vertices[0].Position);
-                points.Add(vertices[1].Position);
-                points.Add(vertices[2].Position);
-            }
+            triangles.ForEach(t => points.AddRange(t.Points()));
             return points.Distinct().ToList();
         }
 

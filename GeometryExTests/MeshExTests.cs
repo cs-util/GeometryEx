@@ -10,6 +10,40 @@ namespace GeometryExTests
     public class MeshExTests
     {
         [Fact]
+        public void AdjacentTriangles()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edge = new Line(new Vector3(5.0, 11.0, 10.0), new Vector3(5.0, 4.0, 10.0));
+            var adjTriangles = mesh.AdjacentTriangles(edge);
+            Assert.Equal(2, adjTriangles.Count);
+            edge = new Line(new Vector3(2.0, 2.0, 12.0), new Vector3(2.0, 13.0, 12.0));
+            adjTriangles = mesh.AdjacentTriangles(edge);
+            Assert.Single(adjTriangles);
+        }
+
+        [Fact]
         public void AverageAt()
         {
             var triangles = new List<Triangle>
@@ -161,6 +195,63 @@ namespace GeometryExTests
             mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
             Assert.True(mesh.IsFlat());
+        }
+
+        [Fact]
+        public void IsValley()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+
+                new Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 11.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(12.0, 5.0, 10.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edges = mesh.Edges();
+            var valleys = new List<Line>();
+            foreach (var e in edges)
+            {
+                if (mesh.IsValley(e, Vector3.ZAxis))
+                {
+                    valleys.Add(e);
+                }
+            }
+            Assert.Equal(2.0, valleys.Count);
         }
 
         [Fact]

@@ -24,6 +24,19 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the centroid of the triangle.
+        /// </summary>
+        /// <returns>A double.</returns>
+        public static Vector3 Centroid(this Triangle triangle)
+        {
+            var a = triangle.Vertices[0].Position;
+            var b = triangle.Vertices[1].Position;
+            var c = triangle.Vertices[2].Position;
+
+            return new Line(a, new Line(b, c).Midpoint()).PointAt(0.666666666);
+        }
+
+        /// <summary>
         /// Returns the edges of a Triangle as a List of Lines.
         /// </summary>
         /// <returns>A List of Lines.</returns>
@@ -38,6 +51,18 @@ namespace GeometryEx
             return edges;
         }
 
-
+        /// <summary>
+        /// Returns the Vector3 Vertex Positions of the triangle.
+        /// </summary>
+        /// <param name="triangle"></param>
+        /// <returns>
+        /// A Vector3 List.
+        /// </returns>
+        public static List<Vector3> Points(this Triangle triangle)
+        {
+            var points = new List<Vector3>();
+            triangle.Vertices.ToList().ForEach(v => points.Add(v.Position));
+            return points;
+        }
     }
 }
