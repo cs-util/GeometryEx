@@ -10,6 +10,23 @@ namespace GeometryExTests
     public class MeshExTests
     {
         [Fact]
+        public void Area()
+        {
+            var triangles = new List<Triangle>
+            {
+                new Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
+                             new Vertex(new Vector3(2.0, 0.0, 0.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 0.0))),
+                new Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 0.0)),
+                             new Vertex(new Vector3(0.0, 2.0, 0.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            Assert.True(mesh.Area().NearEqual(4.0));
+        }
+
+        [Fact]
         public void AdjacentTriangles()
         {
             var triangles = new List<Triangle>

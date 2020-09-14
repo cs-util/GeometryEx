@@ -11,6 +11,20 @@ namespace GeometryEx
     public static class MeshEx
     {
         /// <summary>
+        /// Returns the aggregate area of all Mesh triangles.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns>
+        /// A double.
+        /// </returns>
+        public static double Area (this Mesh mesh)
+        {
+            var area = 0.0;
+            mesh.Triangles.ForEach(t => area += t.Area());
+            return area;
+        }
+
+        /// <summary>
         /// Returns the Mesh Triangle(s) that border the supplied Line edge.
         /// </summary>
         /// <param name="edge">A Line representing a Mesh edge.</param>
