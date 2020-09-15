@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elements.Geometry;
+using DelaunatorSharp;
 using SkeletonNet;
 using SkeletonNet.Primitives;
 
@@ -517,5 +518,35 @@ namespace GeometryEx
             return new List<Polygon> { polygon };
         }
 
+        /// <summary>
+        /// Returns a Mesh by applying the Delauney triangulation algorithm to this Polygon.
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns>
+        /// A Mesh.
+        /// </returns>
+        public static Mesh ToMesh(this Polygon polygon)
+        {
+            var points = new List<IPoint>();
+            polygon.Vertices.ToList().ForEach(v => points.Add(new Point(v.X, v.Y)));
+            var delTriangles = new Delaunator(points.ToArray()).GetTriangles().ToList();
+            var mesh = new Mesh();
+            foreach(var triangle in delTriangles)
+            {
+                var pnts = triangle.Points.ToList();
+                var mTriangle = new Elements.Geometry.Triangle(new Vertex(new Vector3(pnts[0].X, pnts[0].Y)),
+                                                               new Vertex(new Vector3(pnts[1].X, pnts[1].Y)),
+                                                               new Vertex(new Vector3(pnts[2].X, pnts[2].Y)));
+                if(!polygon.Covers(mTriangle.Centroid()))
+                {
+                    continue;
+                }
+                mesh.AddTriangle(mTriangle);
+                mesh.AddVertex(mTriangle.Vertices[0].Position);
+                mesh.AddVertex(mTriangle.Vertices[1].Position);
+                mesh.AddVertex(mTriangle.Vertices[2].Position);
+            }
+            return mesh;
+        }
     }
 }

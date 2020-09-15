@@ -119,36 +119,12 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether all normals of this Mesh's triagles are equivalent.
-        /// </summary>
-        /// <param name="mesh"></param>
-        /// <returns>
-        /// True if the absolute value of all normals is equivalent.
-        /// </returns>
-        public static bool IsFlat(this Mesh mesh)
-        {
-            var triangles = mesh.Triangles;
-            var idx = triangles.First().Normal;
-            var index = new Vector3(Math.Abs(idx.X), Math.Abs(idx.Y), Math.Abs(idx.Z));
-            foreach (var triangle in triangles)
-            {
-                var vtx = triangle.Normal;
-                var compare = new Vector3(Math.Abs(vtx.X), Math.Abs(vtx.Y), Math.Abs(vtx.Z));
-                if (!index.IsAlmostEqualTo(compare))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Calculates whether a supplied edge of the Mesh is a valley relative to its adjacent triangles and a supplied comparison vector.
         /// </summary>
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
         /// <param name="compareTo">A vector to compare adjacent triangle normals.</param>
         /// <returns></returns>
-        public static bool IsValley(this Mesh mesh, Line edge, Vector3 compareTo)
+        public static bool IsConcavity(this Mesh mesh, Line edge, Vector3 compareTo)
         {
             compareTo = compareTo.Unitized();
             var triangles = mesh.AdjacentTriangles(edge);
@@ -181,6 +157,30 @@ namespace GeometryEx
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Returns whether all normals of this Mesh's triagles are equivalent.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns>
+        /// True if the absolute value of all normals is equivalent.
+        /// </returns>
+        public static bool IsFlat(this Mesh mesh)
+        {
+            var triangles = mesh.Triangles;
+            var idx = triangles.First().Normal;
+            var index = new Vector3(Math.Abs(idx.X), Math.Abs(idx.Y), Math.Abs(idx.Z));
+            foreach (var triangle in triangles)
+            {
+                var vtx = triangle.Normal;
+                var compare = new Vector3(Math.Abs(vtx.X), Math.Abs(vtx.Y), Math.Abs(vtx.Z));
+                if (!index.IsAlmostEqualTo(compare))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

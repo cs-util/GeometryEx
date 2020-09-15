@@ -32,7 +32,7 @@ namespace GeometryExTests
 
         [Fact]
         public void AlignedBox()
-        { 
+        {
             var polygon =
                 new Polygon
                 (
@@ -73,7 +73,7 @@ namespace GeometryExTests
         [Fact]
         public void AspectRatio()
         {
-            var polygon = 
+            var polygon =
                 new Polygon
                 (
                     new[]
@@ -178,7 +178,7 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../GeometryExTests/output/expandToArea.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/polygon.ExpandToArea.glb");
         }
 
         [Fact]
@@ -273,13 +273,13 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../GeometryExTests/output/FitAmong.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/polygon.FitAmong.glb");
         }
 
         [Fact]
         public void FitMost()
         {
-            var polygon = 
+            var polygon =
                 new Polygon
                 (
                     new[]
@@ -359,7 +359,7 @@ namespace GeometryExTests
             {
                 model.AddElement(space);
             }
-            model.ToGlTF("../../../../GeometryExTests/output/FitTo.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/polygon.FitTo.glb");
         }
 
         [Fact]
@@ -431,7 +431,7 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(polygon, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "room")));
             }
-            model.ToGlTF("../../../../GeometryExTests/output/jigsaw.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/polygon.Jigsaw.glb");
         }
 
         [Fact]
@@ -607,7 +607,14 @@ namespace GeometryExTests
             {
                 model.AddElement(new Space(corridor, 4.0, new Material(Palette.Aqua, 0.0f, 0.0f, false, null, false, Guid.NewGuid(), "corridor")));
             }
-            model.ToGlTF("../../../../GeometryExTests/output/spine.glb");
+            model.ToGlTF("../../../../GeometryExTests/output/polygon.Spine.glb");
+        }
+
+        [Fact]
+        public void ToMesh()
+        {
+            var mesh = ShapeMaker.C(Vector3.Origin, new Vector3(100.0, 100.0), 25.0).ToMesh();
+            Assert.Equal(6, mesh.Triangles.Count);
         }
     }
 }
