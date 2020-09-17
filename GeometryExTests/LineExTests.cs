@@ -249,6 +249,20 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Occurs()
+        {
+            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
+            var lines = new List<Line>
+            {
+                new Line (new Vector3(5.0, 6.0), new Vector3(2.0, 1.0)),
+                new Line (new Vector3(7.0, 6.0), new Vector3(8.0, 1.0)),
+                new Line (new Vector3(6.0, 6.0), new Vector3(1.0, 1.0)),
+                 new Line (new Vector3(1.0, 1.0), new Vector3(6.0, 6.0))
+            };
+            Assert.Equal(2, line.Occurs(lines));
+        }
+
+        [Fact]
         public void PerpendicularDistanceTo()
         {
             var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));

@@ -72,6 +72,7 @@ namespace GeometryEx
             }
             return average.Unitized();
         }
+
         /// <summary>
         /// Returns the unique edges of a Mesh as a List of Lines.
         /// </summary>
@@ -181,6 +182,47 @@ namespace GeometryEx
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Returns an CCW ordered lists of perimeter edges from a Mesh.
+        /// </summary>
+        /// <returns>
+        /// A List of Lines.
+        /// </returns>
+        public static List<List<Line>> PerimeterEdges(this Mesh mesh)
+        {
+            var edges = new List<Line>();
+            mesh.Triangles.ForEach(t => edges.AddRange(t.Edges()));
+            var pEdges = edges.Where(e => e.Occurs(edges) == 1).ToList();
+            var perimeters = new List<List<Line>>();
+            while (pEdges.Count() > 0)
+            {
+                var edge = pEdges.First();
+                pEdges = pEdges.Skip(1).ToList();
+                var perimeter = new List<Line> { edge };
+                var connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
+                while(connected.Count() > 0)
+                {
+                    pEdges.Remove(connected.First());
+                    edge = new Line(edge.End, edge.End.FarthestFrom(connected.First().Points()));
+                    perimeter.Add(edge);
+                    connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
+                }
+                var linePoints = new List<Vector3>();
+                perimeter.ForEach(e => linePoints.AddRange(e.Points()));
+                linePoints = linePoints.Distinct().ToList();
+                var polyPoints = new List<Vector3>();
+                linePoints.ForEach(p => polyPoints.Add(new Vector3(p.X, p.Y, 0.0)));
+                var polygon = new Polygon(polyPoints);
+                if (polygon.IsClockWise())
+                {
+                    linePoints.Reverse();
+                    perimeter = Shaper.PointsToLines(linePoints, true);
+                }
+                perimeters.Add(perimeter);
+            }
+            return perimeters;
         }
 
         /// <summary>

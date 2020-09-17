@@ -374,6 +374,25 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Return the number of times an Equal Line appears in the supplied list.
+        /// </summary>
+        /// <returns>
+        /// An integer.
+        /// </returns>
+        public static int Occurs(this Line line, List<Line> lines)
+        {
+            int count = 0;
+            foreach (var entry in lines)
+            {
+                if (line.IsEqualTo(entry))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        /// <summary>
         /// Returns the perpendicular distance from this Line to the supplied Vector3 point.
         /// </summary>
         /// <param name="point">Vector3 representing a point.</param>
