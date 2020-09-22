@@ -678,6 +678,20 @@ namespace GeometryEx
                 points.OrderBy(p => Math.Atan2(p.X - relativeTo.X, p.Y - relativeTo.Y)).ToList();
             return sorted;
         }
+
+        /// <summary>
+        /// Returns the toal length of a List of Lines.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns>
+        /// A double.
+        /// </returns>
+        public static double TotalLength(List<Line> lines)
+        {
+            var length = 0.0;
+            lines.ForEach(l => length += (l.Length()));
+            return length;
+        }
  
         /// <summary>
         /// Returns a random double within the supplied range.

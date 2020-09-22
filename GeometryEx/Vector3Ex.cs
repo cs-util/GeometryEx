@@ -27,25 +27,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Return true if an NearEqual Vector3 appears in the supplied list.
-        /// </summary>
-        /// <param name="points">List of Vector3 to compare to point.</param>
-        /// <returns>
-        /// True if this Vectors 3 appears in the supplied List of Vector3 points.
-        /// </returns>
-        public static bool IsListed(this Vector3 point, List<Vector3> points)
-        {
-            foreach (var entry in points)
-            {
-                if (point.IsAlmostEqualTo(entry))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Returns the Vector3 point moved to a new relative location.
         /// </summary>
         /// <param name="from">Vector3 base point of the move.</param>
@@ -74,6 +55,25 @@ namespace GeometryEx
                 return new Vector3(double.NaN, double.NaN);
             }
             return points.OrderBy(pnt => point.DistanceTo(pnt)).First();
+        }
+
+        /// <summary>
+        /// Return true if an NearEqual Vector3 appears in the supplied list.
+        /// </summary>
+        /// <param name="points">List of Vector3 to compare to point.</param>
+        /// <returns>
+        /// True if this Vectors 3 appears in the supplied List of Vector3 points.
+        /// </returns>
+        public static bool Occurs(this Vector3 point, List<Vector3> points)
+        {
+            foreach (var entry in points)
+            {
+                if (point.IsAlmostEqualTo(entry))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>

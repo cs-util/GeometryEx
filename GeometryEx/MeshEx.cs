@@ -120,6 +120,52 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns an CCW ordered lists of perimeter edges from a Mesh.
+        /// </summary>
+        /// <returns>
+        /// A List of Lines.
+        /// </returns>
+        public static List<List<Line>> EdgesPerimeters(this Mesh mesh)
+        {
+            var edges = new List<Line>();
+            mesh.Triangles.ForEach(t => edges.AddRange(t.Edges()));
+            var pEdges = edges.Where(e => e.Occurs(edges) == 1).ToList();
+            var perimeters = new List<List<Line>>();
+            while (pEdges.Count() > 0)
+            {
+                var edge = pEdges.First();
+                pEdges = pEdges.Skip(1).ToList();
+                var perimeter = new List<Line> { edge };
+                var connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
+                while (connected.Count() > 0)
+                {
+                    pEdges.Remove(connected.First());
+                    edge = new Line(edge.End, edge.End.FarthestFrom(connected.First().Points()));
+                    perimeter.Add(edge);
+                    connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
+                }
+                var linePoints = new List<Vector3>();
+                perimeter.ForEach(e => linePoints.AddRange(e.Points()));
+                linePoints = linePoints.Distinct().ToList();
+                var polyPoints = new List<Vector3>();
+                linePoints.ForEach(p => polyPoints.Add(new Vector3(p.X, p.Y, 0.0)));
+                var polygon = new Polygon(polyPoints);
+                if (polygon.IsClockWise())
+                {
+                    linePoints.Reverse();
+                    perimeter = Shaper.PointsToLines(linePoints, true);
+                }
+                perimeters.Add(perimeter);
+            }
+            if (perimeters.Count == 1)
+            {
+                return perimeters;
+            }
+            perimeters = perimeters.OrderByDescending(p => Shaper.TotalLength(p)).ToList();
+            return perimeters;
+        }
+
+        /// <summary>
         /// Calculates whether a supplied edge of the Mesh is a valley relative to its adjacent triangles and a supplied comparison vector.
         /// </summary>
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
@@ -185,47 +231,6 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns an CCW ordered lists of perimeter edges from a Mesh.
-        /// </summary>
-        /// <returns>
-        /// A List of Lines.
-        /// </returns>
-        public static List<List<Line>> PerimeterEdges(this Mesh mesh)
-        {
-            var edges = new List<Line>();
-            mesh.Triangles.ForEach(t => edges.AddRange(t.Edges()));
-            var pEdges = edges.Where(e => e.Occurs(edges) == 1).ToList();
-            var perimeters = new List<List<Line>>();
-            while (pEdges.Count() > 0)
-            {
-                var edge = pEdges.First();
-                pEdges = pEdges.Skip(1).ToList();
-                var perimeter = new List<Line> { edge };
-                var connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
-                while(connected.Count() > 0)
-                {
-                    pEdges.Remove(connected.First());
-                    edge = new Line(edge.End, edge.End.FarthestFrom(connected.First().Points()));
-                    perimeter.Add(edge);
-                    connected = pEdges.Where(e => e.Start.IsAlmostEqualTo(edge.End) || e.End.IsAlmostEqualTo(edge.End)).ToList();
-                }
-                var linePoints = new List<Vector3>();
-                perimeter.ForEach(e => linePoints.AddRange(e.Points()));
-                linePoints = linePoints.Distinct().ToList();
-                var polyPoints = new List<Vector3>();
-                linePoints.ForEach(p => polyPoints.Add(new Vector3(p.X, p.Y, 0.0)));
-                var polygon = new Polygon(polyPoints);
-                if (polygon.IsClockWise())
-                {
-                    linePoints.Reverse();
-                    perimeter = Shaper.PointsToLines(linePoints, true);
-                }
-                perimeters.Add(perimeter);
-            }
-            return perimeters;
-        }
-
-        /// <summary>
         /// Returns a list of distict points in the Mesh.
         /// </summary>
         /// <param name="mesh"></param>
@@ -238,6 +243,37 @@ namespace GeometryEx
             var points = new List<Vector3>();
             triangles.ForEach(t => points.AddRange(t.Points()));
             return points.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Returns the perimeter Vector3 points of the Mesh in CCW order.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns>
+        /// A List of Vector3 points.
+        /// </returns>
+        public static List<Vector3> PointsBoundary(this Mesh mesh)
+        {
+            var pPoints = new List<Vector3>();
+            var edges = EdgesPerimeters(mesh);
+            if (edges.Count == 0)
+            {
+                return pPoints;
+            }
+            edges.First().ForEach(e => pPoints.Add(e.Start));
+            return pPoints;
+        }
+
+        /// <summary>
+        /// Returns the list of Mesh interior Vector3 points.
+        /// </summary>
+        /// <returns>
+        /// A List of Vector3 points.
+        /// </returns>
+        public static List<Vector3> PointsInterior(this Mesh mesh)
+        {
+            var pPoints = mesh.PointsBoundary();
+            return mesh.Points().Where(p => !p.Occurs(pPoints)).ToList();
         }
 
         public enum Normal { X, Y, Z }
@@ -272,6 +308,64 @@ namespace GeometryEx
                     break;
             }
             return planes; ;
+        }
+
+        public struct Vertex
+        {
+            public int index;
+            public bool isBoundary;
+            public Vector3 position;
+        }
+
+        public struct IndexedVertices
+        {
+            public List<int> indices;
+            public List<Vertex> vertices;
+        }
+        /// <summary>
+        /// 
+        /// NOTE: ELIMINATES HOLES IN THE MESH.
+        /// TODO: PRESERVE HOLES.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns>
+        /// A List of IndexedVertices.
+        /// </returns>
+        public static IndexedVertices ToIndexedVertices(this Mesh mesh)
+        {
+            IndexedVertices indexedVertices;
+            indexedVertices.indices = new List<int>();
+            indexedVertices.vertices = new List<Vertex>();
+            var i = 0;
+            foreach(var point in mesh.PointsBoundary())
+            {
+                indexedVertices.vertices.Add(
+                    new Vertex
+                    {
+                        index = i,
+                        isBoundary = true,
+                        position = point
+                    });
+                i++;
+            }
+            foreach (var point in mesh.PointsInterior())
+            {
+                indexedVertices.vertices.Add(
+                    new Vertex
+                    {
+                        index = i,
+                        isBoundary = false,
+                        position = point
+                    });
+                i++;
+            }
+            foreach(var triangle in mesh.Triangles)
+            {
+                var verts = triangle.Vertices.ToList();
+                verts.ForEach(v => indexedVertices.indices.Add(
+                    indexedVertices.vertices.First(vrt => vrt.position.IsAlmostEqualTo(v.Position)).index));
+            }
+            return indexedVertices;
         }
     }
 }

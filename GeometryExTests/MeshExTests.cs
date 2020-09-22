@@ -272,7 +272,7 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void PerimeterEdges()
+        public void EdgesPerimeters()
         {
             var triangles = new List<Triangle>
             {
@@ -311,7 +311,7 @@ namespace GeometryExTests
             };
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
-            var edges = mesh.PerimeterEdges();
+            var edges = mesh.EdgesPerimeters();
             Assert.Equal(4, edges.First().Count);
             Assert.Equal(4, edges.Last().Count);
         }
@@ -384,6 +384,147 @@ namespace GeometryExTests
             triangles.ForEach(t => mesh.AddTriangle(t));
             var points = mesh.Points();
             Assert.Equal(6, points.Count);
+        }
+
+        [Fact]
+        public void PointsBoundary()
+        {
+            var triangles = new List<Triangle>
+            {
+                //south triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
+
+                //north triangles
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+                //west triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+
+                //east triangles
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var bndPoints = mesh.PointsBoundary();
+            Assert.Equal(4, bndPoints.Count);
+            Assert.Contains(new Vector3(2.0, 2.0, 12.0), bndPoints);
+            Assert.Contains(new Vector3(9.0, 2.0, 12.0), bndPoints);
+            Assert.Contains(new Vector3(2.0, 13.0, 12.0), bndPoints);
+            Assert.Contains(new Vector3(9.0, 13.0, 12.0), bndPoints);
+        }
+
+        [Fact]
+        public void PointsInterior()
+        {
+            var triangles = new List<Triangle>
+            {
+                //south triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
+
+                //north triangles
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+                //west triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+
+                //east triangles
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var inPoints = mesh.PointsInterior();
+            Assert.Equal(4, inPoints.Count);
+            Assert.Contains(new Vector3(5.0, 4.0, 10.0), inPoints);
+            Assert.Contains(new Vector3(6.0, 4.0, 10.0), inPoints);
+            Assert.Contains(new Vector3(5.0, 11.0, 10.0), inPoints);
+            Assert.Contains(new Vector3(6.0, 11.0, 10.0), inPoints);
+        }
+
+        [Fact]
+        public void ToIndexedVertices()
+        {
+            var triangles = new List<Triangle>
+            {
+                //south triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
+
+                //north triangles
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+                //west triangles
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+
+                //east triangles
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var idxVerts = mesh.ToIndexedVertices();
+            Assert.Equal(24, idxVerts.indices.Count);
+            Assert.Equal(8, idxVerts.vertices.Count);
         }
     }
 }
