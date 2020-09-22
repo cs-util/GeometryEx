@@ -317,6 +317,74 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void MeshClosed()
+        {
+            var triangles = new List<Triangle>
+            {
+                //topside
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                //underside
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 8.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 8.0))),
+                //west
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                ////east
+                new Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 13.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                //north
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 8.0))),
+                //south
+                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0))),
+                new Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edges = mesh.EdgesPerimeters();
+            var bndPoints = mesh.PointsBoundary();
+            Assert.Empty(edges);
+            Assert.Empty(bndPoints);
+        }
+
+        [Fact]
         public void Planes()
         {
             var triangles = new List<Triangle>
