@@ -591,7 +591,7 @@ namespace GeometryExTests
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
             var idxVerts = mesh.ToIndexedVertices();
-            Assert.Equal(24, idxVerts.indices.Count);
+            Assert.Equal(8, idxVerts.triangles.Count);
             Assert.Equal(8, idxVerts.vertices.Count);
         }
     }

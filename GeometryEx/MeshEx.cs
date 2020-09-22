@@ -308,7 +308,7 @@ namespace GeometryEx
 
         public struct IndexedVertices
         {
-            public List<int> indices;
+            public List<List<int>> triangles;
             public List<Vertex> vertices;
         }
         /// <summary>
@@ -323,7 +323,7 @@ namespace GeometryEx
         public static IndexedVertices ToIndexedVertices(this Mesh mesh)
         {
             IndexedVertices indexedVertices;
-            indexedVertices.indices = new List<int>();
+            indexedVertices.triangles = new List<List<int>>();
             indexedVertices.vertices = new List<Vertex>();
             var i = 0;
             foreach(var point in mesh.PointsBoundary())
@@ -350,9 +350,10 @@ namespace GeometryEx
             }
             foreach(var triangle in mesh.Triangles)
             {
-                var verts = triangle.Vertices.ToList();
-                verts.ForEach(v => indexedVertices.indices.Add(
-                    indexedVertices.vertices.First(vrt => vrt.position.IsAlmostEqualTo(v.Position)).index));
+                var indices = new List<int>();
+                triangle.Vertices.ToList().ForEach(
+                    p => indices.Add(indexedVertices.vertices.First(v => v.position.IsAlmostEqualTo(p.Position)).index));
+                indexedVertices.triangles.Add(indices);
             }
             return indexedVertices;
         }
