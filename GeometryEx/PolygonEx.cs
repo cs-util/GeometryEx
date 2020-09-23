@@ -529,14 +529,15 @@ namespace GeometryEx
         {
             var points = new List<IPoint>();
             polygon.Vertices.ToList().ForEach(v => points.Add(new Point(v.X, v.Y)));
+            var elev = polygon.Vertices.First().Z;
             var delTriangles = new Delaunator(points.ToArray()).GetTriangles().ToList();
             var mesh = new Mesh();
             foreach(var triangle in delTriangles)
             {
                 var pnts = triangle.Points.ToList();
-                var mTriangle = new Elements.Geometry.Triangle(new Vertex(new Vector3(pnts[0].X, pnts[0].Y)),
-                                                               new Vertex(new Vector3(pnts[1].X, pnts[1].Y)),
-                                                               new Vertex(new Vector3(pnts[2].X, pnts[2].Y)));
+                var mTriangle = new Elements.Geometry.Triangle(new Vertex(new Vector3(pnts[0].X, pnts[0].Y, elev)),
+                                                               new Vertex(new Vector3(pnts[1].X, pnts[1].Y, elev)),
+                                                               new Vertex(new Vector3(pnts[2].X, pnts[2].Y, elev)));
                 if(!polygon.Covers(mTriangle.Centroid()))
                 {
                     continue;
