@@ -525,28 +525,41 @@ namespace GeometryEx
         /// <returns>
         /// A Mesh.
         /// </returns>
-        public static Mesh ToMesh(this Polygon polygon)
+        public static Mesh ToMesh(this Polygon polygon, bool top = true)
         {
             var points = new List<IPoint>();
             polygon.Vertices.ToList().ForEach(v => points.Add(new Point(v.X, v.Y)));
             var elev = polygon.Vertices.First().Z;
             var delTriangles = new Delaunator(points.ToArray()).GetTriangles().ToList();
             var mesh = new Mesh();
+            var normal = Vector3.ZAxis;
+            if (!top)
+            {
+                normal *= -1.0;
+            }
             foreach(var triangle in delTriangles)
             {
-                var pnts = triangle.Points.ToList();
-                var mTriangle = new Elements.Geometry.Triangle(new Vertex(new Vector3(pnts[0].X, pnts[0].Y, elev)),
-                                                               new Vertex(new Vector3(pnts[1].X, pnts[1].Y, elev)),
-                                                               new Vertex(new Vector3(pnts[2].X, pnts[2].Y, elev)));
-                if(!polygon.Covers(mTriangle.Centroid()))
+                var vertices = new List<Vector3>();
+                triangle.Points.ToList().ForEach(p => vertices.Add(new Vector3(p.X, p.Y, elev)));
+                var winder = new Polygon(vertices);
+                if (!polygon.Covers(winder))
                 {
                     continue;
                 }
+                if (winder.IsClockWise() && top || !winder.IsClockWise() && !top)
+                {
+                    winder = winder.Reversed();
+                }
+                vertices = winder.Vertices.ToList();
+                var mTriangle = new Elements.Geometry.Triangle(new Vertex(vertices[0], normal),
+                                                               new Vertex(vertices[1], normal),
+                                                               new Vertex(vertices[2], normal));
                 mesh.AddTriangle(mTriangle);
                 mesh.AddVertex(mTriangle.Vertices[0].Position);
                 mesh.AddVertex(mTriangle.Vertices[1].Position);
                 mesh.AddVertex(mTriangle.Vertices[2].Position);
             }
+            mesh.ComputeNormals();
             return mesh;
         }
     }

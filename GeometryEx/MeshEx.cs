@@ -11,20 +11,6 @@ namespace GeometryEx
     public static class MeshEx
     {
         /// <summary>
-        /// Returns the aggregate area of all Mesh triangles.
-        /// </summary>
-        /// <param name="mesh"></param>
-        /// <returns>
-        /// A double.
-        /// </returns>
-        public static double Area (this Mesh mesh)
-        {
-            var area = 0.0;
-            mesh.Triangles.ForEach(t => area += t.Area());
-            return area;
-        }
-
-        /// <summary>
         /// Returns the Mesh Triangle(s) that border the supplied Line edge.
         /// </summary>
         /// <param name="edge">A Line representing a Mesh edge.</param>
@@ -44,6 +30,20 @@ namespace GeometryEx
                 }
             }
             return triangles;
+        }
+
+        /// <summary>
+        /// Returns the aggregate area of all Mesh triangles.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns>
+        /// A double.
+        /// </returns>
+        public static double Area(this Mesh mesh)
+        {
+            var area = 0.0;
+            mesh.Triangles.ForEach(t => area += t.Area());
+            return area;
         }
 
         /// <summary>
@@ -168,9 +168,10 @@ namespace GeometryEx
             {
                 return false;
             }
+            // Find the first triangle's point that doesn't fall on the edge.
             var origin = triangles[0].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
                                                           !p.IsAlmostEqualTo(edge.End)).First();
-
+            //Construct plane using compareTo as the normal.
             var nrmPlane = new Plane(origin, compareTo);
             var distS0 = nrmPlane.SignedDistanceTo(edge.Start);
             var distE0 = nrmPlane.SignedDistanceTo(edge.End);
@@ -182,6 +183,7 @@ namespace GeometryEx
                 }
                 return false;
             }
+            // Find the second triangle's point that doesn't fall on the edge.
             origin = triangles[1].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
                                                       !p.IsAlmostEqualTo(edge.End)).First();
             nrmPlane = new Plane(origin, compareTo);
@@ -196,7 +198,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns whether all normals of this Mesh's triagles are equivalent.
+        /// Returns whether all normals of this Mesh's triangles are equivalent.
         /// </summary>
         /// <param name="mesh"></param>
         /// <returns>
