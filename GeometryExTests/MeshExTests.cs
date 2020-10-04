@@ -12,14 +12,14 @@ namespace GeometryExTests
         [Fact]
         public void Area()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
-                             new Vertex(new Vector3(2.0, 0.0, 0.0)),
-                             new Vertex(new Vector3(2.0, 2.0, 0.0))),
-                new Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
-                             new Vertex(new Vector3(2.0, 2.0, 0.0)),
-                             new Vertex(new Vector3(0.0, 2.0, 0.0)))
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
+                                               new Vertex(new Vector3(2.0, 0.0, 0.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 0.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 0.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 0.0)),
+                                               new Vertex(new Vector3(0.0, 2.0, 0.0)))
             };
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
@@ -29,26 +29,26 @@ namespace GeometryExTests
         [Fact]
         public void AdjacentTriangles()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
@@ -63,24 +63,24 @@ namespace GeometryExTests
         [Fact]
         public void AverageAt()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -99,24 +99,24 @@ namespace GeometryExTests
         [Fact]
         public void Edges()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -129,24 +129,24 @@ namespace GeometryExTests
         [Fact]
         public void EdgesAt()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -163,43 +163,43 @@ namespace GeometryExTests
         [Fact]
         public void IsConcavity()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
 
-                new Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(15.0, 2.0, 12.0)),
                              new Vertex(new Vector3(12.0, 5.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
                              new Vertex(new Vector3(15.0, 13.0, 12.0)),
                              new Vertex(new Vector3(12.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(12.0, 11.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(12.0, 5.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(12.0, 11.0, 10.0)),
                              new Vertex(new Vector3(12.0, 5.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
                              new Vertex(new Vector3(12.0, 11.0, 10.0)),
                              new Vertex(new Vector3(12.0, 5.0, 10.0)))
             };
@@ -220,24 +220,24 @@ namespace GeometryExTests
         [Fact]
         public void IsFlat()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -245,24 +245,24 @@ namespace GeometryExTests
             triangles.ForEach(t => mesh.AddTriangle(t));
             Assert.False(mesh.IsFlat());
 
-            triangles = new List<Triangle>
+            triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -274,37 +274,37 @@ namespace GeometryExTests
         [Fact]
         public void EdgesPerimeters()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
                 //south triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0))),
 
                 //north triangles
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
 
                 //west triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
 
                 //east triangles
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)))
 
@@ -319,60 +319,60 @@ namespace GeometryExTests
         [Fact]
         public void MeshClosed()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
                 //topside
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
                 //underside
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(2.0, 13.0, 8.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 13.0, 8.0))),
                 //west
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
                              new Vertex(new Vector3(2.0, 2.0, 8.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
                 ////east
-                new Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
                 //north
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 8.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 8.0))),
                 //south
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 8.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)))
             };
@@ -387,24 +387,24 @@ namespace GeometryExTests
         [Fact]
         public void Planes()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -427,24 +427,24 @@ namespace GeometryExTests
         [Fact]
         public void Points()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
@@ -457,37 +457,37 @@ namespace GeometryExTests
         [Fact]
         public void PointsBoundary()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
                 //south triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0))),
 
                 //north triangles
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
 
                 //west triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
 
                 //east triangles
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)))
 
@@ -505,37 +505,37 @@ namespace GeometryExTests
         [Fact]
         public void PointsInterior()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
                 //south triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0))),
 
                 //north triangles
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
 
                 //west triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
 
                 //east triangles
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)))
 
@@ -553,37 +553,37 @@ namespace GeometryExTests
         [Fact]
         public void ToIndexedVertices()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
                 //south triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(6.0, 4.0, 10.0))),
 
                 //north triangles
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
 
                 //west triangles
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
 
                 //east triangles
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)),
                              new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0)))
 

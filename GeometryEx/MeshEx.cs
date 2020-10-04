@@ -17,9 +17,9 @@ namespace GeometryEx
         /// <returns>
         /// A List of Triangles.
         /// </returns>
-        public static List<Triangle> AdjacentTriangles(this Mesh mesh, Line edge)
+        public static List<Elements.Geometry.Triangle> AdjacentTriangles(this Mesh mesh, Line edge)
         {
-            var triangles = new List<Triangle>();
+            var triangles = new List<Elements.Geometry.Triangle>();
             foreach (var triangle in mesh.Triangles)
             {
                 var points = new List<Vector3>();
@@ -80,7 +80,7 @@ namespace GeometryEx
         public static List<Line> Edges(this Mesh mesh)
         {
             var edges = new List<Line>();
-            mesh.Triangles.ForEach(t => edges.AddRange(t.Edges().Where(e => !e.IsListed(edges))));
+            mesh.Triangles.ForEach(t => edges.AddRange(t.Edges().Where(e => e.Occurs(edges) == 0)));
             return edges;
         }
 

@@ -9,7 +9,7 @@
 
     <Version>2.7</Version>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
     <AssemblyVersion>2.7.0.0</AssemblyVersion>
   </PropertyGroup>

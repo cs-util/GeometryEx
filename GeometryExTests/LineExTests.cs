@@ -44,26 +44,26 @@ namespace GeometryExTests
         [Fact]
         public void DistanceTo()
         {
-            var triangles = new List<Triangle>
+            var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
-                new Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)))
             };
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));

@@ -14,7 +14,7 @@ namespace GeometryEx
         /// Returns the area of the triangle.
         /// </summary>
         /// <returns>A double.</returns>
-        public static double Area(this Triangle triangle)
+        public static double Area(this Elements.Geometry.Triangle triangle)
         {
             var a = triangle.Vertices[0].Position;
             var b = triangle.Vertices[1].Position;
@@ -27,7 +27,7 @@ namespace GeometryEx
         /// Returns the centroid of the triangle.
         /// </summary>
         /// <returns>A double.</returns>
-        public static Vector3 Centroid(this Triangle triangle)
+        public static Vector3 Centroid(this Elements.Geometry.Triangle triangle)
         {
             var a = triangle.Vertices[0].Position;
             var b = triangle.Vertices[1].Position;
@@ -40,7 +40,7 @@ namespace GeometryEx
         /// Returns the edges of a Triangle as a List of Lines.
         /// </summary>
         /// <returns>A List of Lines.</returns>
-        public static List<Line> Edges(this Triangle triangle)
+        public static List<Line> Edges(this Elements.Geometry.Triangle triangle)
         {
             var edges = new List<Line>();
             var points = new List<Vector3>();
@@ -58,7 +58,7 @@ namespace GeometryEx
         /// <returns>
         /// A Vector3 List.
         /// </returns>
-        public static List<Vector3> Points(this Triangle triangle)
+        public static List<Vector3> Points(this Elements.Geometry.Triangle triangle)
         {
             var points = new List<Vector3>();
             triangle.Vertices.ToList().ForEach(v => points.Add(v.Position));

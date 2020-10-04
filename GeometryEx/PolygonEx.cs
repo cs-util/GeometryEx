@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elements.Geometry;
-using DelaunatorSharp;
 using SkeletonNet;
 using SkeletonNet.Primitives;
 
@@ -532,11 +531,6 @@ namespace GeometryEx
             var elev = polygon.Vertices.First().Z;
             var delTriangles = new Delaunator(points.ToArray()).GetTriangles().ToList();
             var mesh = new Mesh();
-            var normal = Vector3.ZAxis;
-            if (!top)
-            {
-                normal *= -1.0;
-            }
             foreach(var triangle in delTriangles)
             {
                 var vertices = new List<Vector3>();
@@ -550,10 +544,9 @@ namespace GeometryEx
                 {
                     winder = winder.Reversed();
                 }
-                vertices = winder.Vertices.ToList();
-                var mTriangle = new Elements.Geometry.Triangle(new Vertex(vertices[0], normal),
-                                                               new Vertex(vertices[1], normal),
-                                                               new Vertex(vertices[2], normal));
+                var mTriangle = new Elements.Geometry.Triangle(new Vertex(winder.Vertices[0]),
+                                                               new Vertex(winder.Vertices[1]),
+                                                               new Vertex(winder.Vertices[2]));
                 mesh.AddTriangle(mTriangle);
                 mesh.AddVertex(mTriangle.Vertices[0].Position);
                 mesh.AddVertex(mTriangle.Vertices[1].Position);

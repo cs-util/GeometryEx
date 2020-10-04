@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryEx", "GeometryEx\GeometryEx.csproj", "{DE6C8FAC-29DF-4F70-99D5-C9ABD623681E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeometryEx", "GeometryEx\GeometryEx.csproj", "{DE6C8FAC-29DF-4F70-99D5-C9ABD623681E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryExTests", "GeometryExTests\GeometryExTests.csproj", "{A545151F-4F1B-49AE-94A3-DFA919F438EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeometryExTests", "GeometryExTests\GeometryExTests.csproj", "{A545151F-4F1B-49AE-94A3-DFA919F438EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
