@@ -128,6 +128,16 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsEqual2D()
+        {
+            var line = new Line(new Vector3(1.0, 1.0, 5.0), new Vector3(6.0, 6.0, 4.0));
+            var thatLine = new Line(new Vector3(6.0, 6.0, 7.0), new Vector3(1.0, 1.0, 9.0));
+            Assert.True(line.IsEqual2D(thatLine));
+            thatLine = new Line(new Vector3(7.0, 6.0, 0.0), new Vector3(1.0, 1.0, 6.0));
+            Assert.False(line.IsEqual2D(thatLine));
+        }
+
+        [Fact]
         public void IsEqualTo()
         {
             var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));

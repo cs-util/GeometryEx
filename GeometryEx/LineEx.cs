@@ -196,6 +196,27 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Return true if the supplied Line has the same 2D endpoints as this Line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this Line.</param>
+        /// <returns>
+        /// True if the 2D endpoints are near equal to those of the supplied Line.
+        /// </returns>
+        public static bool IsEqual2D(this Line line, Line thatLine)
+        {
+            var line2D = new Line(new Vector3(line.Start.X, line.Start.Y, 0.0),
+                                  new Vector3(line.End.X, line.End.Y, 0.0));
+            var thatLine2D = new Line(new Vector3(thatLine.Start.X, thatLine.Start.Y, 0.0),
+                                      new Vector3(thatLine.End.X, thatLine.End.Y, 0.0));
+            if ((line2D.Start.IsAlmostEqualTo(thatLine2D.Start) || line2D.Start.IsAlmostEqualTo(thatLine2D.End)) &&
+               ((line2D.End.IsAlmostEqualTo(thatLine2D.Start) || line2D.End.IsAlmostEqualTo(thatLine2D.End))))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Return true if the supplied Line has the same endpoints as this Line.
         /// </summary>
         /// <param name="thatLine">Line to compare to this Line.</param>
