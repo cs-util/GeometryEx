@@ -119,6 +119,10 @@ namespace GeometryExTests
             Assert.True(thatLine.IsColinearWith(thisLine));
             Assert.True(thisLine.IsColinearWith(thisLine));
 
+            thisLine = new Line(new Vector3(1.0, 1.0, 5.0), new Vector3(6.0, 6.0, 7.0));
+            thatLine = new Line(new Vector3(3.0, 3.0, 3.0), new Vector3(5.0, 5.0, 8.0));
+            Assert.True(thatLine.IsColinearWith(thisLine, false));
+
             thisLine = new Line(new Vector3(1.0, 1.0), new Vector3(7.0, 6.0));
             thatLine = new Line(new Vector3(3.0, 3.0), new Vector3(5.0, 5.0));
             Assert.False(thisLine.IsColinearWith(thatLine));

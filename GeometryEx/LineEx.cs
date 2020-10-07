@@ -171,11 +171,19 @@ namespace GeometryEx
         /// <returns>
         /// True is this Line's Start and End points fall on the supplied Line.
         /// </returns>
-        public static bool IsColinearWith(this Line line, Line thatLine)
+        public static bool IsColinearWith(this Line line, Line thatLine, bool compareZ = true)
         {
-            var start = thatLine.PointOnLine(line.Start, true);
-            var end = thatLine.PointOnLine(line.End, true);
-            if (start && end)
+            var start = line.Start;
+            var end = line.End;
+            if(!compareZ)
+            {
+                start = new Vector3(start.X, start.Y, 0.0);
+                end = new Vector3(end.X, end.Y, 0.0);
+                thatLine = new Line(new Vector3(thatLine.Start.X, thatLine.Start.Y),
+                                   (new Vector3(thatLine.End.X, thatLine.End.Y)));
+            }
+            if (thatLine.PointOnLine(start, true) && 
+                thatLine.PointOnLine(end, true))
             {
                 return true;
             }
