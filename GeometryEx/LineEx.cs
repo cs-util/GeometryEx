@@ -165,6 +165,24 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns whether the endpoints of this Line both fall on the supplied Line.
+        /// </summary>
+        /// <param name="thatLine">Line to compare to this Line.</param>
+        /// <returns>
+        /// True is this Line's Start and End points fall on the supplied Line.
+        /// </returns>
+        public static bool IsColinearWith(this Line line, Line thatLine)
+        {
+            var start = thatLine.PointOnLine(line.Start, true);
+            var end = thatLine.PointOnLine(line.End, true);
+            if (start && end)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns whether this Line shares a point and a slope with the supplied Line.
         /// </summary>
         /// <param name="thatLine">Line to compare to this Line.</param>
@@ -420,7 +438,7 @@ namespace GeometryEx
         /// <returns>A double.</returns>
         public static double PerpendicularDistanceTo(this Line line, Vector3 point)
         {
-            if (PointOnLine(line, point))
+            if (line.PointOnLine(point, true))
             {
                 return 0.0;
             }
@@ -428,30 +446,30 @@ namespace GeometryEx
             return area / (line.Length() * 0.5);
         }
 
-        /// <summary>
-        /// Tests whether a point falls along this line.
-        /// </summary>
-        /// <param name="point">Vector3 point to compare to this Line.</param>
-        /// <returns>
-        /// True if the supplied Vector3 is coincident with this Line.
-        /// </returns>
-        public static bool PointOnLine(Line line, Vector3 point)
-        {
-            if (line.Start.IsAlmostEqualTo(point) || line.End.IsAlmostEqualTo(point))
-            {
-                return true;
-            }
-            var deltaXp = point.X - line.Start.X;
-            var deltaYp = point.Y - line.Start.Y;
-            var deltaXl = line.End.X - line.Start.X;
-            var deltaYl = line.End.Y - line.Start.Y;
-            var cross = deltaXp * deltaYl - deltaYp * deltaXl;
-            if (Math.Abs(cross) < Vector3.EPSILON)
-            {
-                return true;
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Tests whether a point falls along this line.
+        ///// </summary>
+        ///// <param name="point">Vector3 point to compare to this Line.</param>
+        ///// <returns>
+        ///// True if the supplied Vector3 is coincident with this Line.
+        ///// </returns>
+        //public static bool PointOnLine(Line line, Vector3 point)
+        //{
+        //    if (line.Start.IsAlmostEqualTo(point) || line.End.IsAlmostEqualTo(point))
+        //    {
+        //        return true;
+        //    }
+        //    var deltaXp = point.X - line.Start.X;
+        //    var deltaYp = point.Y - line.Start.Y;
+        //    var deltaXl = line.End.X - line.Start.X;
+        //    var deltaYl = line.End.Y - line.Start.Y;
+        //    var cross = deltaXp * deltaYl - deltaYp * deltaXl;
+        //    if (Math.Abs(cross) < Vector3.EPSILON)
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Returns a Vector3 List of this Line's Start and End points.
