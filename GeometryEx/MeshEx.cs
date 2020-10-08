@@ -301,6 +301,28 @@ namespace GeometryEx
             return planes; ;
         }
 
+        /// <summary>
+        /// Returns the third points of triangles from one delivered edge.
+        /// </summary>
+        /// <param name="edge">A Line representing a Mesh edge.</param>
+        /// <returns>
+        /// A List of Vector3 points.
+        /// </returns>
+        public static List<Vector3> ThirdPoints(this Mesh mesh, Line edge)
+        {
+            var thirdPoints = new List<Vector3>();
+            foreach (var triangle in mesh.Triangles)
+            {
+                var points = new List<Vector3>();
+                triangle.Vertices.ToList().ForEach(v => points.Add(v.Position));
+                if (points.Contains(edge.Start) && points.Contains(edge.End))
+                {
+                    thirdPoints.AddRange(points.Where(p => !edge.Start.IsAlmostEqualTo(p) && !edge.End.IsAlmostEqualTo(p)));
+                }
+            }
+            return thirdPoints;
+        }
+
         public struct Vertex
         {
             public int index;

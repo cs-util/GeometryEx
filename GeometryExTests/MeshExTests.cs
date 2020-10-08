@@ -550,6 +550,41 @@ namespace GeometryExTests
             Assert.Contains(new Vector3(6.0, 11.0, 10.0), inPoints);
         }
 
+
+        [Fact]
+        public void ThirdPoints()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edge = new Line(new Vector3(5.0, 11.0, 10.0), new Vector3(5.0, 4.0, 10.0));
+            var thirdPoints = mesh.ThirdPoints(edge);
+            Assert.Equal(2, thirdPoints.Count);
+            edge = new Line(new Vector3(2.0, 2.0, 12.0), new Vector3(2.0, 13.0, 12.0));
+            thirdPoints = mesh.ThirdPoints(edge);
+            Assert.Single(thirdPoints);
+        }
+
         [Fact]
         public void ToIndexedVertices()
         {
