@@ -454,30 +454,24 @@ namespace GeometryEx
             return area / (line.Length() * 0.5);
         }
 
-        ///// <summary>
-        ///// Tests whether a point falls along this line.
-        ///// </summary>
-        ///// <param name="point">Vector3 point to compare to this Line.</param>
-        ///// <returns>
-        ///// True if the supplied Vector3 is coincident with this Line.
-        ///// </returns>
-        //public static bool PointOnLine(Line line, Vector3 point)
-        //{
-        //    if (line.Start.IsAlmostEqualTo(point) || line.End.IsAlmostEqualTo(point))
-        //    {
-        //        return true;
-        //    }
-        //    var deltaXp = point.X - line.Start.X;
-        //    var deltaYp = point.Y - line.Start.Y;
-        //    var deltaXl = line.End.X - line.Start.X;
-        //    var deltaYl = line.End.Y - line.Start.Y;
-        //    var cross = deltaXp * deltaYl - deltaYp * deltaXl;
-        //    if (Math.Abs(cross) < Vector3.EPSILON)
-        //    {
-        //        return true;
-        //    }
-        //    return false;
-        //}
+        /// <summary>
+        /// Tests whether any of the suppiled points falls along this line.
+        /// </summary>
+        /// <param name="point">List of Vector3 points to compare to this Line.</param>
+        /// <returns>
+        /// True if any of the supplied Vector3 points is coincident with this Line.
+        /// </returns>
+        public static bool PointsOnLine(this Line line, List<Vector3> points)
+        {
+            foreach(var point in points)
+            {
+                if (line.PointOnLine(point, true))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// Returns a Vector3 List of this Line's Start and End points.

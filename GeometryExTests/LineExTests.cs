@@ -300,11 +300,16 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void PointOnLine()
+        public void PointsOnLine()
         {
             var line = new Line(Vector3.Origin, new Vector3(6.0, 0.0));
-            Assert.True(line.PointOnLine(new Vector3(3.0, 0.0)));
-            Assert.False(line.PointOnLine(new Vector3(3.0, 1.0)));
+            var points =
+                new List<Vector3>
+                {
+                    new Vector3(3.0, 0.0),
+                    new Vector3(3.0, 1.0)
+                };
+            Assert.True(line.PointsOnLine(points));
         }
 
         [Fact]
