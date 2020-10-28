@@ -30,5 +30,10 @@ namespace GeometryEx
     /// </summary>
     public enum Corner { NE = 3, SE = 7, SW = 11, NW = 15 };
 
+    /// <summary>
+    /// Defines four Cartesian coordinate quadrants.
+    /// </summary>
     public enum Quadrant { I, II, III, IV };
+
+    //public enum Slope { Concave = -1, Flat = 0, Convex = 1 };
 }

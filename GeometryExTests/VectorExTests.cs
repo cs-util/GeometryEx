@@ -9,6 +9,17 @@ namespace GeometryExTests
     public class VectorExTests
     {
         [Fact]
+        public void DistanceTo()
+        {
+            var point = Vector3.Origin;
+            var line = new Line(new Vector3(-2.0, 2.0, 0.0), new Vector3(2.0, 2.0, 0.0));
+            var dist = point.DistanceTo(line, out var near);
+            Assert.True(0.0.NearEqual(near.X));
+            Assert.True(2.0.NearEqual(near.Y));
+            Assert.True(2.0.NearEqual(dist));
+        }
+
+        [Fact]
         public void FarthestFrom()
         {
             var point = Vector3.Origin;

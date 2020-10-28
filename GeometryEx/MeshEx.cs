@@ -301,6 +301,11 @@ namespace GeometryEx
             return planes; ;
         }
 
+        //public static Slope GetSlopeAtEdge(this Mesh mesh, Line edge, Vector3 compareTo)
+        //{
+        //    var points = ThirdPoints(mesh, edge);
+        //}
+
         /// <summary>
         /// Returns the third points of triangles from one delivered edge.
         /// </summary>

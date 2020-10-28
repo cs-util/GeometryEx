@@ -11,6 +11,35 @@ namespace GeometryEx
     public static class Vector3Ex
     {
         /// <summary>
+        /// Find the distance from this point to the line, and output the location 
+        /// of the closest point on that line.
+        /// Using formula from https://diego.assencio.com/?index=ec3d5dfdfc0b6a0d147a656f0af332bd
+        /// </summary>
+        /// <param name="line">The line to find the distance to.</param>
+        /// <param name="closestPoint">The point on the line that is closest to this point.</param>
+        public static double DistanceTo(this Vector3 point, Line line, out Vector3 closestPoint)
+        {
+            var lambda = 
+                (point - line.Start).Dot(line.End - line.Start) / 
+                (line.End - line.Start).Dot(line.End - line.Start);
+            if (lambda >= 1)
+            {
+                closestPoint = line.End;
+                return point.DistanceTo(line.End);
+            }
+            else if (lambda <= 0)
+            {
+                closestPoint = line.Start;
+                return point.DistanceTo(line.Start);
+            }
+            else
+            {
+                closestPoint = (line.Start + lambda * (line.End - line.Start));
+                return point.DistanceTo(closestPoint);
+            }
+        }
+
+        /// <summary>
         /// Returns the Vector3 point in a List farthest from this point.
         /// </summary>
         /// <param name="points">List of Vector3 points to compare.</param>
