@@ -58,6 +58,9 @@ namespace GeometryExTests
             edge = new Line(new Vector3(2.0, 2.0, 12.0), new Vector3(2.0, 13.0, 12.0));
             adjTriangles = mesh.AdjacentTriangles(edge);
             Assert.Single(adjTriangles);
+            adjTriangles.Clear();
+            adjTriangles = mesh.AdjacentTriangles(triangles.First());
+            Assert.Equal(2, adjTriangles.Count);
         }
 
         [Fact]

@@ -93,16 +93,17 @@ namespace GeometryEx
         /// <returns>
         /// True if this Vectors 3 appears in the supplied List of Vector3 points.
         /// </returns>
-        public static bool Occurs(this Vector3 point, List<Vector3> points)
+        public static int Occurs(this Vector3 point, List<Vector3> points)
         {
+            var occurs = 0;
             foreach (var entry in points)
             {
                 if (point.IsAlmostEqualTo(entry))
                 {
-                    return true;
+                    occurs++;
                 }
             }
-            return false;
+            return occurs;
         }
 
         /// <summary>

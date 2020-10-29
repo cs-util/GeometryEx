@@ -33,6 +33,32 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the Mesh Triangle(s) that border the supplied Triangle.
+        /// </summary>
+        /// <param name="triangle">A Mesh triangle.</param>
+        /// <returns>
+        /// A List of Triangles.
+        /// </returns>
+        public static List<Elements.Geometry.Triangle> AdjacentTriangles(this Mesh mesh, Elements.Geometry.Triangle triangle)
+        {
+            var triangles = new List<Elements.Geometry.Triangle>();
+            var triPoints = new List<Vector3>();
+            triangle.Vertices.ToList().ForEach(v => triPoints.Add(v.Position));
+            foreach (var triang in mesh.Triangles)
+            {
+                var common = 0;
+                var points = new List<Vector3>();
+                triang.Vertices.ToList().ForEach(v => points.Add(v.Position));
+                points.ForEach(p => common += p.Occurs(triPoints));
+                if (common == 2)
+                { 
+                    triangles.Add(triang);
+                }
+            }
+            return triangles;
+        }
+
+        /// <summary>
         /// Returns the aggregate area of all Mesh triangles.
         /// </summary>
         /// <param name="mesh"></param>
@@ -264,7 +290,7 @@ namespace GeometryEx
         public static List<Vector3> PointsInterior(this Mesh mesh)
         {
             var pPoints = mesh.PointsBoundary();
-            return mesh.Points().Where(p => !p.Occurs(pPoints)).ToList();
+            return mesh.Points().Where(p => p.Occurs(pPoints) == 0).ToList();
         }
 
         public enum Normal { X, Y, Z }
