@@ -168,12 +168,15 @@ namespace GeometryExTests
         {
             var triangles = new List<Elements.Geometry.Triangle>
             {
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
                              new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(9.0, 13.0, 12.0))),
@@ -183,9 +186,7 @@ namespace GeometryExTests
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                              new Vertex(new Vector3(2.0, 2.0, 12.0)),
                              new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+
 
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
                              new Vertex(new Vector3(15.0, 2.0, 12.0)),
@@ -217,7 +218,7 @@ namespace GeometryExTests
                     valleys.Add(e);
                 }
             }
-            Assert.Equal(2.0, valleys.Count);
+            Assert.Equal(2, valleys.Count);
         }
 
         [Fact]

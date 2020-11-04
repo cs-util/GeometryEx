@@ -76,15 +76,13 @@ namespace GeometryEx
         /// Averages the vectors terminating at a Mesh Vertex..
         /// </summary>
         /// <param name="point">A Vector3 at the same position as a Vertex on the Mesh.</param>
-        /// <param name="orient">If true, returns lines whose end point is at the supplied point.</param>
         /// <returns>
         /// A Vector3 average.
         /// </returns>
         public static Vector3 AverageAt(this Mesh mesh, Vector3 point)
         {
             var average = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
-            var points = mesh.Points();
-            if (!points.Any(p => p.IsAlmostEqualTo(point)))
+            if (point.Occurs(mesh.Points()) == 0) //Supplied point is not a mesh point.
             {
                 return average;
             }
@@ -140,7 +138,7 @@ namespace GeometryEx
                     edges.Add(line);
                     continue;
                 }
-                edges.Add(new Line(line.End, line.Start));
+                edges.Add(line.Reverse());
             }
             return edges;
         }
@@ -188,39 +186,23 @@ namespace GeometryEx
         /// <returns></returns>
         public static bool IsConcavity(this Mesh mesh, Line edge, Vector3 compareTo)
         {
-            compareTo = compareTo.Unitized();
-            var triangles = mesh.AdjacentTriangles(edge);
-            if (triangles.Count == 0) //Line is not a Mesh edge.
+            if (edge.Occurs(mesh.Edges()) == 0) //Line is not a Mesh edge.
             {
                 return false;
             }
-            // Find the first triangle's point that doesn't fall on the edge.
-            var origin = triangles[0].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
-                                                          !p.IsAlmostEqualTo(edge.End)).First();
-            //Construct plane using compareTo as the normal.
-            var nrmPlane = new Plane(origin, compareTo);
-            var distS0 = nrmPlane.SignedDistanceTo(edge.Start);
-            var distE0 = nrmPlane.SignedDistanceTo(edge.End);
-            if (triangles.Count == 1)
+            foreach (var point in edge.Points())
             {
-                if (distS0 < 0.0 && distE0 < 0.0)
+                var edges = mesh.EdgesAt(point);
+                foreach(var line in edges)
                 {
-                    return true;
+                    var plane = new Plane(line.Start, compareTo);
+                    if (plane.SignedDistanceTo(point) > 0.0)
+                    {
+                        return false;
+                    }
                 }
-                return false;
             }
-            // Find the second triangle's point that doesn't fall on the edge.
-            origin = triangles[1].Points().Where(p => !p.IsAlmostEqualTo(edge.Start) &&
-                                                      !p.IsAlmostEqualTo(edge.End)).First();
-            nrmPlane = new Plane(origin, compareTo);
-            var distS1 = nrmPlane.SignedDistanceTo(edge.Start);
-            var distE1 = nrmPlane.SignedDistanceTo(edge.End);
-            if (distS0 < 0.0 && distE0 < 0.0 &&
-                distS1 < 0.0 && distE1 < 0.0)
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
 
         /// <summary>
