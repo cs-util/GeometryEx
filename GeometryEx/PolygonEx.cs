@@ -544,9 +544,9 @@ namespace GeometryEx
                 {
                     winder = winder.Reversed();
                 }
-                var mTriangle = new Elements.Geometry.Triangle(new Vertex(winder.Vertices[0]),
-                                                               new Vertex(winder.Vertices[1]),
-                                                               new Vertex(winder.Vertices[2]));
+                var mTriangle = new Elements.Geometry.Triangle(new Elements.Geometry.Solids.Vertex(winder.Vertices[0]),
+                                                               new Elements.Geometry.Solids.Vertex(winder.Vertices[1]),
+                                                               new Elements.Geometry.Solids.Vertex(winder.Vertices[2]));
                 mesh.AddTriangle(mTriangle);
                 mesh.AddVertex(mTriangle.Vertices[0].Position);
                 mesh.AddVertex(mTriangle.Vertices[1].Position);
