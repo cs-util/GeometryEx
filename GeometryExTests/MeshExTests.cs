@@ -100,6 +100,49 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void Concavities()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                //south triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
+
+                //north triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+                //west triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+
+                //east triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            Assert.Equal(2, mesh.Concavities(Vector3.ZAxis).Count);
+        }
+
+        [Fact]
         public void Edges()
         {
             var triangles = new List<Elements.Geometry.Triangle>
@@ -164,6 +207,81 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void EdgesInterior()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edges = mesh.EdgesInterior();
+            Assert.Equal(7, edges.Count);
+        }
+
+        [Fact]
+        public void EdgesPerimeters()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                //south triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
+
+                //north triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+                //west triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
+
+                //east triangles
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
+                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var edges = mesh.EdgesPerimeters();
+            Assert.Equal(4, edges.First().Count);
+            Assert.Equal(4, edges.Last().Count);
+        }
+
+        [Fact]
         public void IsConcavity()
         {
             var triangles = new List<Elements.Geometry.Triangle>
@@ -218,7 +336,7 @@ namespace GeometryExTests
                     valleys.Add(e);
                 }
             }
-            Assert.Equal(2, valleys.Count);
+            Assert.Equal(9, valleys.Count);
         }
 
         [Fact]
@@ -273,51 +391,6 @@ namespace GeometryExTests
             mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
             Assert.True(mesh.IsFlat());
-        }
-
-        [Fact]
-        public void EdgesPerimeters()
-        {
-            var triangles = new List<Elements.Geometry.Triangle>
-            {
-                //south triangles
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(6.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(6.0, 4.0, 10.0))),
-
-                //north triangles
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(6.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 13.0, 12.0))),
-
-                //west triangles
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                             new Vertex(new Vector3(2.0, 13.0, 12.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(5.0, 11.0, 10.0))),
-
-                //east triangles
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 13.0, 12.0)),
-                             new Vertex(new Vector3(6.0, 11.0, 10.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(6.0, 4.0, 10.0)),
-                             new Vertex(new Vector3(9.0, 2.0, 12.0)),
-                             new Vertex(new Vector3(9.0, 13.0, 12.0)))
-
-            };
-            var mesh = new Mesh();
-            triangles.ForEach(t => mesh.AddTriangle(t));
-            var edges = mesh.EdgesPerimeters();
-            Assert.Equal(4, edges.First().Count);
-            Assert.Equal(4, edges.Last().Count);
         }
 
         [Fact]

@@ -5,7 +5,6 @@ using Xunit;
 using Elements.Geometry;
 using GeometryEx;
 
-
 namespace GeometryExTests
 {
     public class LineExTests
