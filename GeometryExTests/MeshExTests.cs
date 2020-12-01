@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Xunit;
 using Elements;
 using Elements.Geometry;
+using Elements.Geometry.Solids;
 using GeometryEx;
 
 namespace GeometryExTests

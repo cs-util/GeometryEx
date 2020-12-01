@@ -58,7 +58,7 @@ namespace GeometryEx
         /// </returns>
         public static List<Vector3> Divide(this Line line, int segments)
         {
-            var lines = line.DivideByCount(segments);
+            var lines = line.DivideIntoEqualSegments(segments);
             var points = new List<Vector3>();
             foreach (var segment in lines)
             {
