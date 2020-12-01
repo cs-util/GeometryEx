@@ -33,6 +33,21 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Returns the Mesh points adjacent to the supplied Mesh point.
+        /// </summary>
+        /// <param name="point">A Vector3 point located at a mesh vertex.</param>
+        /// <returns>
+        /// A List of Vector3 points.
+        /// </returns>
+        public static List<Vector3> AdjacentPoints(this Mesh mesh, Vector3 point)
+        {
+            var edges = EdgesAt(mesh, point);
+            var points = new List<Vector3>();
+            edges.ForEach(e => points.Add(e.Start));
+            return points;
+        }
+
+        /// <summary>
         /// Returns the Mesh Triangle(s) that border the supplied Triangle.
         /// </summary>
         /// <param name="triangle">A Mesh triangle.</param>
@@ -258,36 +273,44 @@ namespace GeometryEx
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
         /// <param name="compareTo">A vector to compare adjacent triangle normals.</param>
         /// <returns></returns>
-        public static bool IsConcavity(this Mesh mesh, Line edge, Vector3 compareTo)
+        public static bool IsConcave(this Mesh mesh, Line edge, Vector3 compareTo)
         {
             if (edge.Occurs(mesh.Edges()) == 0) //Line is not a Mesh edge.
             {
                 return false;
             }
-            var points = mesh.ThirdPoints(edge);
-            var plane = new Plane(points.First(), compareTo);
-            var ends = edge.Points();
-            var valley = 0;
-            if (plane.SignedDistanceTo(ends.First()) <= 0.0 &&
-                plane.SignedDistanceTo(ends.Last()) <= 0.0)
+            if (!IsConcave(mesh, edge.Start, compareTo) || !IsConcave(mesh, edge.End, compareTo))
             {
-                valley++;
+                return false;
             }
-            if (points.Count == valley)
+            return true;
+        }
+
+        /// <summary>
+        /// Tests the spatial relationship of the supplied mesh point with adjacent points and a supplied normal to determine whether the points represents a concavity with respect to the normal.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="point">The Vector3 point to test.</param>
+        /// <param name="compareTo">The Vector3 normal to compare.</param>
+        /// <returns>
+        /// True if all adjacent points are "higher" along the supplied normal in comparison to the supplied point.
+        /// </returns>
+        public static bool IsConcave(this Mesh mesh, Vector3 point, Vector3 compareTo)
+        {
+            if (point.Occurs(mesh.Points()) == 0) //point is not a Mesh vertex.
             {
-                return true;
+                return false;
             }
-            plane = new Plane(points.Last(), compareTo);
-            if (plane.SignedDistanceTo(ends.First()) <= 0.0 &&
-                plane.SignedDistanceTo(ends.Last()) <= 0.0)
+            var adjPoints = AdjacentPoints(mesh, point);
+            foreach (var pnt in adjPoints)
             {
-                valley++;
+                var plane = new Plane(pnt, compareTo);
+                if (plane.SignedDistanceTo(point) > 0.0)
+                {
+                    return false;
+                }
             }
-            if (points.Count == valley)
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
 
         /// <summary>

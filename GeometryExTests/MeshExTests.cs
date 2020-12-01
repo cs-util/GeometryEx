@@ -64,6 +64,43 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void AdjacentPoints()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var pnt1 = new Vector3(2.0, 2.0, 12.0);
+            var pnt2 = new Vector3(5.0, 4.0, 10.0);
+            var pnt3 = new Vector3(9.0, 13.0, 12.0);
+            var adjPoints = mesh.AdjacentPoints(pnt1);
+            Assert.Equal(3, adjPoints.Count);
+            adjPoints = mesh.AdjacentPoints(pnt2);
+            Assert.Equal(4, adjPoints.Count);
+            adjPoints = mesh.AdjacentPoints(pnt3);
+            Assert.Equal(3, adjPoints.Count);
+        }
+
+        [Fact]
         public void AverageAt()
         {
             var triangles = new List<Elements.Geometry.Triangle>
@@ -282,7 +319,7 @@ namespace GeometryExTests
         }
 
         [Fact]
-        public void IsConcavity()
+        public void IsConcaveLine()
         {
             var triangles = new List<Elements.Geometry.Triangle>
             {
@@ -331,12 +368,46 @@ namespace GeometryExTests
             var valleys = new List<Line>();
             foreach (var e in edges)
             {
-                if (mesh.IsConcavity(e, Vector3.ZAxis))
+                if (mesh.IsConcave(e, Vector3.ZAxis))
                 {
                     valleys.Add(e);
                 }
             }
-            Assert.Equal(9, valleys.Count);
+            Assert.Equal(2, valleys.Count);
+        }
+
+        [Fact]
+        public void IsConcavePoint()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)))
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var pnt1 = new Vector3(2.0, 2.0, 12.0);
+            var pnt2 = new Vector3(5.0, 4.0, 10.0);
+            var pnt3 = new Vector3(9.0, 13.0, 12.0);
+            Assert.False(mesh.IsConcave(pnt1, Vector3.ZAxis));
+            Assert.True(mesh.IsConcave(pnt2, Vector3.ZAxis));
+            Assert.False(mesh.IsConcave(pnt3, Vector3.ZAxis));
         }
 
         [Fact]
