@@ -124,39 +124,11 @@ namespace GeometryEx
 
         public static List<Line> Concavities(this Mesh mesh, Vector3 compareTo)
         {            
-            var iEdges = mesh.EdgesInterior();
+            var iEdges = mesh.Edges();
             var lowLines = new List<Line>();
             foreach (var edge in iEdges)
             {
-                var triPoints = mesh.ThirdPoints(edge);
-                var plane1 = new Plane(triPoints.First(), compareTo);
-                var plane2 = new Plane(triPoints.Last(), compareTo);
-                if (plane1.SignedDistanceTo(edge.Start) <= 0.0 &&
-                    plane1.SignedDistanceTo(edge.End) <= 0.0 &&
-                    plane2.SignedDistanceTo(edge.Start) <= 0.0 &&
-                    plane2.SignedDistanceTo(edge.End) <= 0.0)
-                {
-                    lowLines.Add(edge);
-                }
-            }
-            var pEdges = mesh.EdgesPerimeters();
-            var lowPerims = new List<Line>();
-            foreach (var lines in pEdges)
-            {
-                foreach (var edge in lines)
-                {
-                    var triPoint = mesh.ThirdPoints(edge).First();
-                    var plane = new Plane(triPoint, compareTo);
-                    if (plane.SignedDistanceTo(edge.Start) <= 0.0 &&
-                        plane.SignedDistanceTo(edge.End) <= 0.0)
-                    {
-                        lowPerims.Add(edge);
-                    }
-                }
-            }
-            foreach (var edge in lowPerims)
-            {
-                if (edge.SharesEndpointWith(lowLines).Count == 0)
+                if (mesh.IsConcave(edge, compareTo))
                 {
                     lowLines.Add(edge);
                 }

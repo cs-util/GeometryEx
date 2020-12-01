@@ -177,7 +177,7 @@ namespace GeometryExTests
             };
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
-            Assert.Equal(2, mesh.Concavities(Vector3.ZAxis).Count);
+            Assert.Equal(4, mesh.Concavities(Vector3.ZAxis).Count);
         }
 
         [Fact]
