@@ -186,16 +186,16 @@ namespace GeometryExTests
             (
                 new[]
                 {
-                    new Vector3(5, 5),
-                    new Vector3(60, 5),
-                    new Vector3(60, 36),
-                    new Vector3(5, 36)
+                    new Vector3(5.0, 5.0),
+                    new Vector3(60.0, 5.0),
+                    new Vector3(60.0, 36.0),
+                    new Vector3(5.0, 36.0)
                 }
             );
             var grid = new CoordinateGrid(perimeter);
             var min = grid.AvailableMin();
-            Assert.Equal(5, min.X);
-            Assert.Equal(5, min.Y);
+            Assert.Equal(6.0, min.X);
+            Assert.Equal(6.0, min.Y);
         }
 
         [Fact]
