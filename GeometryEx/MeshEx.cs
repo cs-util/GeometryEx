@@ -129,9 +129,10 @@ namespace GeometryEx
             {
                 foreach (var adjPoint in mesh.AdjacentPoints(point))
                 {
-                    if (!mesh.IsConvex(adjPoint, compareTo))
+                    var line = new Line(adjPoint, point);
+                    if (!mesh.IsConvex(adjPoint, compareTo) ||
+                         IsConcave(mesh, line, compareTo))
                     {
-                        var line = new Line(adjPoint, point);
                         if (line.Occurs(lowLines) == 0)
                         {
                             lowLines.Add(line);
