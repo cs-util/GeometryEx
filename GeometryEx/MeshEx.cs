@@ -316,7 +316,7 @@ namespace GeometryEx
             {
                 var plane = new Plane(point, compareTo);
                 if (plane.SignedDistanceTo(edge.Start) >= 0.0 ||
-                    plane.SignedDistanceTo(edge.Start) >= 0.0)
+                    plane.SignedDistanceTo(edge.End) >= 0.0)
                 {
                     return false;
                 }
