@@ -130,13 +130,9 @@ namespace GeometryEx
                 foreach (var adjPoint in mesh.AdjacentPoints(point))
                 {
                     var line = new Line(adjPoint, point);
-                    if (!mesh.IsConvex(adjPoint, compareTo) ||
-                         IsConcave(mesh, line, compareTo))
+                    if (line.Occurs(lowLines) == 0 && mesh.IsConcave(line, compareTo))
                     {
-                        if (line.Occurs(lowLines) == 0)
-                        {
-                            lowLines.Add(line);
-                        }
+                        lowLines.Add(line);
                     }
                 }
             }
@@ -311,12 +307,22 @@ namespace GeometryEx
             {
                 return false;
             }
-            var triPoints = mesh.ThirdPoints(edge);
-            foreach(var point in triPoints)
+            var sConc = mesh.IsConcave(edge.Start, compareTo);
+            var eConc = mesh.IsConcave(edge.End, compareTo);
+            if (!sConc && !eConc)
             {
-                var plane = new Plane(point, compareTo);
-                if (plane.SignedDistanceTo(edge.Start) >= 0.0 ||
-                    plane.SignedDistanceTo(edge.End) >= 0.0)
+                return false;
+            }
+            if (sConc && eConc)
+            {
+                return true;
+            }
+            var triangles = mesh.AdjacentTriangles(edge);
+            if (triangles.Count == 2)
+            {
+                var tFnormal = triangles.First().Normal;
+                var tLnormal = triangles.Last().Normal;
+                if (tFnormal.IsAlmostEqualTo(tLnormal) || tFnormal.IsAlmostEqualTo(tLnormal.Negate()))
                 {
                     return false;
                 }

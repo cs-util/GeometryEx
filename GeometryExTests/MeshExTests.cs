@@ -178,7 +178,7 @@ namespace GeometryExTests
             var mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
             var conEdges = mesh.ConcaveEdges(Vector3.ZAxis);
-            Assert.Equal(4, conEdges.Count);
+            Assert.Equal(8, conEdges.Count);
         }
 
         [Fact]
@@ -439,9 +439,6 @@ namespace GeometryExTests
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
                                                new Vertex(new Vector3(9.0, 2.0, 12.0)),
                                                new Vertex(new Vector3(5.0, 11.0, 10.0))),
-                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
-                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
-                                               new Vertex(new Vector3(2.0, 13.0, 12.0))),
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
                                                new Vertex(new Vector3(9.0, 2.0, 12.0)),
                                                new Vertex(new Vector3(5.0, 4.0, 10.0))),
@@ -454,6 +451,9 @@ namespace GeometryExTests
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
                                                new Vertex(new Vector3(2.0, 2.0, 12.0)),
                                                new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
 
 
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
@@ -464,7 +464,7 @@ namespace GeometryExTests
                                                new Vertex(new Vector3(12.0, 11.0, 10.0))),
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
                                                new Vertex(new Vector3(9.0, 13.0, 12.0)),
-                                               new Vertex(new Vector3(12.0, 11.0, 12.0))),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0))),
                 new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
                                                new Vertex(new Vector3(9.0, 2.0, 12.0)),
                                                new Vertex(new Vector3(12.0, 5.0, 10.0))),
@@ -486,7 +486,7 @@ namespace GeometryExTests
                     valleys.Add(e);
                 }
             }
-            Assert.Equal(4, valleys.Count);
+            Assert.Equal(10, valleys.Count);
         }
 
         [Fact]

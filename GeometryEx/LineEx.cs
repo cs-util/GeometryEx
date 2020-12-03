@@ -635,7 +635,7 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Returns a list of Lines shares an endpoint with the supplied Line.
+        /// Returns a list of Lines sharing an endpoint with the supplied Line.
         /// </summary>
         /// <param name="thatLine">Line to compare to this Line.</param>
         /// <returns>
