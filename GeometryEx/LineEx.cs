@@ -275,10 +275,10 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Return true if an Equal Line appears in the supplied list.
+        /// Return true if an Equal Line appears at least once in the supplied list.
         /// </summary>
         /// <returns>
-        /// True if the Line endpoints are NearEqual to those of a Line in the supplied List.
+        /// True if both Line endpoints are NearEqual to those of a Line in the supplied List.
         /// </returns>
         public static bool IsListed(this Line line, List<Line> lines)
         {

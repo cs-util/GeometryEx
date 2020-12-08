@@ -56,6 +56,24 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Return true if an AlmostEqual Vector3 point appears at least once in the supplied list.
+        /// </summary>
+        /// <returns>
+        /// True if this Vector3 point IsAlmostEqual to a Vector3 point in the supplied List.
+        /// </returns>
+        public static bool IsListed(this Vector3 point, List<Vector3> points)
+        {
+            foreach (var entry in points)
+            {
+                if (entry.IsAlmostEqualTo(point))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns the Vector3 point moved to a new relative location.
         /// </summary>
         /// <param name="from">Vector3 base point of the move.</param>
@@ -120,6 +138,15 @@ namespace GeometryEx
             var rX = (Math.Cos(theta) * (point.X - pivot.X)) - (Math.Sin(theta) * (point.Y - pivot.Y)) + pivot.X;
             var rY = (Math.Sin(theta) * (point.X - pivot.X)) + (Math.Cos(theta) * (point.Y - pivot.Y)) + pivot.Y;
             return new Vector3(rX, rY);
+        }
+
+        /// <summary>
+        /// Inserts this Vector3 into a new List.
+        /// </summary>
+        /// <returns>A List containing this Vector3.</returns>
+        public static List<Vector3> ToList(this Vector3 vector)
+        {
+            return new List<Vector3> { vector };
         }
     }
 }

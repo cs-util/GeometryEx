@@ -117,20 +117,20 @@ namespace GeometryEx
         /// Finds "low" lines in the mesh by comparing vertices with their adjacent vertices and returning edges between a low point and a non-convex point.
         /// </summary>
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
-        /// <param name="compareTo">A Vector3 normal.</param>
+        /// <param name="normal">A Vector3 normal.</param>
         /// <returns>
         /// A List of Lines.
         /// </returns>
-        public static List<Line> ConcaveEdges(this Mesh mesh, Vector3 compareTo)
+        public static List<Line> ConcaveEdges(this Mesh mesh, Vector3 normal)
         {
-            var lowPoints = ConcavePoints(mesh, compareTo);
+            var lowPoints = ConcavePoints(mesh, normal);
             var lowLines = new List<Line>();
             foreach (var point in lowPoints)
             {
                 foreach (var adjPoint in mesh.AdjacentPoints(point))
                 {
                     var line = new Line(adjPoint, point);
-                    if (line.Occurs(lowLines) == 0 && mesh.IsConcave(line, compareTo))
+                    if (line.Occurs(lowLines) == 0 && mesh.IsConcave(line, normal))
                     {
                         lowLines.Add(line);
                     }
@@ -143,19 +143,19 @@ namespace GeometryEx
         /// Finds "high" lines in the mesh by comparing vertices with their adjacent vertices and returning edges between a high point and a convex point.
         /// </summary>
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
-        /// <param name="compareTo">A Vector3 normal.</param>
+        /// <param name="normal">A Vector3 normal.</param>
         /// <returns>
         /// A List of Lines.
         /// </returns>
-        public static List<Line> ConvexEdges(this Mesh mesh, Vector3 compareTo)
+        public static List<Line> ConvexEdges(this Mesh mesh, Vector3 normal)
         {
-            var hiPoints = ConvexPoints(mesh, compareTo);
+            var hiPoints = ConvexPoints(mesh, normal);
             var hiLines = new List<Line>();
             foreach (var point in hiPoints)
             {
                 foreach (var adjPoint in mesh.AdjacentPoints(point))
                 {
-                    if (mesh.IsConvex(adjPoint, compareTo))
+                    if (mesh.IsConvex(adjPoint, normal))
                     {
                         var line = new Line(adjPoint, point);
                         if (line.Occurs(hiLines) == 0)
@@ -171,25 +171,25 @@ namespace GeometryEx
         /// <summary>
         /// Applies a concavity test to all mesh vertices in comparison to the supplied normal.
         /// </summary>
-        /// <param name="compareTo">A Vector3 normal.</param>
+        /// <param name="normal">A Vector3 normal.</param>
         /// <returns>
         /// A List of Vector3 points.
         /// </returns>
-        public static List<Vector3> ConcavePoints(this Mesh mesh, Vector3 compareTo)
+        public static List<Vector3> ConcavePoints(this Mesh mesh, Vector3 normal)
         {
-            return mesh.Points().Where(p => mesh.IsConcave(p, compareTo)).ToList();
+            return mesh.Points().Where(p => mesh.IsConcave(p, normal)).ToList();
         }
 
         /// <summary>
         /// Applies a convexity test to all mesh vertices in comparison to the supplied normal.
         /// </summary>
-        /// <param name="compareTo">A Vector3 normal.</param>
+        /// <param name="normal">A Vector3 normal.</param>
         /// <returns>
         ///  A List of Vector3 points.
         /// </returns>
-        public static List<Vector3> ConvexPoints(this Mesh mesh, Vector3 compareTo)
+        public static List<Vector3> ConvexPoints(this Mesh mesh, Vector3 normal)
         {
-            return mesh.Points().Where(p => mesh.IsConvex(p, compareTo)).ToList();
+            return mesh.Points().Where(p => mesh.IsConvex(p, normal)).ToList();
         }
 
 
@@ -296,19 +296,46 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Tests the spatial relationship of the supplied mesh point with adjacent points and a supplied normal to recursively discover the "highest" connected point with reference to the supplied normal.
+        /// </summary>
+        /// <param name="point">The Vector3 point to test.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
+        /// <returns>
+        /// A List of Vector3 "high" points relative to the supplied normal.
+        /// </returns>
+        public static List<Vector3> HighestFrom(this Mesh mesh, Vector3 point, Vector3 normal)
+        {
+            if (!point.IsListed(mesh.Points())) //point is not a Mesh vertex.
+            {
+                return null;
+            }
+            var plane = new Plane(point, normal);
+            var adjPoints = AdjacentPoints(mesh, point)
+                                           .Where(p => plane.SignedDistanceTo(p) > 0.0)
+                                           .OrderByDescending(p => plane.SignedDistanceTo(p)).ToList();
+            if (adjPoints.Count == 0)
+            {
+                return point.ToList();
+            }
+            var hiPoints = new List<Vector3>();
+            adjPoints.ForEach(pnt => hiPoints.AddRange(HighestFrom(mesh, pnt, normal)));
+            return hiPoints.Distinct().ToList();
+        }
+
+        /// <summary>
         /// Calculates whether a supplied edge of the Mesh is a valley relative to its adjacent triangles and a supplied comparison vector.
         /// </summary>
         /// <param name="edge">A Line representing an edge of this Mesh.</param>
-        /// <param name="compareTo">A vector to compare adjacent triangle normals.</param>
+        /// <param name="normal">A vector to compare adjacent triangle normals.</param>
         /// <returns></returns>
-        public static bool IsConcave(this Mesh mesh, Line edge, Vector3 compareTo)
+        public static bool IsConcave(this Mesh mesh, Line edge, Vector3 normal)
         {
             if (edge.Occurs(mesh.Edges()) == 0) //Line is not a Mesh edge.
             {
                 return false;
             }
-            var sConc = mesh.IsConcave(edge.Start, compareTo);
-            var eConc = mesh.IsConcave(edge.End, compareTo);
+            var sConc = mesh.IsConcave(edge.Start, normal);
+            var eConc = mesh.IsConcave(edge.End, normal);
             if (!sConc && !eConc)
             {
                 return false;
@@ -335,11 +362,11 @@ namespace GeometryEx
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="point">The Vector3 point to test.</param>
-        /// <param name="compareTo">The Vector3 normal to compare.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
         /// <returns>
         /// True if all adjacent points are "higher" along the supplied normal in comparison to the supplied point.
         /// </returns>
-        public static bool IsConcave(this Mesh mesh, Vector3 point, Vector3 compareTo)
+        public static bool IsConcave(this Mesh mesh, Vector3 point, Vector3 normal)
         {
             if (point.Occurs(mesh.Points()) == 0) //point is not a Mesh vertex.
             {
@@ -348,7 +375,7 @@ namespace GeometryEx
             var adjPoints = AdjacentPoints(mesh, point);
             foreach (var pnt in adjPoints)
             {
-                var plane = new Plane(pnt, compareTo);
+                var plane = new Plane(pnt, normal);
                 if (plane.SignedDistanceTo(point) > 0.0)
                 {
                     return false;
@@ -362,11 +389,11 @@ namespace GeometryEx
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="point">The Vector3 point to test.</param>
-        /// <param name="compareTo">The Vector3 normal to compare.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
         /// <returns>
         /// True if all adjacent points are "higher" along the supplied normal in comparison to the supplied point.
         /// </returns>
-        public static bool IsConvex(this Mesh mesh, Vector3 point, Vector3 compareTo)
+        public static bool IsConvex(this Mesh mesh, Vector3 point, Vector3 normal)
         {
             if (point.Occurs(mesh.Points()) == 0) //point is not a Mesh vertex.
             {
@@ -375,7 +402,7 @@ namespace GeometryEx
             var adjPoints = AdjacentPoints(mesh, point);
             foreach (var pnt in adjPoints)
             {
-                var plane = new Plane(pnt, compareTo);
+                var plane = new Plane(pnt, normal);
                 if (plane.SignedDistanceTo(point) < 0.0)
                 {
                     return false;
@@ -389,11 +416,11 @@ namespace GeometryEx
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="edge">The Line edge to test.</param>
-        /// <param name="compareTo">The Vector3 normal to compare.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
         /// <returns>
         /// True if all adjacent points are "lower" along the supplied normal in comparison to the supplied Line's endpoints.
         /// </returns>
-        public static bool IsConvex(this Mesh mesh, Line edge, Vector3 compareTo)
+        public static bool IsConvex(this Mesh mesh, Line edge, Vector3 normal)
         {
             if (edge.Occurs(mesh.Edges()) == 0) //Line is not a Mesh edge.
             {
@@ -402,7 +429,7 @@ namespace GeometryEx
             var adjPoints = AdjacentPoints(mesh, edge.Start);
             foreach (var pnt in adjPoints)
             {
-                var plane = new Plane(pnt, compareTo);
+                var plane = new Plane(pnt, normal);
                 if (plane.SignedDistanceTo(edge.Start) < 0.0)
                 {
                     return false;
@@ -411,7 +438,7 @@ namespace GeometryEx
             adjPoints = AdjacentPoints(mesh, edge.End);
             foreach (var pnt in adjPoints)
             {
-                var plane = new Plane(pnt, compareTo);
+                var plane = new Plane(pnt, normal);
                 if (plane.SignedDistanceTo(edge.End) < 0.0)
                 {
                     return false;
@@ -425,11 +452,11 @@ namespace GeometryEx
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="point">The Vector3 point to test.</param>
-        /// <param name="compareTo">The Vector3 normal to compare.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
         /// <returns>
         /// True if all adjacent points are "higher" along the supplied normal in comparison to the supplied point.
         /// </returns>
-        public static bool IsFlat(this Mesh mesh, Vector3 point, Vector3 compareTo)
+        public static bool IsFlat(this Mesh mesh, Vector3 point, Vector3 normal)
         {
             if (point.Occurs(mesh.Points()) == 0) //point is not a Mesh vertex.
             {
@@ -438,7 +465,7 @@ namespace GeometryEx
             var adjPoints = AdjacentPoints(mesh, point);
             foreach (var pnt in adjPoints)
             {
-                var plane = new Plane(pnt, compareTo);
+                var plane = new Plane(pnt, normal);
                 if (plane.SignedDistanceTo(point) != 0.0)
                 {
                     return false;
@@ -469,6 +496,33 @@ namespace GeometryEx
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Tests the spatial relationship of the supplied mesh point with adjacent points and a supplied normal to recursively discover the "lowest" connected point with reference to the supplied normal.
+        /// </summary>
+        /// <param name="point">The Vector3 point to test.</param>
+        /// <param name="normal">The Vector3 normal to compare.</param>
+        /// <returns>
+        /// A List of Vector3 "low" points relative to the supplied normal.
+        /// </returns>
+        public static List<Vector3> LowestFrom(this Mesh mesh, Vector3 point, Vector3 normal)
+        {
+            if (!point.IsListed(mesh.Points())) //point is not a Mesh vertex.
+            {
+                return null;
+            }
+            var plane = new Plane(point, normal);
+            var adjPoints = AdjacentPoints(mesh, point)
+                                           .Where(p => plane.SignedDistanceTo(p) < 0.0)
+                                           .OrderBy(p => plane.SignedDistanceTo(p)).ToList();
+            if (adjPoints.Count == 0)
+            {
+                return point.ToList();
+            }
+            var lowPoints = new List<Vector3>();
+            adjPoints.ForEach(pnt => lowPoints.AddRange(LowestFrom(mesh, pnt, normal)));
+            return lowPoints.Distinct().ToList();
         }
 
         /// <summary>

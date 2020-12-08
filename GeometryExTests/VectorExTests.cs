@@ -23,15 +23,32 @@ namespace GeometryExTests
         public void FarthestFrom()
         {
             var point = Vector3.Origin;
-            var points = new List<Vector3>();
-            points.Add(new Vector3(5.0, 5.0));
-            points.Add(new Vector3(6.0, 6.0));
-            points.Add(new Vector3(7.0, 7.0));
-            points.Add(new Vector3(8.0, 8.0));
+            var points = new List<Vector3>
+            {
+                new Vector3(5.0, 5.0, 0.0),
+                new Vector3(6.0, 6.0, 0.0),
+                new Vector3(7.0, 7.0, 0.0),
+                new Vector3(8.0, 8.0, 0.0)
+            };
 
             var farPoint = point.FarthestFrom(points);
             Assert.Equal(8.0, farPoint.X);
             Assert.Equal(8.0, farPoint.Y);
+        }
+
+        [Fact]
+        public void IsListed()
+        {
+            var points = new List<Vector3>
+            {
+                new Vector3(5.0, 5.0, 0.0),
+                new Vector3(6.0, 6.0, 0.0),
+                new Vector3(7.0, 7.0, 0.0),
+                new Vector3(8.0, 8.0, 0.0)
+            };
+
+            Assert.True(new Vector3(8.0, 8.0, 0.0).IsListed(points));
+            Assert.False(new Vector3(4.0, 4.0, 0.0).IsListed(points));
         }
 
         [Fact]

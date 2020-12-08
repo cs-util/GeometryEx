@@ -432,6 +432,74 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void HighestFrom()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(0.0, 15.0, 14.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 15.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var lowPnt1 = new Vector3(5.0, 4.0, 10.0);
+            var lowPnt2 = new Vector3(12.0, 11.0, 10.0);
+            var hiFrom1 = mesh.HighestFrom(lowPnt1, Vector3.ZAxis);
+            var hiFrom2 = mesh.HighestFrom(lowPnt2, Vector3.ZAxis);
+            Assert.Equal(2, hiFrom1.Count);
+            Assert.Equal(3, hiFrom2.Count);
+        }
+
+        [Fact]
         public void IsConcaveLine()
         {
             var triangles = new List<Elements.Geometry.Triangle>
@@ -643,6 +711,74 @@ namespace GeometryExTests
             mesh = new Mesh();
             triangles.ForEach(t => mesh.AddTriangle(t));
             Assert.True(mesh.IsFlat());
+        }
+
+        [Fact]
+        public void LowestFrom()
+        {
+            var triangles = new List<Elements.Geometry.Triangle>
+            {
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 4.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(5.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(5.0, 4.0, 10.0))),
+
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(9.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(15.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(12.0, 11.0, 10.0)),
+                                               new Vertex(new Vector3(12.0, 5.0, 10.0))),
+
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(9.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 2.0, 12.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 0.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(0.0, 15.0, 14.0))),
+                new Elements.Geometry.Triangle(new Vertex(new Vector3(0.0, 15.0, 14.0)),
+                                               new Vertex(new Vector3(2.0, 13.0, 12.0)),
+                                               new Vertex(new Vector3(9.0, 13.0, 12.0))),
+
+
+            };
+            var mesh = new Mesh();
+            triangles.ForEach(t => mesh.AddTriangle(t));
+            var hiPnt1 = new Vector3(0.0, 15.0, 14.0);
+            var hiPnt2 = new Vector3(15.0, 13.0, 12.0);
+            var loFrom1 = mesh.LowestFrom(hiPnt1, Vector3.ZAxis);
+            var loFrom2 = mesh.LowestFrom(hiPnt2, Vector3.ZAxis);
+            Assert.Equal(4, loFrom1.Count);
+            Assert.Single(loFrom2);
         }
 
         [Fact]
