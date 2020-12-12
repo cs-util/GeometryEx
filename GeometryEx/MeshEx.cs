@@ -497,7 +497,7 @@ namespace GeometryEx
             }
             return true;
         }
-
+        
         /// <summary>
         /// Tests the spatial relationship of the supplied mesh point with adjacent points and a supplied normal to recursively discover the "lowest" connected point with reference to the supplied normal.
         /// </summary>

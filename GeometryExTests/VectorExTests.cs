@@ -37,6 +37,40 @@ namespace GeometryExTests
         }
 
         [Fact]
+        public void IsHigherThan()
+        {
+            var pnt1 = new Vector3(5.0, 5.0, 1.0);
+            var pnt2 = new Vector3(6.0, 6.0, 2.0);
+            var pnt3 = new Vector3(7.0, 7.0, 3.0);
+            var pnt4 = new Vector3(8.0, 8.0, 4.0);
+
+            Assert.True(pnt4.IsHigherThan(pnt1, Vector3.XAxis));
+            Assert.True(pnt4.IsHigherThan(pnt1, Vector3.YAxis));
+            Assert.True(pnt4.IsHigherThan(pnt1, Vector3.ZAxis));
+
+            Assert.False(pnt1.IsHigherThan(pnt2, Vector3.XAxis));
+            Assert.False(pnt3.IsHigherThan(pnt4, Vector3.YAxis));
+            Assert.False(pnt2.IsHigherThan(pnt3, Vector3.ZAxis));
+        }
+
+        [Fact]
+        public void IsLevelWith()
+        {
+            var pnt1 = new Vector3(5.0, 5.0, 1.0);
+            var pnt2 = new Vector3(6.0, 5.0, 2.0);
+            var pnt3 = new Vector3(7.0, 7.0, 1.0);
+            var pnt4 = new Vector3(8.0, 7.0, 2.0);
+
+            Assert.True(pnt1.IsLevelWith(pnt1, Vector3.XAxis));
+            Assert.True(pnt1.IsLevelWith(pnt2, Vector3.YAxis));
+            Assert.True(pnt1.IsLevelWith(pnt3, Vector3.ZAxis));
+
+            Assert.False(pnt1.IsLevelWith(pnt2, Vector3.XAxis));
+            Assert.False(pnt2.IsLevelWith(pnt4, Vector3.YAxis));
+            Assert.False(pnt3.IsLevelWith(pnt4, Vector3.ZAxis));
+        }
+
+        [Fact]
         public void IsListed()
         {
             var points = new List<Vector3>

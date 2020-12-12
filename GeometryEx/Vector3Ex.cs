@@ -56,6 +56,38 @@ namespace GeometryEx
         }
 
         /// <summary>
+        /// Tests if this Vector3 point is "higher" than the supplied point relative to the supplied normal.
+        /// </summary>
+        /// <returns>
+        /// Returns true if this Vector3 point is "higher" than the supplied point relative to the supplied normal.
+        /// </returns>
+        public static bool IsHigherThan(this Vector3 thisPoint, Vector3 thatPoint, Vector3 normal)
+        {
+            var plane = new Plane(thisPoint, normal);
+            if(new Plane(thisPoint, normal).SignedDistanceTo(thatPoint) >= 0.0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this Vector3 point is "level" with the supplied point relative to the supplied normal.
+        /// </summary>
+        /// <returns>
+        /// Returns true if this Vector3 point is "level" with the supplied point relative to the supplied normal.
+        /// </returns>
+        public static bool IsLevelWith(this Vector3 thisPoint, Vector3 thatPoint, Vector3 normal)
+        {
+            if (new Plane(thisPoint, normal).SignedDistanceTo(thatPoint) != 0.0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        /// <summary>
         /// Return true if an AlmostEqual Vector3 point appears at least once in the supplied list.
         /// </summary>
         /// <returns>
