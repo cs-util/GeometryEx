@@ -521,7 +521,7 @@ namespace GeometryEx
         {
             for (var t = 0; t < Triangles.Length / 3; t++)
             {
-                yield return new Triangle(t, GetTrianglePoints(t));
+                yield return new _delTriangle(t, GetTrianglePoints(t));
             }
         }
         public IEnumerable<IEdge> GetEdges()

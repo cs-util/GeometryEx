@@ -50,11 +50,12 @@ namespace GeometryEx
         }
 
         /// <summary>
-        /// Creates a collection of Vector3 points representing the division of the linear geometry into the supplied number of segments.
+        /// Returns a List of Vector3 points representing the division of 
+        /// the linear geometry into the supplied number of segments.
         /// </summary>
         /// <param name="segments">The quantity of desired segments.</param>
         /// <returns>
-        /// List of Vector3 including the start and end points of the series.
+        /// A List of Vector3 including the start and end points of the series.
         /// </returns>
         public static List<Vector3> Divide(this Line line, int segments)
         {
@@ -78,10 +79,7 @@ namespace GeometryEx
         public static Line ExtendStart(this Line line, double length)
         {
             length += line.Length();
-            double extend = Math.Atan2(line.Start.Y - line.End.Y, line.Start.X - line.End.X);
-            var startX = line.End.X + length * Math.Cos(extend);
-            var startY = line.End.Y + length * Math.Sin(extend);
-            return new Line(line.End, new Vector3(startX, startY));
+            return new Line(line.Start, line.Direction().Negate(), length);
         }
 
         /// <summary>
@@ -94,10 +92,7 @@ namespace GeometryEx
         public static Line ExtendEnd(this Line line, double length)
         {
             length += line.Length();
-            double extend = Math.Atan2(line.End.Y - line.Start.Y, line.End.X - line.Start.X);
-            var endX = line.Start.X + length * Math.Cos(extend);
-            var endY = line.Start.Y + length * Math.Sin(extend);
-            return new Line(line.Start, new Vector3(endX, endY));
+            return new Line(line.Start, line.Direction(), length);
         }
 
         /// <summary>
@@ -171,54 +166,17 @@ namespace GeometryEx
         /// <returns>
         /// True is this Line's Start and End points fall on the supplied Line.
         /// </returns>
-        public static bool IsColinearWith(this Line line, Line thatLine, bool compareZ = true)
+        public static bool IsColinearWith(this Line line, Line thatLine, bool contiguous = false)
         {
-            var start = line.Start;
-            var end = line.End;
-            if(!compareZ)
-            {
-                start = new Vector3(start.X, start.Y, 0.0);
-                end = new Vector3(end.X, end.Y, 0.0);
-                thatLine = new Line(new Vector3(thatLine.Start.X, thatLine.Start.Y),
-                                   (new Vector3(thatLine.End.X, thatLine.End.Y)));
-            }
-            if (thatLine.PointOnLine(start, true) && 
-                thatLine.PointOnLine(end, true))
+            if (contiguous && (thatLine.PointOnLine(line.Start, true) || thatLine.PointOnLine(line.End, true)))
             {
                 return true;
             }
-            return false;
-        }
-
-        /// <summary>
-        /// Returns whether this Line shares a point and a slope with the supplied Line.
-        /// </summary>
-        /// <param name="thatLine">Line to compare to this Line.</param>
-        /// <returns>
-        /// True if the Lines share a point and have the same slope.
-        /// </returns>
-        public static bool IsContiguousWith(this Line line, Line thatLine)
-        {
-            var lineSlope = line.Slope();
-            var thatSlope = thatLine.Slope();
-            if (lineSlope.NearEqual(double.NegativeInfinity))
-            {
-                lineSlope = double.PositiveInfinity;
-            }
-            if (thatSlope.NearEqual(double.NegativeInfinity))
-            {
-                thatSlope = double.PositiveInfinity;
-            }
-            if (!lineSlope.NearEqual(thatSlope))
+            if (!thatLine.PointOnLine(line.Start, true) || !thatLine.PointOnLine(line.End, true))
             {
                 return false;
             }
-            if (line.End.IsAlmostEqualTo(thatLine.End) || line.Start.IsAlmostEqualTo(thatLine.Start) ||
-                line.Start.IsAlmostEqualTo(thatLine.End) || line.End.IsAlmostEqualTo(thatLine.Start))
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -263,15 +221,15 @@ namespace GeometryEx
         /// Returns whether a Line is parallel to the x-axis.
         /// </summary>
         /// <returns>
-        /// True if the Line's slope is zero.
+        /// True if the Line's Direction equals Vector3.XAxis or its negation.
         /// </returns>
         public static bool IsHorizontal(this Line line)
         {
-            if (line.Slope().NearEqual(0.0))
+            if (line.Direction() != Vector3.XAxis && line.Direction() != Vector3.XAxis.Negate())
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -297,25 +255,16 @@ namespace GeometryEx
         /// </summary>
         /// <param name="thatLine">Line to compare to this Line.</param>
         /// <returns>
-        /// True if the Lines have equal slopes.
+        /// True if the Lines have equal or negated Direction.
         /// </returns>
         public static bool IsParallelTo(this Line line, Line thatLine)
         {
-            var lineSlope = line.Slope();
-            var thatSlope = thatLine.Slope();
-            if (lineSlope.NearEqual(double.NegativeInfinity))
+            if (line.Direction() != thatLine.Direction() &&
+                line.Direction() != thatLine.Direction().Negate())
             {
-                lineSlope = double.PositiveInfinity;
+                return false;
             }
-            if (thatSlope.NearEqual(double.NegativeInfinity))
-            {
-                thatSlope = double.PositiveInfinity;
-            }
-            if (lineSlope.NearEqual(thatSlope))
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -327,34 +276,26 @@ namespace GeometryEx
         /// </returns>
         public static bool IsPerpendicularTo(this Line line, Line thatLine)
         {
-            var lineSlope = line.Slope();
-            var thatSlope = thatLine.Slope();
-            if (((lineSlope.NearEqual(double.PositiveInfinity) || lineSlope.NearEqual(double.NegativeInfinity)) && thatSlope.NearEqual(0.0)) ||
-                ((thatSlope.NearEqual(double.PositiveInfinity) || thatSlope.NearEqual(double.NegativeInfinity)) && lineSlope.NearEqual(0.0)))
+            if (line.Direction().Dot(thatLine.Direction()) != 0.0)
             {
-                return true;
+                return false;
             }
-            if ((lineSlope * thatSlope).NearEqual(-1))
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
 
         /// <summary>
-        /// Returns whether this Line is parallel to the y-axis.
+        /// Returns whether a Line is parallel to the y-axis.
         /// </summary>
         /// <returns>
-        /// True if the line's slope resolves to an infinite value.
+        /// True if the Line's Direction equals Vector3.YAxis or its negation.
         /// </returns>
-        public static bool IsVertical (this Line line)
+        public static bool IsVertical(this Line line)
         {
-            var slope = line.Slope();
-            if (slope.NearEqual(double.PositiveInfinity) || slope.NearEqual(double.NegativeInfinity))
+            if (line.Direction() != Vector3.YAxis && line.Direction() != Vector3.YAxis.Negate())
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -365,11 +306,7 @@ namespace GeometryEx
         /// </returns>
         public static Line JoinTo (this Line line, Line join)
         {
-            if (!line.Slope().NearEqual(join.Slope()) ||
-               (!line.Start.IsAlmostEqualTo(join.Start) &&
-                !line.Start.IsAlmostEqualTo(join.End) &&
-                !line.End.IsAlmostEqualTo(join.Start) &&
-                !line.End.IsAlmostEqualTo(join.End)))
+            if(!line.IsColinearWith(join, true))
             {
                 return null;
             }

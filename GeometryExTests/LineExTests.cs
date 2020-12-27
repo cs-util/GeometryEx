@@ -119,29 +119,13 @@ namespace GeometryExTests
             Assert.True(thatLine.IsColinearWith(thisLine));
             Assert.True(thisLine.IsColinearWith(thisLine));
 
-            thisLine = new Line(new Vector3(1.0, 1.0, 5.0), new Vector3(6.0, 6.0, 7.0));
-            thatLine = new Line(new Vector3(3.0, 3.0, 3.0), new Vector3(5.0, 5.0, 8.0));
-            Assert.True(thatLine.IsColinearWith(thisLine, false));
+            thisLine = new Line(new Vector3(1.0, 1.0, 1.0), new Vector3(5.0, 5.0, 5.0));
+            thatLine = new Line(new Vector3(3.0, 3.0, 3.0), new Vector3(8.0, 8.0, 8.0));
+            Assert.True(thatLine.IsColinearWith(thisLine, true));
 
             thisLine = new Line(new Vector3(1.0, 1.0), new Vector3(7.0, 6.0));
             thatLine = new Line(new Vector3(3.0, 3.0), new Vector3(5.0, 5.0));
             Assert.False(thisLine.IsColinearWith(thatLine));
-        }
-
-        [Fact]
-        public void IsContiguousWith()
-        {
-            var line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
-            var intr = new Line(new Vector3(6.0, 6.0), new Vector3(12.0, 12.0));
-            Assert.True(line.IsContiguousWith(intr));
-
-            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
-            intr = new Line(new Vector3(7.0, 7.0), new Vector3(12.0, 12.0));
-            Assert.False(line.IsContiguousWith(intr));
-
-            line = new Line(new Vector3(1.0, 1.0), new Vector3(6.0, 6.0));
-            intr = new Line(new Vector3(6.0, 6.0), new Vector3(13.0, 12.0));
-            Assert.False(line.IsContiguousWith(intr));
         }
 
         [Fact]

@@ -2,13 +2,13 @@
 
 namespace GeometryEx
 {
-    public struct Triangle : ITriangle
+    public struct _delTriangle : ITriangle
     {
         public int Index { get; set; }
 
         public IEnumerable<IPoint> Points { get; set; }
 
-        public Triangle(int t, IEnumerable<IPoint> points)
+        public _delTriangle(int t, IEnumerable<IPoint> points)
         {
             Points = points;
             Index = t;
